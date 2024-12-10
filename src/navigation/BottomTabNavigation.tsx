@@ -1,11 +1,10 @@
 import React from 'react';
 import {
   Image,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
-  ViewStyle,
 } from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Messages from '../screens/Messages/Messages';
@@ -45,7 +44,9 @@ const BottomTabNavigation = () => {
         component={Messages}
         options={{
           tabBarButton: props => (
-            <TouchableOpacity style={styles.iconContainer} onPress={props.onPress}>
+            <TouchableOpacity
+              style={styles.iconContainer}
+              onPress={props.onPress}>
               <Image
                 source={require('../assets/icons/message-icon.png')}
                 style={styles.icon}
@@ -61,8 +62,14 @@ const BottomTabNavigation = () => {
         component={Calls}
         options={{
           tabBarButton: props => (
-            <TouchableOpacity style={styles.iconContainer} onPress={props.onPress}>
-              <Image source={require('../assets/icons/call-icon.png')} resizeMode="contain" style={styles.icon}/>
+            <TouchableOpacity
+              style={styles.iconContainer}
+              onPress={props.onPress}>
+              <Image
+                source={require('../assets/icons/call-icon.png')}
+                resizeMode="contain"
+                style={styles.icon}
+              />
               <Text style={styles.label}>Calls</Text>
             </TouchableOpacity>
           ),
@@ -74,8 +81,14 @@ const BottomTabNavigation = () => {
         component={Contacts}
         options={{
           tabBarButton: props => (
-            <TouchableOpacity style={styles.iconContainer} onPress={props.onPress}>
-              <Image source={require('../assets/icons/contacts-icon.png')} resizeMode="contain" style={styles.icon}/>
+            <TouchableOpacity
+              style={styles.iconContainer}
+              onPress={props.onPress}>
+              <Image
+                source={require('../assets/icons/contacts-icon.png')}
+                resizeMode="contain"
+                style={styles.icon}
+              />
               <Text style={styles.label}>Contacts</Text>
             </TouchableOpacity>
           ),
@@ -86,8 +99,14 @@ const BottomTabNavigation = () => {
         component={Profile}
         options={{
           tabBarButton: props => (
-            <TouchableOpacity style={styles.iconContainer} onPress={props.onPress}>
-              <Image source={require('../assets/icons/profile-icon.png')} resizeMode="contain" style={styles.icon}/>
+            <TouchableOpacity
+              style={styles.iconContainer}
+              onPress={props.onPress}>
+              <Image
+                source={require('../assets/icons/profile-icon.png')}
+                resizeMode="contain"
+                style={styles.icon}
+              />
               <Text style={styles.label}>Profile</Text>
             </TouchableOpacity>
           ),
@@ -103,17 +122,26 @@ const styles = StyleSheet.create({
   container: {
     height: 56,
     position: 'absolute',
-    bottom: 20,
+    bottom: Platform.OS === 'ios' ? 20 : 40,
     marginLeft: '5%',
     marginRight: '5%',
     borderRadius: 14,
     backgroundColor: '#F9FAFC',
     display: 'flex',
     flexDirection: 'row',
+    borderWidth: 1,
+    borderColor: '#F9FAFC',
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
   },
 
   iconContainer: {
     flex: 1,
+    transform: Platform.OS === 'android' ? [{translateY: 10}] : undefined,
     alignItems: 'center',
     justifyContent: 'center',
   },

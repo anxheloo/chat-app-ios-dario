@@ -4,12 +4,10 @@ import {
   View,
   Image,
   TouchableOpacity,
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
-  TextInput,
 } from 'react-native'; // Ensure `Text` is imported
 import ReusableText from '../../components/ReusableText';
 import ReusableInput from '../../components/ReusableInput';
@@ -17,11 +15,12 @@ import {BORDERRADIUS, COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import {useAppStore} from '../../store';
 import BottomSheet from '@gorhom/bottom-sheet';
 import SelectAvatar from './SelectAvatar';
+import AvatarIcon from '../../assets/icons/svg/Avatar0';
 
 const CreatePersona: React.FC = () => {
   const setUserPersona = useAppStore(state => state.setUserPersona);
   const username = useAppStore(state => state.username);
-
+  const [isFocus, setIsFocus] = useState<boolean>(false);
   const bottomSheetRef = useRef<BottomSheet | null>(null);
 
   const onPress = (): void => {
@@ -57,21 +56,23 @@ const CreatePersona: React.FC = () => {
           <View style={styles.contentContainer}>
             <View style={styles.iconAndInputContainer}>
               <View style={styles.iconContainer}>
-                <Image
-                  source={require('../../assets/icons/avatar-icons/avatar-0.png')}
-                />
+                <AvatarIcon width={60} height={60} />
               </View>
 
-              <View style={styles.inputContainer}>
-                <ReusableText fontSize={FONTSIZE.md}>@</ReusableText>
-                <ReusableInput
-                  placeholder="username"
-                  value={username}
-                  onChange={onChange}
-                />
-
-                <Image source={require('../../assets/icons/info-icon.png')} />
-              </View>
+              <TouchableWithoutFeedback
+                onFocus={() => setIsFocus(true)}
+                onBlur={() => setIsFocus(false)}>
+                <View
+                  style={[styles.inputContainer, isFocus && styles.focused]}>
+                  <ReusableText fontSize={FONTSIZE.md}>@</ReusableText>
+                  <ReusableInput
+                    placeholder="username"
+                    value={username}
+                    onChange={onChange}
+                  />
+                  <Image source={require('../../assets/icons/info-icon.png')} />
+                </View>
+              </TouchableWithoutFeedback>
             </View>
 
             <TouchableOpacity style={styles.button} onPress={onPress}>
@@ -91,12 +92,14 @@ const CreatePersona: React.FC = () => {
 const styles = StyleSheet.create({
   safeAreaView: {
     flex: 1,
+    padding: 20,
+    backgroundColor: 'white',
   },
 
   container: {
     flex: 1,
     backgroundColor: 'white',
-    padding: 10,
+    padding: 20,
   },
 
   textContainer: {
@@ -136,6 +139,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
 
+  focused: {
+    borderColor: COLORS.Black,
+    borderWidth: 1,
+  },
+
   button: {
     width: '100%',
     backgroundColor: COLORS.Black,
@@ -143,7 +151,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     height: 46,
     borderRadius: BORDERRADIUS.radius_14,
-    marginBottom: 20,
   },
 });
 

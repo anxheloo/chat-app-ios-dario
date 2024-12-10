@@ -1,14 +1,21 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import {SafeAreaView, StyleSheet, Text, View} from 'react-native';
 
 const Messages = () => {
-    return (
-        <View style={{backgroundColor:"blue", flex: 1}}>
-            <Text>Messages</Text>
-        </View>
-    );
-}
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
+        <Text>Messages</Text>
+      </View>
+    </SafeAreaView>
+  );
+};
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+});
 
 export default Messages;

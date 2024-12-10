@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Svg, {Path} from 'react-native-svg';
-const AvatarIcon = (props: any) => (
+const Avatar0 = (props: any) => (
   <Svg
     viewBox="0 0 90 90"
     fill="none"
@@ -14,4 +14,4 @@ const AvatarIcon = (props: any) => (
     />
   </Svg>
 );
-export default AvatarIcon;
+export default Avatar0;
