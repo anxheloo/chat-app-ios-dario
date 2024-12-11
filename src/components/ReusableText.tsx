@@ -9,6 +9,7 @@ type TextProps = {
   color?: string;
   textAlign?: 'auto' | 'left' | 'right' | 'center' | 'justify';
   style?: TextStyle;
+  textDecorationLine?: string;
   onPress?: () => void;
 };
 
@@ -19,12 +20,22 @@ const ReusableText: React.FC<TextProps> = ({
   color = '#000',
   textAlign = 'left',
   style,
+  textDecorationLine,
   onPress,
 }) => {
   return (
     <Text
       onPress={onPress}
-      style={[{fontSize, fontWeight, color, textAlign} as TextStyle, style]}>
+      style={[
+        {
+          fontSize,
+          fontWeight,
+          color,
+          textAlign,
+          textDecorationLine,
+        } as TextStyle,
+        style,
+      ]}>
       {children}
     </Text>
   );

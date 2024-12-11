@@ -4,10 +4,10 @@ import Svg, {Path} from 'react-native-svg';
 const Avatar1 = (props: any) => {
   return (
     <Svg
-      {...props}
       viewBox="0 0 38 38"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg">
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}>
       <Path
         d="M19 14.833a4.167 4.167 0 100 8.334 4.167 4.167 0 000-8.334z"
         fill="#212121"

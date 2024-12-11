@@ -8,22 +8,32 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
-} from 'react-native'; // Ensure `Text` is imported
+  Pressable,
+} from 'react-native';
 import ReusableText from '../../components/ReusableText';
 import ReusableInput from '../../components/ReusableInput';
 import {BORDERRADIUS, COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import {useAppStore} from '../../store';
 import BottomSheet from '@gorhom/bottom-sheet';
-import SelectAvatar from './SelectAvatar';
-import AvatarIcon from '../../assets/icons/svg/Avatar0';
+import AvatarIcon from '../../assets/icons/avatar/Avatar0';
+import BottomSheetWrapper from '../../components/BottomSheet/BottomSheetWrapper';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import SelectAvatar from '../../components/BottomSheet/SelectAvatar';
+
+type RootStackParamList = {
+  CreatePin: undefined;
+};
 
 const CreatePersona: React.FC = () => {
   const setUserPersona = useAppStore(state => state.setUserPersona);
   const username = useAppStore(state => state.username);
   const [isFocus, setIsFocus] = useState<boolean>(false);
   const bottomSheetRef = useRef<BottomSheet | null>(null);
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const onPress = (): void => {
+  const openBottomSheet = (): void => {
     setUserPersona({username});
     bottomSheetRef.current?.expand();
   };
@@ -32,11 +42,20 @@ const CreatePersona: React.FC = () => {
     setUserPersona({username: text});
   };
 
+  const cancel = (): void => {
+    bottomSheetRef?.current?.close();
+  };
+
+  const setFunc = (): void => {
+    bottomSheetRef?.current?.close();
+    navigation.navigate('CreatePin');
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.safeAreaView}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <Pressable onPress={Keyboard.dismiss} style={{flex: 1}}>
         <View style={styles.container}>
           <View style={styles.textContainer}>
             <ReusableText fontSize={FONTSIZE.title} fontWeight={700}>
@@ -75,16 +94,18 @@ const CreatePersona: React.FC = () => {
               </TouchableWithoutFeedback>
             </View>
 
-            <TouchableOpacity style={styles.button} onPress={onPress}>
+            <TouchableOpacity style={styles.button} onPress={openBottomSheet}>
               <ReusableText color="white" fontWeight={FONTWEIGHT[600]}>
                 Continue
               </ReusableText>
             </TouchableOpacity>
           </View>
         </View>
-      </TouchableWithoutFeedback>
+      </Pressable>
 
-      <SelectAvatar ref={bottomSheetRef} />
+      <BottomSheetWrapper ref={bottomSheetRef}>
+        <SelectAvatar cancel={cancel} setFunc={setFunc} />
+      </BottomSheetWrapper>
     </KeyboardAvoidingView>
   );
 };
@@ -129,6 +150,7 @@ const styles = StyleSheet.create({
   },
 
   inputContainer: {
+    alignSelf: 'center',
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
