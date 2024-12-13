@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Svg, {Path} from 'react-native-svg';
-const SearchIcon = (props: any) => (
+const ScanIcon = (props: any) => (
   <Svg
     viewBox="0 0 20 20"
     fill="none"
@@ -22,4 +22,4 @@ const SearchIcon = (props: any) => (
     />
   </Svg>
 );
-export default SearchIcon;
+export default ScanIcon;

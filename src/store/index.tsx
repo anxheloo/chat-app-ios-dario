@@ -6,8 +6,20 @@ type PersonaSlice = {
   username: string;
   avatar: number;
   pin: string;
+  id: string | null;
   setUserPersona: (data: Partial<PersonaSlice>) => void;
 };
+
+type StatusSlice = {
+  loading: boolean;
+  message: string | null;
+  updateKeys: (data: Partial<StatusSlice>) => void;
+};
+
+// type CreateSlice = {
+//   Persona: PersonaSlice;
+//   Status: StatusSlice;
+// }
 
 // Auth Slice
 // const createAuthSlice = set => ({
@@ -19,17 +31,17 @@ const createPersonaSlice: StateCreator<PersonaSlice> = set => ({
   username: '',
   avatar: 0,
   pin: '',
-  // setUsername: (username: string) => set({username}),
+  id: null,
   setUserPersona: set,
 });
 
 // Status Slice
-// const createStatusSlice = (set) => ({
-//   status: null,
-//   message: null,
+const createStatusSlice: StateCreator<StatusSlice> = set => ({
+  loading: false,
+  message: null,
 
-//   updateKeys: (newkeys) => set(newkeys),
-// });
+  updateKeys: set,
+});
 
 // const chatSlice = (set,get) => ({
 //   selectedChatType: null,
@@ -105,10 +117,10 @@ const createPersonaSlice: StateCreator<PersonaSlice> = set => ({
 // });
 
 // Combined Store
-export const useAppStore = create<PersonaSlice>()((...args) => ({
+export const useAppStore = create<PersonaSlice & StatusSlice>()((...args) => ({
   // ...createAuthSlice(...args),
   ...createPersonaSlice(...args),
-  // ...createStatusSlice(...args),
+  ...createStatusSlice(...args),
   // ...chatSlice(...args),
   // ...socketSlice(...args),
 }));

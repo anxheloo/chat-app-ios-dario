@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {
+  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -15,18 +16,22 @@ import ReusableInput from '../../components/ReusableInput';
 import {useAppStore} from '../../store';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {apiClient} from '../../api/apiClient';
+import {SIGNUP_ROUTES} from '../../api/apis';
+import {saveToken} from '../../utils/TokenStorage';
 
-type RootStackParamList = {
-  CreatePersona: undefined;
-  BottomTabNavigation: undefined;
+type RegisterProps = {
+  // CreatePersona: undefined;
+  // BottomTabNavigation: undefined;
+  navigation: NativeStackNavigationProp<any>;
 };
 
-const CreatePin = () => {
+const CreatePin: React.FC<RegisterProps> = ({navigation}) => {
   const setUserPersona = useAppStore(state => state.setUserPersona);
+  const updateKeys = useAppStore(state => state.updateKeys);
+  const username = useAppStore(state => state.username);
   const pin = useAppStore(state => state.pin);
-
-  const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const avatar = useAppStore(state => state.avatar);
 
   const [pinError, setPinError] = useState<boolean>(false);
 
@@ -40,17 +45,60 @@ const CreatePin = () => {
       return;
     }
 
-    navigation.navigate('BottomTabNavigation');
+    handleRegister();
+
+    // navigation.navigate('BottomTabNavigation');
   };
 
   const cancel = (): void => {
     navigation.navigate('CreatePersona');
   };
 
+  const handleRegister = async () => {
+    updateKeys({loading: true});
+
+    try {
+      const response = await apiClient.post(SIGNUP_ROUTES, {
+        username,
+        pin,
+        avatar,
+      });
+
+      if (response.status === 201) {
+        updateKeys({loading: false, message: 'Registered Successful'});
+
+        saveToken(response.data.token);
+        console.log('THIS IS TOKEN: ', response.data.token);
+
+        const {username, avatar, id} = response.data.user;
+
+        setUserPersona({
+          username,
+          avatar,
+          id,
+        });
+
+        console.log('THIS IS response.data.user,: ', response.data.user);
+
+        navigation.replace('BottomTabNavigation');
+        console.log('This is res.data: ', response.data);
+      } else {
+        updateKeys({loading: false, message: 'Login Failed'});
+        Alert.alert(
+          'Login Failed',
+          'Please check your credentials and try again.',
+        );
+      }
+    } catch (error: any) {
+      updateKeys({loading: false, message: 'Login Failed'});
+      Alert.alert('Login Error', 'An error occurred. Please try again later.');
+    } finally {
+      updateKeys({loading: false});
+    }
+  };
+
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}>
+    <KeyboardAvoidingView behavior={'padding'} style={styles.container}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={{flex: 1}}>
           <View style={styles.header}>
@@ -87,14 +135,11 @@ const CreatePin = () => {
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>
-              <View style={styles.inputContainer}>
-                <ReusableInput
-                  placeholder="Enter PIN"
-                  value={pin}
-                  onChange={onChange}
-                  isPassword={true}
-                />
-              </View>
+              <ReusableInput
+                value={pin}
+                onChange={onChange}
+                isPassword={true}
+              />
 
               {pinError && (
                 <Text style={styles.errorStyle}>PIN must be 4-Digits</Text>

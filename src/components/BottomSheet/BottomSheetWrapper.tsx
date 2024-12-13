@@ -25,7 +25,8 @@ const BottomSheetWrapper = forwardRef<BottomSheet, BottomSheetProps>(
             enablePanDownToClose
             index={-1}
             handleIndicatorStyle={styles.handleIndicator}
-            handleComponent={null}
+            // handleComponent={null}
+            handleStyle={styles.indicatorContainer}
             style={styles.bottomSheet}>
             <BottomSheetView style={styles.contentContainer}>
               {children}
@@ -55,17 +56,24 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.LightGray2,
   },
 
+  indicatorContainer: {
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+    backgroundColor: COLORS.LightGray2,
+  },
+
   handleIndicator: {
-    // backgroundColor: COLORS.LightGray2,
+    backgroundColor: COLORS.LightGray,
   },
 
   contentContainer: {
     flex: 1,
-    padding: Platform.OS === 'ios' ? 20 : 40,
+    paddingHorizontal: Platform.OS === 'ios' ? 20 : 40,
     justifyContent: 'space-between',
     backgroundColor: COLORS.LightGray2,
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
+    paddingBottom: 20,
   },
 });
 

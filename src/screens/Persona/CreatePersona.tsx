@@ -1,40 +1,35 @@
-import React, {useRef, useState} from 'react';
+import React, {useRef} from 'react';
 import {
   StyleSheet,
   View,
   Image,
-  TouchableOpacity,
   KeyboardAvoidingView,
-  Platform,
-  TouchableWithoutFeedback,
   Keyboard,
-  Pressable,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import ReusableText from '../../components/ReusableText';
-import ReusableInput from '../../components/ReusableInput';
 import {BORDERRADIUS, COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import {useAppStore} from '../../store';
 import BottomSheet from '@gorhom/bottom-sheet';
 import AvatarIcon from '../../assets/icons/avatar/Avatar0';
 import BottomSheetWrapper from '../../components/BottomSheet/BottomSheetWrapper';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {NavigationProp} from '@react-navigation/native';
 import SelectAvatar from '../../components/BottomSheet/SelectAvatar';
+import ReusableInput from '../../components/ReusableInput';
+import ReusableButton from '../../components/ReusableButton';
 
-type RootStackParamList = {
-  CreatePin: undefined;
+type CreatePersonaProps = {
+  navigation: NavigationProp<any>;
 };
 
-const CreatePersona: React.FC = () => {
+const CreatePersona: React.FC<CreatePersonaProps> = ({navigation}) => {
   const setUserPersona = useAppStore(state => state.setUserPersona);
   const username = useAppStore(state => state.username);
-  const [isFocus, setIsFocus] = useState<boolean>(false);
   const bottomSheetRef = useRef<BottomSheet | null>(null);
-  const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const openBottomSheet = (): void => {
     setUserPersona({username});
+    Keyboard.dismiss();
     bottomSheetRef.current?.expand();
   };
 
@@ -52,10 +47,8 @@ const CreatePersona: React.FC = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.safeAreaView}>
-      <Pressable onPress={Keyboard.dismiss} style={{flex: 1}}>
+    <KeyboardAvoidingView behavior="padding" style={styles.safeAreaView}>
+      <TouchableWithoutFeedback onPressIn={Keyboard.dismiss}>
         <View style={styles.container}>
           <View style={styles.textContainer}>
             <ReusableText fontSize={FONTSIZE.title} fontWeight={700}>
@@ -78,30 +71,29 @@ const CreatePersona: React.FC = () => {
                 <AvatarIcon width={60} height={60} />
               </View>
 
-              <TouchableWithoutFeedback
-                onFocus={() => setIsFocus(true)}
-                onBlur={() => setIsFocus(false)}>
-                <View
-                  style={[styles.inputContainer, isFocus && styles.focused]}>
-                  <ReusableText fontSize={FONTSIZE.md}>@</ReusableText>
-                  <ReusableInput
-                    placeholder="username"
-                    value={username}
-                    onChange={onChange}
-                  />
+              <ReusableInput
+                placeholder="username"
+                value={username}
+                onChange={onChange}
+                icon1={<ReusableText fontSize={FONTSIZE.md}>@</ReusableText>}
+                icon2={
                   <Image source={require('../../assets/icons/info-icon.png')} />
-                </View>
-              </TouchableWithoutFeedback>
+                }
+              />
+
+              <ReusableText
+                onPress={() => navigation.navigate('Login')}
+                textDecorationLine="underline"
+                fontWeight={FONTWEIGHT[300]}
+                color={COLORS.Black}>
+                Already have an account? Sign In
+              </ReusableText>
             </View>
 
-            <TouchableOpacity style={styles.button} onPress={openBottomSheet}>
-              <ReusableText color="white" fontWeight={FONTWEIGHT[600]}>
-                Continue
-              </ReusableText>
-            </TouchableOpacity>
+            <ReusableButton text="Continue" onPress={openBottomSheet} />
           </View>
         </View>
-      </Pressable>
+      </TouchableWithoutFeedback>
 
       <BottomSheetWrapper ref={bottomSheetRef}>
         <SelectAvatar cancel={cancel} setFunc={setFunc} />
@@ -147,32 +139,6 @@ const styles = StyleSheet.create({
     borderRadius: BORDERRADIUS.radius_14,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-
-  inputContainer: {
-    alignSelf: 'center',
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-    maxWidth: 320,
-    height: 46,
-    borderRadius: BORDERRADIUS.radius_14,
-    backgroundColor: COLORS.LightGray2,
-    paddingHorizontal: 15,
-  },
-
-  focused: {
-    borderColor: COLORS.Black,
-    borderWidth: 1,
-  },
-
-  button: {
-    width: '100%',
-    backgroundColor: COLORS.Black,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 46,
-    borderRadius: BORDERRADIUS.radius_14,
   },
 });
 

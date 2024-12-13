@@ -1,35 +1,78 @@
-import React from 'react';
-import {StyleSheet, TextInput, View} from 'react-native';
-import {COLORS} from '../theme/theme';
+import React, {useState} from 'react';
+import {StyleSheet, TextInput, TouchableOpacity, View} from 'react-native';
+import {BORDERRADIUS, COLORS} from '../theme/theme';
 
 type inputProps = {
-  backgroundColor?: string;
-  placeholder: string;
+  placeholder?: string;
   value: string;
   isPassword?: boolean;
+  backgroundColor?: string;
+  icon1?: React.ReactNode;
+  icon2?: React.ReactNode;
+  clearSearch?: () => void;
   onChange: (value: string) => void;
 };
 
 const ReusableInput: React.FC<inputProps> = ({
-  backgroundColor = 'transparent',
   placeholder,
   value,
   isPassword,
+  backgroundColor = COLORS.LightGray2,
+  icon1,
+  icon2,
+  clearSearch,
   onChange,
 }) => {
+  const [isFocused, setIsFocused] = useState(false);
+
   return (
-    <TextInput
-      value={value}
-      onChangeText={text => onChange(text)}
-      secureTextEntry={isPassword}
-      maxLength={isPassword ? 4 : undefined}
-      placeholder={placeholder}
-      placeholderTextColor={COLORS.LightGray}
-      style={{flex: 1, paddingHorizontal: 10, height: '100%', backgroundColor}}
-    />
+    <View
+      style={[
+        styles.inputContainer,
+        isFocused && styles.focused,
+        {backgroundColor},
+      ]}>
+      {icon1 && icon1}
+      <TextInput
+        value={value}
+        onChangeText={text => onChange(text)}
+        secureTextEntry={isPassword}
+        maxLength={isPassword ? 4 : undefined}
+        placeholder={placeholder}
+        placeholderTextColor={COLORS.LightGray}
+        style={[styles.input, {textAlign: isPassword ? 'center' : 'left'}]}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+      />
+
+      {icon2 && (
+        <TouchableOpacity onPress={clearSearch}>{icon2}</TouchableOpacity>
+      )}
+    </View>
   );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    height: 46,
+    borderRadius: BORDERRADIUS.radius_14,
+    paddingHorizontal: 15,
+    maxWidth: 320,
+    alignSelf: 'center',
+    marginVertical: 20,
+  },
+  focused: {
+    borderColor: COLORS.Black,
+    borderWidth: 1,
+  },
+  input: {
+    flex: 1,
+    paddingHorizontal: 10,
+    height: '100%',
+  },
+});
 
 export default ReusableInput;

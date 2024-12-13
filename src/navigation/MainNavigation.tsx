@@ -5,6 +5,7 @@ import {StyleSheet, View} from 'react-native';
 import CreatePersona from '../screens/Persona/CreatePersona';
 import CreatePin from '../screens/Persona/CreatePin';
 import BottomTabNavigation from './BottomTabNavigation';
+import Login from '../screens/Login/Login';
 
 const MainNavigation = () => {
   const Stack = createNativeStackNavigator();
@@ -12,6 +13,11 @@ const MainNavigation = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
+        <Stack.Screen
+          name="Login"
+          component={Login}
+          options={{headerShown: false}}
+        />
         <Stack.Screen
           name="CreatePersona"
           component={CreatePersona}

@@ -2,15 +2,10 @@ import React from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import ReusableText from '../ReusableText';
 import {BORDERRADIUS, COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
-import Avatar0 from '../../assets/icons/avatar/Avatar0';
-import Avatar1 from '../../assets/icons/avatar/Avatar1';
-import Avatar2 from '../../assets/icons/avatar/Avatar2';
-import Avatar3 from '../../assets/icons/avatar/Avatar3';
-import Avatar4 from '../../assets/icons/avatar/Avatar4';
-import Avatar5 from '../../assets/icons/avatar/Avatar5';
-import Avatar6 from '../../assets/icons/avatar/Avatar6';
-import Avatar7 from '../../assets/icons/avatar/Avatar7';
 import {useAppStore} from '../../store';
+import {avatarUrls} from '../../utils/constants';
+import Avatar from '../Persona/Avatar';
+import ReusableButton from '../ReusableButton';
 
 type SelectAvatarProps = {
   cancel: () => void;
@@ -21,16 +16,6 @@ const SelectAvatar: React.FC<SelectAvatarProps> = ({cancel, setFunc}) => {
   const setUserPersona = useAppStore(state => state.setUserPersona);
   const avatar = useAppStore(state => state.avatar);
 
-  const avatarUrls = [
-    Avatar0,
-    Avatar1,
-    Avatar2,
-    Avatar3,
-    Avatar4,
-    Avatar5,
-    Avatar6,
-    Avatar7,
-  ];
   const SelectedIcon = avatarUrls[avatar];
 
   return (
@@ -59,9 +44,7 @@ const SelectAvatar: React.FC<SelectAvatarProps> = ({cancel, setFunc}) => {
       </View>
 
       <View style={styles.selectableIconParent}>
-        <View style={styles.iconContainer}>
-          <SelectedIcon width={70} height={70} />
-        </View>
+        <Avatar width={100} height={100} avatarWidth={70} avatarHeight={70} />
       </View>
 
       <View
@@ -87,12 +70,7 @@ const SelectAvatar: React.FC<SelectAvatarProps> = ({cancel, setFunc}) => {
           })}
         </View>
       </View>
-
-      <TouchableOpacity style={styles.button} onPress={setFunc}>
-        <ReusableText color="white" fontWeight={FONTWEIGHT[600]}>
-          Set
-        </ReusableText>
-      </TouchableOpacity>
+      <ReusableButton text="Set" onPress={setFunc} />
     </>
   );
 };
@@ -116,15 +94,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-
-  iconContainer: {
-    backgroundColor: 'white',
-    width: 100,
-    height: 100,
-    borderRadius: BORDERRADIUS.radius_14,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 
   icon: {
@@ -155,15 +124,6 @@ const styles = StyleSheet.create({
     width: '75%',
     height: '75%',
     resizeMode: 'contain',
-  },
-
-  button: {
-    width: '100%',
-    backgroundColor: COLORS.Black,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 46,
-    borderRadius: BORDERRADIUS.radius_14,
   },
 });
 

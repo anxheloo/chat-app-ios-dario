@@ -3,7 +3,7 @@ import {Text, TextStyle} from 'react-native';
 import {FONTSIZE} from '../theme/theme';
 
 type TextProps = {
-  children: string;
+  children: string | React.ReactNode;
   fontSize?: number;
   fontWeight?: string | number;
   color?: string;
