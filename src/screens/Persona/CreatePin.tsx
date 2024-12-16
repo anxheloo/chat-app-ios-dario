@@ -56,6 +56,7 @@ const CreatePin: React.FC<RegisterProps> = ({navigation}) => {
 
   const handleRegister = async () => {
     updateKeys({loading: true});
+    console.log('Inside handleRegister');
 
     try {
       const response = await apiClient.post(SIGNUP_ROUTES, {
@@ -82,16 +83,10 @@ const CreatePin: React.FC<RegisterProps> = ({navigation}) => {
 
         navigation.replace('BottomTabNavigation');
         console.log('This is res.data: ', response.data);
-      } else {
-        updateKeys({loading: false, message: 'Login Failed'});
-        Alert.alert(
-          'Login Failed',
-          'Please check your credentials and try again.',
-        );
       }
     } catch (error: any) {
-      updateKeys({loading: false, message: 'Login Failed'});
-      Alert.alert('Login Error', 'An error occurred. Please try again later.');
+      updateKeys({loading: false, message: 'Register Failed'});
+      Alert.alert('Register Error', error?.response.data.message);
     } finally {
       updateKeys({loading: false});
     }

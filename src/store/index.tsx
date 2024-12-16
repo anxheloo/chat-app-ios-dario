@@ -16,16 +16,25 @@ type StatusSlice = {
   updateKeys: (data: Partial<StatusSlice>) => void;
 };
 
-// type CreateSlice = {
-//   Persona: PersonaSlice;
-//   Status: StatusSlice;
-// }
+type ChatSlice = {
+  selectedChatData: Contact | null;
+  selectedChatMessages: Message[];
+  directMessagesContacts: Contact[];
+  updateFuncChat: (data: Partial<ChatSlice>) => void;
+};
 
-// Auth Slice
-// const createAuthSlice = set => ({
-//   userInfo: undefined,
-//   setUserInfo: newInfo => set({userInfo: newInfo}),
-// });
+type Contact = {
+  _id: string;
+  username: string;
+  avatar: number;
+};
+
+type Message = {
+  sender: string;
+  recipient: string;
+  content: string;
+  timestamp: string;
+};
 
 const createPersonaSlice: StateCreator<PersonaSlice> = set => ({
   username: '',
@@ -33,6 +42,56 @@ const createPersonaSlice: StateCreator<PersonaSlice> = set => ({
   pin: '',
   id: null,
   setUserPersona: set,
+});
+
+const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
+  // selectedChatType: null,
+  selectedChatData: null,
+  // existing messages
+  selectedChatMessages: [],
+  directMessagesContacts: [],
+  // uploading state
+  // isUploading: false,
+  // isDownloading: false,
+  // fileUploadProgress: 0,
+  // fileDownloadProgress: 0,
+  // channels
+  // channels: [],
+  // updateFuncChat: typeOrData => set(typeOrData),
+  updateFuncChat: set,
+
+  // sortChannelByLastConversation: message => {
+  //   const channels = [...get().channels];
+  //   const data = channels.find(channel => channel._id === message.channelId);
+  //   const index = channels.findIndex(
+  //     channel => channel._id === message.channelId,
+  //   );
+  //   if (index !== -1 && index !== undefined) {
+  //     channels.splice(index, 1);
+  //     channels.unshift(data);
+  //     set({channels: channels});
+  //   }
+  // },
+
+  // sortContactsByLastConversation: (message: Message) => {
+  //   const userId = get().id;
+  //   const fromId =
+  //     message.sender._id === userId
+  //       ? message.recipient._id
+  //       : message.sender._id;
+  //   const fromData =
+  //     message.sender._id === userId ? message.recipient : message.sender;
+  //   const contacts = [...get().directMessagesContacts];
+  //   const data = contacts.find(contact => contact._id === fromId);
+  //   const index = contacts.findIndex(contact => contact._id === fromId);
+  //   if (index !== -1 && index !== undefined) {
+  //     contacts.splice(index, 1);
+  //     contacts.unshift(data);
+  //   } else {
+  //     contacts.unshift(fromData);
+  //   }
+  //   set({directMessagesContacts: contacts});
+  // },
 });
 
 // Status Slice
@@ -117,10 +176,13 @@ const createStatusSlice: StateCreator<StatusSlice> = set => ({
 // });
 
 // Combined Store
-export const useAppStore = create<PersonaSlice & StatusSlice>()((...args) => ({
-  // ...createAuthSlice(...args),
-  ...createPersonaSlice(...args),
-  ...createStatusSlice(...args),
-  // ...chatSlice(...args),
-  // ...socketSlice(...args),
-}));
+
+export const useAppStore = create<PersonaSlice & StatusSlice & ChatSlice>()(
+  (...args) => ({
+    // ...createAuthSlice(...args),
+    ...createPersonaSlice(...args),
+    ...createStatusSlice(...args),
+    ...chatSlice(...args),
+    // ...socketSlice(...args),
+  }),
+);

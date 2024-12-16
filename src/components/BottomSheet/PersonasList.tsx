@@ -16,18 +16,27 @@ import CloseIcon from '../../assets/icons/messages/CloseIcon';
 import Persona from '../Persona/Persona';
 import {apiClient} from '../../api/apiClient';
 import {SEARCH} from '../../api/apis';
+import {getToken} from '../../utils/TokenStorage';
+import {RootStackParamList} from '../../screens/Profile/SettingElement';
+import {NavigationProp} from '@react-navigation/native';
 
 type PersonasListProps = {
   cancel: () => void;
   addNew: () => void;
+  navigation: NavigationProp<RootStackParamList>;
 };
 
-type Contact = {
+export type Contact = {
   _id: string;
-  firstName: string;
+  username: string;
+  avatar: number;
 };
 
-const PersonasList: React.FC<PersonasListProps> = ({cancel, addNew}) => {
+const PersonasList: React.FC<PersonasListProps> = ({
+  cancel,
+  addNew,
+  navigation,
+}) => {
   const [search, setSearch] = useState<string>('');
   const [searchedContacts, setSearchContacts] = useState<Contact[]>([]);
 
@@ -39,8 +48,18 @@ const PersonasList: React.FC<PersonasListProps> = ({cancel, addNew}) => {
 
   const searchContact = async (search: string) => {
     if (search.length > 0) {
+      const token = await getToken();
+
       try {
-        const res = await apiClient.post(SEARCH, {searchTerm: search});
+        const res = await apiClient.post(
+          SEARCH,
+          {searchTerm: search},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
 
         if (res.status === 200) {
           console.log('these are contacts:', res.data.contacts);
@@ -104,7 +123,9 @@ const PersonasList: React.FC<PersonasListProps> = ({cancel, addNew}) => {
         <FlatList
           contentContainerStyle={styles.list}
           data={searchedContacts}
-          renderItem={({item}) => <Persona username={item.firstName} />}
+          renderItem={({item}) => (
+            <Persona contact={item} navigation={navigation} cancel={cancel} />
+          )}
           keyExtractor={item => item._id}
           extraData={searchedContacts}
           // ListEmptyComponent={<Text>ska kontakte</Text>}

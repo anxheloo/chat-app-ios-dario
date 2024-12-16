@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     maxWidth: 320,
     alignSelf: 'center',
-    marginVertical: 20,
+    marginVertical: 10,
   },
   focused: {
     borderColor: COLORS.Black,

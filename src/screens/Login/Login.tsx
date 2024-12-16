@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Alert,
   Keyboard,
@@ -14,7 +14,7 @@ import ReusableButton from '../../components/ReusableButton';
 import {useAppStore} from '../../store';
 import {apiClient} from '../../api/apiClient';
 import {LOGIN_ROUTE} from '../../api/apis';
-import {saveToken} from '../../utils/TokenStorage';
+import {getToken, saveToken} from '../../utils/TokenStorage';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 type LoginProps = {
@@ -27,8 +27,28 @@ const Login: React.FC<LoginProps> = ({navigation}) => {
   const setUserPersona = useAppStore(state => state.setUserPersona);
   const updateKeys = useAppStore(state => state.updateKeys);
 
+  // Login
+  const onPress = (): void => {
+    if (username === '' || pin === '') {
+      Alert.alert(
+        'Invalid Credentials',
+        'Please enter a valid username and PIN',
+      );
+      return;
+    }
+
+    if (pin.length !== 4) {
+      Alert.alert('Invalid PIN', 'Please enter a 4 digit PIN');
+      return;
+    }
+
+    handleLogin();
+  };
+
+  // Login
   const handleLogin = async () => {
     updateKeys({loading: true});
+    console.log('Inside handleLogin');
 
     try {
       const response = await apiClient.post(LOGIN_ROUTE, {username, pin});
@@ -48,34 +68,34 @@ const Login: React.FC<LoginProps> = ({navigation}) => {
           id,
         });
 
-        console.log('THIS IS response.data.user,: ', response.data.user);
-
         navigation.replace('BottomTabNavigation');
         console.log('This is res.data: ', response.data);
-      } else {
-        updateKeys({loading: false, message: 'Login Failed'});
-        Alert.alert(
-          'Login Failed',
-          'Please check your credentials and try again.',
-        );
       }
     } catch (error: any) {
-      //   updateKeys({loading: false, message: error?.response.data.message});
-
-      //   Alert.alert('', error?.response.data.message, [
-      //     {
-      //       text: 'Cancel',
-      //       onPress: () => setUserPersona({username: '', pin: ''}),
-      //     },
-      //   ]);
-
+      console.log('This is error:', error);
+      console.log('Error response:', error.response); // Log full response
+      console.log('Error request:', error.request); // Log request details
+      console.log('Error message:', error.message); // Log error message
       updateKeys({loading: false, message: 'Login Failed'});
-      console.error('Login error:', error);
-      Alert.alert('Login Error', 'An error occurred. Please try again later.');
+      Alert.alert('Login Error', error?.response.data.message);
     } finally {
       updateKeys({loading: false});
     }
   };
+
+  // Check if token exists
+  useEffect(() => {
+    const checkToken = async () => {
+      const token = await getToken();
+      console.log('This is token:', token);
+
+      if (token) {
+        navigation.replace('BottomTabNavigation');
+      }
+    };
+
+    checkToken();
+  }, []);
 
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.safeAreaView}>
@@ -119,7 +139,7 @@ const Login: React.FC<LoginProps> = ({navigation}) => {
               </ReusableText>
             </View>
 
-            <ReusableButton text="Login" onPress={handleLogin} />
+            <ReusableButton text="Login" onPress={onPress} />
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -148,7 +168,6 @@ const styles = StyleSheet.create({
   },
 
   inputContainer: {
-    gap: 10,
     alignItems: 'center',
   },
 

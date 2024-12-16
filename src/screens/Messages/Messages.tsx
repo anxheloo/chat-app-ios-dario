@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -16,28 +16,59 @@ import Header from '../../components/Header/Header';
 import ReusableInput from '../../components/ReusableInput';
 import SearchIcon from '../../assets/icons/messages/SearchIcon';
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
+import {getToken} from '../../utils/TokenStorage';
+import {apiClient} from '../../api/apiClient';
+import {GET_USER_INFO} from '../../api/apis';
+import {useAppStore} from '../../store';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {RootStackParamList} from '../Profile/SettingElement';
 
 const Messages = () => {
   const [search, setSearch] = useState<string>('');
   const bottomSheetRef = useRef<BottomSheet | null>(null);
+  const setUserPersona = useAppStore(state => state.setUserPersona);
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
+  // Open bottom sheet
   const openBottomSheet = (): void => {
     bottomSheetRef.current?.expand();
   };
 
+  // Add new
   const addNew = (): void => {
     console.log('Add new');
   };
 
+  // Close bottom sheet
   const cancel = (): void => {
     if (bottomSheetRef && bottomSheetRef?.current) {
       bottomSheetRef.current.close();
     }
   };
 
+  // Clear search
   const clearSearch = (): void => {
     setSearch('');
   };
+
+  //  Get user info
+  useEffect(() => {
+    const getUserInfo = async () => {
+      const token = await getToken();
+      const res = await apiClient.get(GET_USER_INFO, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.status === 200) {
+        console.log('this is user info:', res.data);
+        setUserPersona(res.data);
+      }
+    };
+
+    getUserInfo();
+  }, []);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -60,7 +91,11 @@ const Messages = () => {
         </View>
 
         <BottomSheetWrapper ref={bottomSheetRef}>
-          <PersonasList cancel={cancel} addNew={addNew} />
+          <PersonasList
+            cancel={cancel}
+            addNew={addNew}
+            navigation={navigation}
+          />
         </BottomSheetWrapper>
       </SafeAreaView>
     </TouchableWithoutFeedback>

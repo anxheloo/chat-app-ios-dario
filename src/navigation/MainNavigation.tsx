@@ -6,6 +6,7 @@ import CreatePersona from '../screens/Persona/CreatePersona';
 import CreatePin from '../screens/Persona/CreatePin';
 import BottomTabNavigation from './BottomTabNavigation';
 import Login from '../screens/Login/Login';
+import Chat from '../screens/Chat/Chat';
 
 const MainNavigation = () => {
   const Stack = createNativeStackNavigator();
@@ -26,6 +27,11 @@ const MainNavigation = () => {
         <Stack.Screen
           name="CreatePin"
           component={CreatePin}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Chat"
+          component={Chat}
           options={{headerShown: false}}
         />
         <Stack.Screen

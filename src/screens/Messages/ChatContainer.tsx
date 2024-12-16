@@ -1,10 +1,26 @@
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
+import {
+  Keyboard,
+  StyleSheet,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 
 const ChatContainer = () => {
-  return <View></View>;
+  return (
+    <TouchableWithoutFeedback onPressIn={Keyboard.dismiss}>
+      <View style={styles.chatContainer}>
+        <Text>asdfadsf</Text>
+      </View>
+    </TouchableWithoutFeedback>
+  );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  chatContainer: {
+    flex: 1,
+  },
+});
 
 export default ChatContainer;

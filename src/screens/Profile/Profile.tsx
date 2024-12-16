@@ -6,6 +6,7 @@ import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import Header from '../../components/Header/Header';
 import Avatar from '../../components/Persona/Avatar';
 import SettingElement from './SettingElement';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 const Profile = () => {
   const router = useRoute();
@@ -49,6 +50,7 @@ const Profile = () => {
             <SettingElement type="qr-code" />
             <SettingElement type="pin" />
             <SettingElement type="clock" />
+            <SettingElement type="logout" />
           </View>
         </View>
       </View>
