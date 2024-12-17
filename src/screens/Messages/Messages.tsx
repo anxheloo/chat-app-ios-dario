@@ -7,11 +7,9 @@ import {
   Keyboard,
 } from 'react-native';
 
-import {COLORS} from '../../theme/theme';
 import BottomSheetWrapper from '../../components/BottomSheet/BottomSheetWrapper';
 import PersonasList from '../../components/BottomSheet/PersonasList';
 import BottomSheet from '@gorhom/bottom-sheet';
-import EmptyChat from './EmptyChat';
 import Header from '../../components/Header/Header';
 import ReusableInput from '../../components/ReusableInput';
 import SearchIcon from '../../assets/icons/messages/SearchIcon';
@@ -20,14 +18,21 @@ import {getToken} from '../../utils/TokenStorage';
 import {apiClient} from '../../api/apiClient';
 import {GET_USER_INFO} from '../../api/apis';
 import {useAppStore} from '../../store';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {RootStackParamList} from '../Profile/SettingElement';
+import Content from './Content';
+import {useSocket} from '../../utils/useSocket';
+import {NavigationProps} from '../../utils/types';
 
-const Messages = () => {
+type MessagesScreenProps = {
+  navigation: NavigationProps;
+};
+
+const Messages: React.FC<MessagesScreenProps> = ({navigation}) => {
   const [search, setSearch] = useState<string>('');
   const bottomSheetRef = useRef<BottomSheet | null>(null);
   const setUserPersona = useAppStore(state => state.setUserPersona);
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+  // Socket initialization when user logs in.
+  useSocket();
 
   // Open bottom sheet
   const openBottomSheet = (): void => {
@@ -85,9 +90,7 @@ const Messages = () => {
             icon2={<CloseIcon width={15} height={15} />}
           />
 
-          <View style={styles.content}>
-            <EmptyChat openBottomSheet={openBottomSheet} />
-          </View>
+          <Content openBottomSheet={openBottomSheet} navigation={navigation} />
         </View>
 
         <BottomSheetWrapper ref={bottomSheetRef}>

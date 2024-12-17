@@ -13,16 +13,16 @@ import {useAppStore} from '../../store';
 import BottomSheet from '@gorhom/bottom-sheet';
 import AvatarIcon from '../../assets/icons/avatar/Avatar0';
 import BottomSheetWrapper from '../../components/BottomSheet/BottomSheetWrapper';
-import {NavigationProp} from '@react-navigation/native';
 import SelectAvatar from '../../components/BottomSheet/SelectAvatar';
 import ReusableInput from '../../components/ReusableInput';
 import ReusableButton from '../../components/ReusableButton';
+import {NavigationProps} from '../../utils/types';
 
-type CreatePersonaProps = {
-  navigation: NavigationProp<any>;
+type CreatePersonaScreenProps = {
+  navigation: NavigationProps;
 };
 
-const CreatePersona: React.FC<CreatePersonaProps> = ({navigation}) => {
+const CreatePersona: React.FC<CreatePersonaScreenProps> = ({navigation}) => {
   const setUserPersona = useAppStore(state => state.setUserPersona);
   const username = useAppStore(state => state.username);
   const bottomSheetRef = useRef<BottomSheet | null>(null);

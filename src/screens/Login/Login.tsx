@@ -15,13 +15,13 @@ import {useAppStore} from '../../store';
 import {apiClient} from '../../api/apiClient';
 import {LOGIN_ROUTE} from '../../api/apis';
 import {getToken, saveToken} from '../../utils/TokenStorage';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {NavigationProps} from '../../utils/types';
 
-type LoginProps = {
-  navigation: NativeStackNavigationProp<any>;
+type LoginScreenProps = {
+  navigation: NavigationProps;
 };
 
-const Login: React.FC<LoginProps> = ({navigation}) => {
+const Login: React.FC<LoginScreenProps> = ({navigation}) => {
   const [username, setUsername] = useState('');
   const [pin, setPin] = useState('');
   const setUserPersona = useAppStore(state => state.setUserPersona);

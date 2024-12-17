@@ -3,7 +3,6 @@ import {
   Alert,
   Keyboard,
   KeyboardAvoidingView,
-  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -14,19 +13,16 @@ import ReusableText from '../../components/ReusableText';
 import {BORDERRADIUS, COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import ReusableInput from '../../components/ReusableInput';
 import {useAppStore} from '../../store';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {apiClient} from '../../api/apiClient';
 import {SIGNUP_ROUTES} from '../../api/apis';
 import {saveToken} from '../../utils/TokenStorage';
+import {NavigationProps} from '../../utils/types';
 
-type RegisterProps = {
-  // CreatePersona: undefined;
-  // BottomTabNavigation: undefined;
-  navigation: NativeStackNavigationProp<any>;
+type CreatePinScreenProps = {
+  navigation: NavigationProps;
 };
 
-const CreatePin: React.FC<RegisterProps> = ({navigation}) => {
+const CreatePin: React.FC<CreatePinScreenProps> = ({navigation}) => {
   const setUserPersona = useAppStore(state => state.setUserPersona);
   const updateKeys = useAppStore(state => state.updateKeys);
   const username = useAppStore(state => state.username);

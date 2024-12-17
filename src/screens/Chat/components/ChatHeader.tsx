@@ -10,7 +10,7 @@ import VideoIcon from '../../../assets/icons/Chat/VideoIcon';
 
 const ChatHeader = () => {
   const navigation = useNavigation();
-  const username = useAppStore(state => state.username);
+  const selectedChatData = useAppStore(state => state.selectedChatData);
 
   const goBack = () => {
     navigation.goBack();
@@ -31,7 +31,9 @@ const ChatHeader = () => {
           backgroundColor={COLORS.LightGray2}
         />
 
-        <ReusableText fontWeight={500}>@{username}</ReusableText>
+        <ReusableText fontWeight={500}>
+          @{selectedChatData?.username}
+        </ReusableText>
       </View>
 
       <TouchableOpacity

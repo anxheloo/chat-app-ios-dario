@@ -1,31 +1,47 @@
 import React from 'react';
 import {StyleSheet, Text, TouchableOpacity} from 'react-native';
 import Avatar from './Avatar';
-import {Contact} from '../BottomSheet/PersonasList';
 import {useAppStore} from '../../store';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {RootStackParamList} from '../../screens/Profile/SettingElement';
+import {Contact, NavigationProps} from '../../utils/types';
+import {COLORS} from '../../theme/theme';
 
 type PersonaProps = {
   contact: Contact;
-  navigation: NavigationProp<RootStackParamList>;
-  cancel: () => void;
+  navigation?: NavigationProps;
+  cancel?: () => void;
+  version: number;
 };
 
-const Persona: React.FC<PersonaProps> = ({contact, navigation, cancel}) => {
+const Persona: React.FC<PersonaProps> = ({
+  contact,
+  navigation,
+  cancel,
+  version,
+}) => {
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
 
   // Select contact to update chat
   const selectContact = () => {
     updateFuncChat({selectedChatData: contact, selectedChatMessages: []});
     console.log('Selected contact:', contact);
-    cancel();
-    navigation.navigate('Chat');
+    if (cancel) {
+      cancel();
+    }
+
+    navigation?.navigate('Chat');
   };
+
+  console.log('Persona:', contact);
 
   return (
     <TouchableOpacity style={styles.container} onPress={selectContact}>
-      <Avatar width={36} height={36} avatarWidth={27} avatarHeight={27} />
+      <Avatar
+        width={version === 2 ? 46 : 36}
+        height={version === 2 ? 46 : 36}
+        avatarWidth={version === 2 ? 34 : 27}
+        avatarHeight={version === 2 ? 34 : 27}
+        backgroundColor={COLORS.LightGray2}
+      />
       <Text style={styles.username}>@{contact.username}</Text>
     </TouchableOpacity>
   );

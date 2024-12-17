@@ -11,6 +11,7 @@ type inputProps = {
   icon2?: React.ReactNode;
   clearSearch?: () => void;
   onChange: (value: string) => void;
+  onSubmitEditing?: () => void;
 };
 
 const ReusableInput: React.FC<inputProps> = ({
@@ -22,6 +23,7 @@ const ReusableInput: React.FC<inputProps> = ({
   icon2,
   clearSearch,
   onChange,
+  onSubmitEditing,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -43,6 +45,7 @@ const ReusableInput: React.FC<inputProps> = ({
         style={[styles.input, {textAlign: isPassword ? 'center' : 'left'}]}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
+        onSubmitEditing={onSubmitEditing}
       />
 
       {icon2 && (
@@ -57,6 +60,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
+    // flex: 1,
     height: 46,
     borderRadius: BORDERRADIUS.radius_14,
     paddingHorizontal: 15,

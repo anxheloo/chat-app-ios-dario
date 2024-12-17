@@ -19,18 +19,19 @@ import {SEARCH} from '../../api/apis';
 import {getToken} from '../../utils/TokenStorage';
 import {RootStackParamList} from '../../screens/Profile/SettingElement';
 import {NavigationProp} from '@react-navigation/native';
+import {Contact, NavigationProps} from '../../utils/types';
 
 type PersonasListProps = {
   cancel: () => void;
   addNew: () => void;
-  navigation: NavigationProp<RootStackParamList>;
+  navigation: NavigationProps;
 };
 
-export type Contact = {
-  _id: string;
-  username: string;
-  avatar: number;
-};
+// export type Contact = {
+//   _id: string;
+//   username: string;
+//   avatar: number;
+// };
 
 const PersonasList: React.FC<PersonasListProps> = ({
   cancel,
@@ -124,7 +125,12 @@ const PersonasList: React.FC<PersonasListProps> = ({
           contentContainerStyle={styles.list}
           data={searchedContacts}
           renderItem={({item}) => (
-            <Persona contact={item} navigation={navigation} cancel={cancel} />
+            <Persona
+              contact={item}
+              navigation={navigation}
+              cancel={cancel}
+              version={1}
+            />
           )}
           keyExtractor={item => item._id}
           extraData={searchedContacts}

@@ -1,7 +1,7 @@
 import React from 'react';
 import {KeyboardAvoidingView, StyleSheet, View} from 'react-native';
 import ChatHeader from './components/ChatHeader';
-import ChatContainer from '../Messages/ChatContainer';
+import ChatContainer from './components/ChatContainer';
 import ChatFooter from './components/ChatFooter';
 
 const Chat = () => {
