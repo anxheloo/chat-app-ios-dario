@@ -1,9 +1,12 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {FlatList, StyleSheet, View} from 'react-native';
 import EmptyChat from './EmptyChat';
 import {useAppStore} from '../../store';
 import Persona from '../../components/Persona/Persona';
 import {NavigationProps} from '../../utils/types';
+import {apiClient} from '../../api/apiClient';
+import {GET_CONTACTS_FOR_DM} from '../../api/apis';
+import {getToken} from '../../utils/TokenStorage';
 
 type ContentProps = {
   openBottomSheet: () => void;
@@ -14,6 +17,26 @@ const Content: React.FC<ContentProps> = ({openBottomSheet, navigation}) => {
   const directMessagesContacts = useAppStore(
     state => state.directMessagesContacts,
   );
+  const updateFuncChat = useAppStore(state => state.updateFuncChat);
+
+  useEffect(() => {
+    const getContacts = async () => {
+      const token = await getToken();
+
+      const res = await apiClient.get(GET_CONTACTS_FOR_DM, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.status === 200) {
+        console.log('This are contacts:', res.data.contacts);
+        updateFuncChat({directMessagesContacts: [...res.data.contacts]});
+      }
+    };
+
+    getContacts();
+  }, []);
 
   if (directMessagesContacts.length > 0) {
     return (
