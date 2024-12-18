@@ -19,13 +19,21 @@ const Persona: React.FC<PersonaProps> = ({
   version,
 }) => {
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
+  const selectedChatData = useAppStore(state => state.selectedChatData);
+
+  console.log('Selected chat data:', selectedChatData);
+  console.log('Selected contact:', contact);
 
   // Select contact to update chat
   const selectContact = () => {
-    updateFuncChat({selectedChatData: contact, selectedChatMessages: []});
+    updateFuncChat({selectedChatData: contact});
     console.log('Selected contact:', contact);
     if (cancel) {
       cancel();
+    }
+
+    if (selectedChatData && selectedChatData._id !== contact._id) {
+      updateFuncChat({selectedChatMessages: []});
     }
 
     navigation?.navigate('Chat');

@@ -116,4 +116,6 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+     implementation("androidx.activity:activity:1.9.+")
 }

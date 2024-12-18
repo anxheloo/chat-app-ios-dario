@@ -17,13 +17,17 @@ export type NavigationProps = NativeStackNavigationProp<RootStackParamList>;
 
 export type Message = {
   _id: string;
-  sender: Contact;
-  recipient: Contact;
+  // sender: Contact;
+  // recipient: Contact;
+  sender: string;
+  recipient: string;
   content: string;
   timestamp: string;
   messageType: string;
   fileUrl: string;
 };
+
+export const MessageFromServer = {};
 
 export type Contact = {
   _id: string;

@@ -1,9 +1,12 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {Message} from '../../../utils/types';
 import moment from 'moment';
 import {useAppStore} from '../../../store';
 import {BORDERRADIUS, COLORS, FONTSIZE} from '../../../theme/theme';
+import {HOST} from '../../../api/apis';
+import TextMsg from './TextMsg';
+import Video from 'react-native-video';
 
 type MessageItemProps = {
   message: Message;
@@ -12,55 +15,80 @@ type MessageItemProps = {
 const MessageItem: React.FC<MessageItemProps> = ({message}) => {
   const selectedChatData = useAppStore(state => state.selectedChatData);
 
-  let lastDate: string | null = null;
-  const messageDate = moment(message.timestamp).format('YYYY-MM-DD');
-  const showDate = messageDate !== lastDate;
-  lastDate = messageDate;
+  const isSender = message.sender === selectedChatData?._id;
 
-  const renderDmMessages = (message: Message) => (
-    <View style={styles.messageContainer}>
+  // let lastDate: string | null = null;
+  // const messageDate = moment(message.timestamp).format('YYYY-MM-DD');
+  // const showDate = messageDate !== lastDate;
+  // lastDate = messageDate;
+
+  console.log('This is message:', message);
+
+  const checkIfImage = (fileUrl: string) => {
+    return (
+      fileUrl.endsWith('.jpg') ||
+      fileUrl.endsWith('.jpeg') ||
+      fileUrl.endsWith('.png')
+    );
+  };
+
+  const checkIfVideo = (fileUrl: string) => {
+    return (
+      fileUrl.endsWith('.mp4') ||
+      fileUrl.endsWith('.mov') ||
+      fileUrl.endsWith('.avi')
+    );
+  };
+
+  const renderMsgs = (message: Message) => (
+    <View
+      style={[
+        styles.messageContainer,
+        {
+          backgroundColor: isSender ? COLORS.LightGray2 : COLORS.Black,
+        },
+      ]}>
       {message.messageType === 'text' && (
-        <Text style={styles.messageText}>{message.content}</Text>
+        <TextMsg isSender={isSender}>{message.content}</TextMsg>
       )}
 
-      {/* {message.messageType === 'file' && (
-            <div
-            // className={`${
-            //   message.sender !== selectedChatData?._id
-            //     ? 'bg-[#8417ff]/5 text-[#8417ff]/90 border-[#8417ff]/50'
-            //     : 'bg-[#2a2b33]/5 text-white/80 border-white/20'
-            // } border inline-block p-4 rounded max-w-[50%] break-words`}
-            >
-              {checkIfImage(message.fileUrl) ? (
-                <div
-                  className="cursor-pointer"
-                  onClick={() => {
-                    setShowImage(true);
-                    setImageUrl(message.fileUrl);
-                  }}>
-                  <img
-                    src={`${HOST}/${message.fileUrl}`}
-                    alt="file display"
-                    className=" size-[300px]"
-                  />
-                </div>
-              ) : (
-                <div className="flex items-center justify-center gap-4">
-                  <span className="tet-white/80 text-3xl bg-black/20 rounded-full p-3">
-                    <GoFileZip />
-                  </span>
-                  <span>{message.fileUrl.split('/').pop()}</span>
-                  <span
-                    className="text-3xl cursor-pointer hover:opacity-80"
-                    onClick={() => downloadFile(message.fileUrl)}>
-                    <MdDownloadForOffline />
-                  </span>
-                </div>
-              )}
-            </div>
-          )} */}
+      {message.messageType === 'file' && checkIfImage(message.fileUrl) && (
+        <Image
+          source={{uri: `${HOST}/${message.fileUrl}`}}
+          style={styles.image}
+          resizeMode="cover"
+        />
+      )}
 
-      <Text style={styles.messageDate}>
+      {message.messageType === 'file' && checkIfVideo(message.fileUrl) && (
+        <Video
+          source={{uri: `${HOST}/${message.fileUrl}`}}
+          style={styles.image}
+          controls={true} // Add controls for play/pause/seek
+          resizeMode="contain"
+        />
+      )}
+
+      {message.messageType === 'file' &&
+        !checkIfVideo(message.fileUrl) &&
+        !checkIfImage(message.fileUrl) && (
+          <TouchableOpacity
+            onPress={() => {
+              console.log('File pressed');
+            }}>
+            <Text style={styles.fileName}>
+              {message.fileUrl.split('/').pop()}
+            </Text>
+          </TouchableOpacity>
+        )}
+
+      <Text
+        style={[
+          styles.messageDate,
+          {
+            color: isSender ? COLORS.Black : 'white',
+          },
+        ]}>
         {moment(message.timestamp).format('LT')}
       </Text>
     </View>
@@ -70,17 +98,9 @@ const MessageItem: React.FC<MessageItemProps> = ({message}) => {
     <View
       style={{
         flexDirection: 'row',
-        justifyContent:
-          message.sender._id === selectedChatData?._id
-            ? 'flex-start'
-            : 'flex-end',
+        justifyContent: isSender ? 'flex-start' : 'flex-end',
       }}>
-      {/* {showDate && (
-        <Text style={styles.dateContainer}>
-          {moment(message.timestamp).format('LL')}
-        </Text>
-      )}  */}
-      {renderDmMessages(message)}
+      {renderMsgs(message)}
     </View>
   );
 };
@@ -93,25 +113,35 @@ const styles = StyleSheet.create({
   },
 
   messageContainer: {
-    backgroundColor: COLORS.Black,
     borderRadius: BORDERRADIUS.radius_14,
-    padding: 10,
+    padding: 2,
     minWidth: 100,
-    maxWidth: '45%',
+    maxWidth: '70%',
   },
 
   messageText: {
-    color: 'white',
     fontWeight: 300,
     fontSize: FONTSIZE.sm,
   },
 
   messageDate: {
-    color: 'white',
     fontWeight: 300,
     fontSize: FONTSIZE.xs,
     alignSelf: 'flex-end',
-    paddingTop: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 5,
+  },
+
+  image: {
+    width: 220,
+    height: 150,
+    borderTopLeftRadius: BORDERRADIUS.radius_13,
+    borderTopRightRadius: BORDERRADIUS.radius_13,
+  },
+
+  fileName: {
+    fontSize: FONTSIZE.sm,
+    fontWeight: '500',
   },
 });
 

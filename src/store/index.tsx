@@ -14,6 +14,8 @@ type PersonaSlice = {
 type StatusSlice = {
   loading: boolean;
   message: string | null;
+  isUploading: boolean;
+  fileUploadProgress: number;
   updateKeys: (data: Partial<StatusSlice>) => void;
 };
 
@@ -57,16 +59,13 @@ const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
   // updateFuncChat: typeOrData => set(typeOrData),
   updateFuncChat: set,
 
-  sortContactsByLastConversation: (message: Message) => {
+  sortContactsByLastConversation: (message: any) => {
     const {id} = get() as CreateSlice;
-    // const fromId = message.sender === id ? message.recipient : message.sender;
     const fromId =
       message.sender._id === id ? message.recipient._id : message.sender._id;
-    const contacts = [...get().directMessagesContacts];
-    // const fromData = message.sender === id ? message.recipient : message.sender;
     const fromData =
       message.sender._id === id ? message.recipient : message.sender;
-    // const fromData = contacts.find(contact => contact._id === fromId);
+    const contacts = [...get().directMessagesContacts];
     const data = contacts.find(contact => contact._id === fromId);
     const index = contacts.findIndex(contact => contact._id === fromId);
     if (index !== -1 && index !== undefined) {
@@ -74,7 +73,7 @@ const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
       if (data) {
         contacts.unshift(data);
       }
-    } else if (fromData) {
+    } else {
       contacts.unshift(fromData);
     }
     set({directMessagesContacts: contacts});
@@ -85,7 +84,8 @@ const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
 const createStatusSlice: StateCreator<StatusSlice> = set => ({
   loading: false,
   message: null,
-
+  isUploading: false,
+  fileUploadProgress: 0,
   updateKeys: set,
 });
 

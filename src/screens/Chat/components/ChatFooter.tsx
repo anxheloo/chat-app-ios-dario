@@ -11,9 +11,14 @@ import AddIcon from '../../../assets/icons/Chat/AddIcon';
 import MicrophoneIcon from '../../../assets/icons/Chat/MicrophoneIcon';
 import CameraIcon from '../../../assets/icons/Chat/CameraIcon';
 import {useAppStore} from '../../../store';
+import {apiClient} from '../../../api/apiClient';
+import {UPLOAD_FILE} from '../../../api/apis';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {getToken} from '../../../utils/TokenStorage';
 
 const ChatFooter = () => {
   const socket = useAppStore(state => state.socket);
+  const updateKeys = useAppStore(state => state.updateKeys);
   const id = useAppStore(state => state.id);
   const selectedChatData = useAppStore(state => state.selectedChatData);
   const [message, setMessage] = useState('');
@@ -23,7 +28,7 @@ const ChatFooter = () => {
 
     if (message.trim() === '') return;
 
-    socket.emit('sendMessage', {
+    socket?.emit('sendMessage', {
       sender: id,
       content: message,
       recipient: selectedChatData?._id,
@@ -32,6 +37,60 @@ const ChatFooter = () => {
     });
 
     setMessage('');
+  };
+
+  const handleCameraUpload = async () => {
+    console.log('Inside handleCameraUpload');
+
+    try {
+      const res = await launchImageLibrary({
+        mediaType: 'mixed',
+      });
+
+      console.log('This is res: ', res);
+
+      if (res.assets?.length) {
+        const formData = new FormData();
+        formData.append('file', {
+          uri: res.assets[0].uri,
+          name: res.assets[0].fileName,
+          type: res.assets[0].type,
+        });
+
+        updateKeys({isUploading: true});
+
+        const token = await getToken();
+
+        const uploadResponse = await apiClient.post(UPLOAD_FILE, formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+          onUploadProgress: data =>
+            updateKeys({
+              fileUploadProgress:
+                data.total !== undefined
+                  ? Math.round((100 * data.loaded) / data.total)
+                  : 0,
+            }),
+        });
+
+        if (uploadResponse.status === 200) {
+          updateKeys({isUploading: false});
+
+          socket?.emit('sendMessage', {
+            sender: id,
+            content: undefined,
+            recipient: selectedChatData?._id,
+            messageType: 'file',
+            fileUrl: uploadResponse.data.filePath,
+          });
+        }
+      }
+    } catch (err) {
+      updateKeys({isUploading: false});
+      console.error('Camera upload error:', err);
+    }
   };
 
   return (
@@ -49,7 +108,7 @@ const ChatFooter = () => {
       <TouchableOpacity>
         <MicrophoneIcon width={24} height={24} />
       </TouchableOpacity>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={handleCameraUpload}>
         <CameraIcon width={24} height={24} />
       </TouchableOpacity>
     </View>
@@ -62,6 +121,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 15,
     padding: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E5E5',
   },
 });
 

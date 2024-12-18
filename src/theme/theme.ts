@@ -57,10 +57,12 @@ export const FONTSIZE: FontSize = {
 };
 
 interface BorderRadius {
+  radius_13: number;
   radius_14: number;
 }
 
 export const BORDERRADIUS: BorderRadius = {
+  radius_13: 13,
   radius_14: 14,
 };
 
