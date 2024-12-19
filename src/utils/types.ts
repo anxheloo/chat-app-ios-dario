@@ -33,4 +33,8 @@ export type Contact = {
   _id: string;
   username: string;
   avatar: number;
+  lastMessageTime: string;
+  lastMessageContent?: string | undefined;
+  lastMessageType: 'text' | 'file';
+  lastMessageFileUrl?: string | undefined;
 };

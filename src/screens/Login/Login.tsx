@@ -52,13 +52,13 @@ const Login: React.FC<LoginScreenProps> = ({navigation}) => {
 
     try {
       const response = await apiClient.post(LOGIN_ROUTE, {username, pin});
-      console.log('This is response: ', response);
+      // console.log('This is response: ', response);
 
       if (response.status === 200) {
         updateKeys({loading: false, message: 'Login Successful'});
 
         saveToken(response.data.token);
-        console.log('THIS IS TOKEN: ', response.data.token);
+        // console.log('THIS IS TOKEN: ', response.data.token);
 
         const {username, avatar, id} = response.data.user;
 
@@ -69,13 +69,13 @@ const Login: React.FC<LoginScreenProps> = ({navigation}) => {
         });
 
         navigation.replace('BottomTabNavigation');
-        console.log('This is res.data: ', response.data);
+        // console.log('This is res.data: ', response.data);
       }
     } catch (error: any) {
-      console.log('This is error:', error);
-      console.log('Error response:', error.response); // Log full response
-      console.log('Error request:', error.request); // Log request details
-      console.log('Error message:', error.message); // Log error message
+      // console.log('This is error:', error);
+      // console.log('Error response:', error.response); // Log full response
+      // console.log('Error request:', error.request); // Log request details
+      // console.log('Error message:', error.message); // Log error message
       updateKeys({loading: false, message: 'Login Failed'});
       Alert.alert('Login Error', error?.response.data.message);
     } finally {

@@ -25,7 +25,7 @@ const Calls = () => {
   };
 
   const addNew = (): void => {
-    console.log('Add new');
+    // console.log('Add new');
   };
 
   const cancel = (): void => {

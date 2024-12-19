@@ -10,45 +10,25 @@ type TextMsgProps = {
 
 const TextMsg: React.FC<TextMsgProps> = ({isSender, children}) => {
   return (
-    <View
+    <Text
       style={[
-        styles.messageContainer,
+        styles.messageText,
         {
-          backgroundColor: isSender ? COLORS.LightGray2 : COLORS.Black,
+          color: isSender ? COLORS.Black : 'white',
         },
       ]}>
-      <Text
-        style={[
-          styles.messageText,
-          {
-            color: isSender ? COLORS.Black : 'white',
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
+      {children}
+    </Text>
   );
 };
 
 const styles = StyleSheet.create({
-  messageContainer: {
-    borderRadius: BORDERRADIUS.radius_14,
-    padding: 8,
-    minWidth: 100,
-    maxWidth: '70%',
-  },
-
   messageText: {
     fontWeight: 300,
     fontSize: FONTSIZE.sm,
-  },
-
-  messageDate: {
-    fontWeight: 300,
-    fontSize: FONTSIZE.xs,
-    alignSelf: 'flex-end',
-    paddingVertical: 10,
-    paddingHorizontal: 5,
+    width: '100%',
+    paddingTop: 10,
+    paddingHorizontal: 8,
   },
 });
 

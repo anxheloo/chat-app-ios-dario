@@ -63,7 +63,7 @@ const PersonasList: React.FC<PersonasListProps> = ({
         );
 
         if (res.status === 200) {
-          console.log('these are contacts:', res.data.contacts);
+          // console.log('these are contacts:', res.data.contacts);
           setSearchContacts(res.data.contacts);
         } else {
           console.log('error searching contacts');

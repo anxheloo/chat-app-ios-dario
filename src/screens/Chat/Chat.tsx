@@ -1,10 +1,20 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {KeyboardAvoidingView, StyleSheet, View} from 'react-native';
 import ChatHeader from './components/ChatHeader';
 import ChatContainer from './components/ChatContainer';
 import ChatFooter from './components/ChatFooter';
+import {useAppStore} from '../../store';
 
 const Chat = () => {
+  const updateFuncChat = useAppStore(state => state.updateFuncChat);
+
+  useEffect(() => {
+    return () => {
+      console.log('unmounting');
+      updateFuncChat({selectedChatMessages: []});
+    };
+  }, []);
+
   return (
     <KeyboardAvoidingView
       behavior="padding"

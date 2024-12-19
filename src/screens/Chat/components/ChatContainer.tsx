@@ -1,5 +1,6 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
+  ActivityIndicator,
   FlatList,
   Keyboard,
   StyleSheet,
@@ -20,32 +21,50 @@ const ChatContainer = () => {
   const updateKeys = useAppStore(state => state.updateKeys);
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
   const flatListRef = useRef<FlatList>(null);
+  const [page, setPage] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+
+  // get all messages
+  const getAllMessages = async () => {
+    if (isLoading || !hasMore) return;
+
+    setIsLoading(true);
+
+    try {
+      const token = await getToken();
+
+      const response = await apiClient.post(
+        GET_ALL_MESSAGES,
+        {id: selectedChatData?._id, page: page},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.status === 200) {
+        const {messages, hasMore: updatedHasMore} = response.data;
+
+        if (messages.length > 0) {
+          updateFuncChat({
+            selectedChatMessages: [...messages, ...selectedChatMessages],
+          });
+          setPage(prev => prev + 1);
+        }
+        setHasMore(updatedHasMore);
+      }
+    } catch (error) {
+      updateKeys({message: 'Something went wrong!'});
+      setIsLoading(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // get all messages
   useEffect(() => {
-    const getAllMessages = async () => {
-      try {
-        const token = await getToken();
-
-        const response = await apiClient.post(
-          GET_ALL_MESSAGES,
-          {id: selectedChatData?._id},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-
-        if (response.status === 200) {
-          updateFuncChat({selectedChatMessages: response.data.messages});
-          console.log('These are messages:', response.data.messages);
-        }
-      } catch (error) {
-        updateKeys({message: 'Something went wrong!'});
-      }
-    };
-
     if (selectedChatData?._id) {
       getAllMessages();
     }
@@ -56,8 +75,9 @@ const ChatContainer = () => {
     if (flatListRef.current) {
       flatListRef.current.scrollToEnd({animated: true});
     }
-  }, [selectedChatMessages]);
+  }, []);
 
+  // preprocess messages
   const preprocessMessages = () => {
     let lastMessageDate: string | null = null;
 
@@ -68,13 +88,11 @@ const ChatContainer = () => {
 
       return {
         ...message,
-        showDate, // Flag for showing the date label
+        showDate,
       };
     });
   };
-
   const processedMessages = preprocessMessages();
-
   const renderMessageItem = ({item}: {item: any}) => (
     <View>
       {item.showDate && (
@@ -93,14 +111,27 @@ const ChatContainer = () => {
     </View>
   );
 
+  // render loader on scroll up to show other messages
+  const renderLoader = () => {
+    return isLoading ? (
+      <View>
+        <ActivityIndicator size={'small'} color={'black'} />
+      </View>
+    ) : null;
+  };
+
+  const loadMoreItem = () => {
+    if (!isLoading && hasMore) {
+      getAllMessages();
+    }
+  };
+
   return (
     <TouchableWithoutFeedback onPressIn={Keyboard.dismiss}>
       <FlatList
         ref={flatListRef}
         contentContainerStyle={styles.chatContainer}
-        // data={selectedChatMessages}
-        // renderItem={({item}) => <MessageItem message={item} />}
-        data={processedMessages} // Use preprocessed messages
+        data={processedMessages}
         renderItem={renderMessageItem}
         keyExtractor={item => item._id}
         onContentSizeChange={() =>
@@ -108,6 +139,9 @@ const ChatContainer = () => {
         }
         onLayout={() => flatListRef.current?.scrollToEnd({animated: true})}
         initialNumToRender={20}
+        ListHeaderComponent={renderLoader}
+        onStartReachedThreshold={0.5}
+        onStartReached={loadMoreItem}
       />
     </TouchableWithoutFeedback>
   );
@@ -126,12 +160,6 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     fontSize: 12,
   },
-
-  // dateContainer: {
-  //   textAlign: 'center',
-  //   color: 'gray',
-  //   marginVertical: 10,
-  // },
 });
 
 export default ChatContainer;

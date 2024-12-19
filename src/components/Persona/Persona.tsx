@@ -1,9 +1,13 @@
 import React from 'react';
-import {StyleSheet, Text, TouchableOpacity} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Avatar from './Avatar';
 import {useAppStore} from '../../store';
 import {Contact, NavigationProps} from '../../utils/types';
-import {COLORS} from '../../theme/theme';
+import {COLORS, FONTSIZE} from '../../theme/theme';
+import moment from 'moment';
+import {checkIfImage, checkIfVideo} from '../../utils/helpers';
+import CameraIcon from '../../assets/icons/Chat/CameraIcon';
+import VideoIcon from '../../assets/icons/Chat/VideoIcon';
 
 type PersonaProps = {
   contact: Contact;
@@ -21,13 +25,10 @@ const Persona: React.FC<PersonaProps> = ({
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
   const selectedChatData = useAppStore(state => state.selectedChatData);
 
-  console.log('Selected chat data:', selectedChatData);
-  console.log('Selected contact:', contact);
-
   // Select contact to update chat
   const selectContact = () => {
     updateFuncChat({selectedChatData: contact});
-    console.log('Selected contact:', contact);
+    // console.log('Selected contact:', contact);
     if (cancel) {
       cancel();
     }
@@ -39,7 +40,41 @@ const Persona: React.FC<PersonaProps> = ({
     navigation?.navigate('Chat');
   };
 
-  console.log('Persona:', contact);
+  // console.log('Persona:', contact);
+
+  const renderLastMessage = () => {
+    if (contact.lastMessageType === 'text') {
+      return (
+        <Text style={styles.lastMessage} numberOfLines={1}>
+          {contact.lastMessageContent}
+        </Text>
+      );
+    }
+
+    if (contact.lastMessageType === 'file' && contact.lastMessageFileUrl) {
+      if (checkIfImage(contact.lastMessageFileUrl)) {
+        return (
+          <View style={styles.lastMessage}>
+            <CameraIcon width={12} height={12} />
+            <Text style={styles.lastMessage}>Image</Text>
+          </View>
+        );
+      } else if (checkIfVideo(contact.lastMessageFileUrl)) {
+        return (
+          <View style={styles.lastMessage}>
+            <VideoIcon width={15} height={15} />
+            <Text style={styles.lastMessage}>Video</Text>
+          </View>
+        );
+      } else {
+        return (
+          <View style={styles.lastMessage}>
+            <Text style={styles.lastMessage}>File</Text>
+          </View>
+        );
+      }
+    }
+  };
 
   return (
     <TouchableOpacity style={styles.container} onPress={selectContact}>
@@ -50,7 +85,16 @@ const Persona: React.FC<PersonaProps> = ({
         avatarHeight={version === 2 ? 34 : 27}
         backgroundColor={COLORS.LightGray2}
       />
-      <Text style={styles.username}>@{contact.username}</Text>
+      <View style={styles.secondContainer}>
+        <Text style={styles.username}>@{contact.username}</Text>
+        {version === 2 && renderLastMessage()}
+      </View>
+
+      {version === 2 && (
+        <Text style={[styles.messageDate]}>
+          {moment(contact.lastMessageTime).format('H:mm')}
+        </Text>
+      )}
     </TouchableOpacity>
   );
 };
@@ -64,8 +108,31 @@ const styles = StyleSheet.create({
     gap: 15,
   },
 
+  secondContainer: {
+    flex: 1,
+    gap: 5,
+    justifyContent: 'space-between',
+  },
+
   username: {
     fontWeight: '300',
+  },
+
+  lastMessage: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    fontSize: FONTSIZE.sm,
+    color: COLORS.LightGray,
+    maxWidth: 200,
+  },
+
+  messageDate: {
+    fontWeight: '300',
+    fontSize: FONTSIZE.sm,
+    color: 'black',
+    paddingVertical: 6,
+    alignSelf: 'flex-start',
   },
 });
 

@@ -67,7 +67,7 @@ const Messages: React.FC<MessagesScreenProps> = ({navigation}) => {
       });
 
       if (res.status === 200) {
-        console.log('this is user info:', res.data);
+        // console.log('this is user info:', res.data);
         setUserPersona(res.data);
       }
     };

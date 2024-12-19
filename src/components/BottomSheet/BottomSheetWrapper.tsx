@@ -12,7 +12,7 @@ const BottomSheetWrapper = forwardRef<BottomSheet, BottomSheetProps>(
   ({children}, ref) => {
     const snapPoints = useMemo(() => ['25%', '50%', '85%'], []);
     const handleSheetChanges = useCallback((index: number) => {
-      console.log('handleSheetChanges', index);
+      // console.log('handleSheetChanges', index);
     }, []);
 
     return (

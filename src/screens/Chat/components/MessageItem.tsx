@@ -7,6 +7,7 @@ import {BORDERRADIUS, COLORS, FONTSIZE} from '../../../theme/theme';
 import {HOST} from '../../../api/apis';
 import TextMsg from './TextMsg';
 import Video from 'react-native-video';
+import {checkIfImage, checkIfVideo} from '../../../utils/helpers';
 
 type MessageItemProps = {
   message: Message;
@@ -14,31 +15,7 @@ type MessageItemProps = {
 
 const MessageItem: React.FC<MessageItemProps> = ({message}) => {
   const selectedChatData = useAppStore(state => state.selectedChatData);
-
   const isSender = message.sender === selectedChatData?._id;
-
-  // let lastDate: string | null = null;
-  // const messageDate = moment(message.timestamp).format('YYYY-MM-DD');
-  // const showDate = messageDate !== lastDate;
-  // lastDate = messageDate;
-
-  console.log('This is message:', message);
-
-  const checkIfImage = (fileUrl: string) => {
-    return (
-      fileUrl.endsWith('.jpg') ||
-      fileUrl.endsWith('.jpeg') ||
-      fileUrl.endsWith('.png')
-    );
-  };
-
-  const checkIfVideo = (fileUrl: string) => {
-    return (
-      fileUrl.endsWith('.mp4') ||
-      fileUrl.endsWith('.mov') ||
-      fileUrl.endsWith('.avi')
-    );
-  };
 
   const renderMsgs = (message: Message) => (
     <View
@@ -89,7 +66,7 @@ const MessageItem: React.FC<MessageItemProps> = ({message}) => {
             color: isSender ? COLORS.Black : 'white',
           },
         ]}>
-        {moment(message.timestamp).format('LT')}
+        {moment(message.timestamp).format('H:mm')}
       </Text>
     </View>
   );
@@ -117,6 +94,7 @@ const styles = StyleSheet.create({
     padding: 2,
     minWidth: 100,
     maxWidth: '70%',
+    overflow: 'hidden',
   },
 
   messageText: {
@@ -129,7 +107,7 @@ const styles = StyleSheet.create({
     fontSize: FONTSIZE.xs,
     alignSelf: 'flex-end',
     paddingVertical: 10,
-    paddingHorizontal: 5,
+    paddingHorizontal: 8,
   },
 
   image: {

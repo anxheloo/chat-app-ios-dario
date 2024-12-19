@@ -18,7 +18,9 @@ const Content: React.FC<ContentProps> = ({openBottomSheet, navigation}) => {
     state => state.directMessagesContacts,
   );
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
+  const selectedChatMessages = useAppStore(state => state.selectedChatMessages);
 
+  // Get all contacts that we have sent a message
   useEffect(() => {
     const getContacts = async () => {
       const token = await getToken();
@@ -30,13 +32,13 @@ const Content: React.FC<ContentProps> = ({openBottomSheet, navigation}) => {
       });
 
       if (res.status === 200) {
-        console.log('This are contacts:', res.data.contacts);
+        // console.log('This are contacts:', res.data.contacts);
         updateFuncChat({directMessagesContacts: [...res.data.contacts]});
       }
     };
 
     getContacts();
-  }, []);
+  }, [selectedChatMessages]);
 
   if (directMessagesContacts.length > 0) {
     return (
