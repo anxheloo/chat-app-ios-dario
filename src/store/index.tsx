@@ -11,6 +11,11 @@ type PersonaSlice = {
   setUserPersona: (data: Partial<PersonaSlice>) => void;
 };
 
+type TokenSlice = {
+  token: string | null;
+  setToken: (token: string | null) => void;
+};
+
 type StatusSlice = {
   loading: boolean;
   message: string | null;
@@ -33,7 +38,11 @@ type SocketSlice = {
   disconnectSocket: () => void;
 };
 
-type CreateSlice = PersonaSlice & StatusSlice & ChatSlice & SocketSlice;
+type CreateSlice = PersonaSlice &
+  TokenSlice &
+  StatusSlice &
+  ChatSlice &
+  SocketSlice;
 
 const createPersonaSlice: StateCreator<PersonaSlice> = set => ({
   username: '',
@@ -41,6 +50,11 @@ const createPersonaSlice: StateCreator<PersonaSlice> = set => ({
   pin: '',
   id: null,
   setUserPersona: set,
+});
+
+const createTokenSlice: StateCreator<TokenSlice> = set => ({
+  token: null,
+  setToken: (token: string | null) => set({token}),
 });
 
 const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
@@ -124,4 +138,5 @@ export const useAppStore = create<CreateSlice>()((...args) => ({
   ...createStatusSlice(...args),
   ...chatSlice(...args),
   ...socketSlice(...args),
+  ...createTokenSlice(...args),
 }));

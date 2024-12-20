@@ -24,6 +24,7 @@ type CreatePinScreenProps = {
 
 const CreatePin: React.FC<CreatePinScreenProps> = ({navigation}) => {
   const setUserPersona = useAppStore(state => state.setUserPersona);
+  const setToken = useAppStore(state => state.setToken);
   const updateKeys = useAppStore(state => state.updateKeys);
   const username = useAppStore(state => state.username);
   const pin = useAppStore(state => state.pin);
@@ -65,6 +66,7 @@ const CreatePin: React.FC<CreatePinScreenProps> = ({navigation}) => {
         updateKeys({loading: false, message: 'Registered Successful'});
 
         saveToken(response.data.token);
+        setToken(response.data.token);
         console.log('THIS IS TOKEN: ', response.data.token);
 
         const {username, avatar, id} = response.data.user;

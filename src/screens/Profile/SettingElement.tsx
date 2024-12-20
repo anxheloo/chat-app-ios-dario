@@ -23,6 +23,7 @@ const SettingElement: React.FC<SettingProps> = ({type}) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const username = useAppStore(state => state.username);
   const setUserPersona = useAppStore(state => state.setUserPersona);
+  const setToken = useAppStore(state => state.setToken);
 
   const onClick = (): void => {
     Alert.alert('Logout', 'Are you sure you want to logout?', [
@@ -38,8 +39,9 @@ const SettingElement: React.FC<SettingProps> = ({type}) => {
     ]);
   };
 
-  const handleLogout = (): void => {
-    removeToken();
+  const handleLogout = async () => {
+    await removeToken();
+    setToken(null);
 
     setUserPersona({username: '', pin: '', avatar: 0});
 

@@ -25,6 +25,7 @@ const Login: React.FC<LoginScreenProps> = ({navigation}) => {
   const [username, setUsername] = useState('');
   const [pin, setPin] = useState('');
   const setUserPersona = useAppStore(state => state.setUserPersona);
+  const setToken = useAppStore(state => state.setToken);
   const updateKeys = useAppStore(state => state.updateKeys);
 
   // Login
@@ -57,7 +58,8 @@ const Login: React.FC<LoginScreenProps> = ({navigation}) => {
       if (response.status === 200) {
         updateKeys({loading: false, message: 'Login Successful'});
 
-        saveToken(response.data.token);
+        await saveToken(response.data.token);
+        setToken(response.data.token);
         // console.log('THIS IS TOKEN: ', response.data.token);
 
         const {username, avatar, id} = response.data.user;
@@ -90,6 +92,7 @@ const Login: React.FC<LoginScreenProps> = ({navigation}) => {
       console.log('This is token:', token);
 
       if (token) {
+        setToken(token);
         navigation.replace('BottomTabNavigation');
       }
     };

@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {
+  Platform,
   StyleSheet,
   Text,
   Touchable,
@@ -14,11 +15,11 @@ import {useAppStore} from '../../../store';
 import {apiClient} from '../../../api/apiClient';
 import {UPLOAD_FILE} from '../../../api/apis';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import {getToken} from '../../../utils/TokenStorage';
 
 const ChatFooter = () => {
   const socket = useAppStore(state => state.socket);
   const updateKeys = useAppStore(state => state.updateKeys);
+  const token = useAppStore(state => state.token);
   const id = useAppStore(state => state.id);
   const selectedChatData = useAppStore(state => state.selectedChatData);
   const [message, setMessage] = useState('');
@@ -58,8 +59,6 @@ const ChatFooter = () => {
         });
 
         updateKeys({isUploading: true});
-
-        const token = await getToken();
 
         const uploadResponse = await apiClient.post(UPLOAD_FILE, formData, {
           headers: {
@@ -123,6 +122,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderTopWidth: 1,
     borderTopColor: '#E5E5E5',
+    paddingBottom: Platform.OS === 'ios' ? 0 : 30,
   },
 });
 

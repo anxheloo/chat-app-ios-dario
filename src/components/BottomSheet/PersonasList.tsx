@@ -2,9 +2,7 @@ import React, {useState} from 'react';
 import {
   FlatList,
   Keyboard,
-  Platform,
   StyleSheet,
-  Text,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
@@ -16,22 +14,14 @@ import CloseIcon from '../../assets/icons/messages/CloseIcon';
 import Persona from '../Persona/Persona';
 import {apiClient} from '../../api/apiClient';
 import {SEARCH} from '../../api/apis';
-import {getToken} from '../../utils/TokenStorage';
-import {RootStackParamList} from '../../screens/Profile/SettingElement';
-import {NavigationProp} from '@react-navigation/native';
 import {Contact, NavigationProps} from '../../utils/types';
+import {useAppStore} from '../../store';
 
 type PersonasListProps = {
   cancel: () => void;
   addNew: () => void;
   navigation: NavigationProps;
 };
-
-// export type Contact = {
-//   _id: string;
-//   username: string;
-//   avatar: number;
-// };
 
 const PersonasList: React.FC<PersonasListProps> = ({
   cancel,
@@ -40,6 +30,7 @@ const PersonasList: React.FC<PersonasListProps> = ({
 }) => {
   const [search, setSearch] = useState<string>('');
   const [searchedContacts, setSearchContacts] = useState<Contact[]>([]);
+  const token = useAppStore(state => state.token);
 
   const clearSearch = (): void => {
     setSearch('');
@@ -49,8 +40,6 @@ const PersonasList: React.FC<PersonasListProps> = ({
 
   const searchContact = async (search: string) => {
     if (search.length > 0) {
-      const token = await getToken();
-
       try {
         const res = await apiClient.post(
           SEARCH,
@@ -63,7 +52,6 @@ const PersonasList: React.FC<PersonasListProps> = ({
         );
 
         if (res.status === 200) {
-          // console.log('these are contacts:', res.data.contacts);
           setSearchContacts(res.data.contacts);
         } else {
           console.log('error searching contacts');

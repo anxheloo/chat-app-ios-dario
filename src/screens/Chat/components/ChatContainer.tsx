@@ -11,7 +11,6 @@ import {
 import {apiClient} from '../../../api/apiClient';
 import {GET_ALL_MESSAGES} from '../../../api/apis';
 import {useAppStore} from '../../../store';
-import {getToken} from '../../../utils/TokenStorage';
 import MessageItem from './MessageItem';
 import moment from 'moment';
 
@@ -20,6 +19,7 @@ const ChatContainer = () => {
   const selectedChatMessages = useAppStore(state => state.selectedChatMessages);
   const updateKeys = useAppStore(state => state.updateKeys);
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
+  const token = useAppStore(state => state.token);
   const flatListRef = useRef<FlatList>(null);
   const [page, setPage] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -32,8 +32,6 @@ const ChatContainer = () => {
     setIsLoading(true);
 
     try {
-      const token = await getToken();
-
       const response = await apiClient.post(
         GET_ALL_MESSAGES,
         {id: selectedChatData?._id, page: page},
@@ -72,10 +70,12 @@ const ChatContainer = () => {
 
   // scroll to end
   useEffect(() => {
-    if (flatListRef.current) {
-      flatListRef.current.scrollToEnd({animated: true});
+    if (flatListRef.current && selectedChatMessages.length > 0) {
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({animated: true});
+      }, 200); // Add a slight delay to ensure the layout is finalized
     }
-  }, []);
+  }, [selectedChatMessages]);
 
   // preprocess messages
   const preprocessMessages = () => {
@@ -137,7 +137,7 @@ const ChatContainer = () => {
         onContentSizeChange={() =>
           flatListRef.current?.scrollToEnd({animated: true})
         }
-        onLayout={() => flatListRef.current?.scrollToEnd({animated: true})}
+        // onLayout={() => flatListRef.current?.scrollToEnd({animated: true})}
         initialNumToRender={20}
         ListHeaderComponent={renderLoader}
         onStartReachedThreshold={0.5}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {Message} from '../../../utils/types';
 import moment from 'moment';
@@ -8,6 +8,9 @@ import {HOST} from '../../../api/apis';
 import TextMsg from './TextMsg';
 import Video from 'react-native-video';
 import {checkIfImage, checkIfVideo} from '../../../utils/helpers';
+import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
+import DeleteIcon from '../../../assets/icons/Chat/DeleteIcon';
+import DeleteMsg from '../../../components/modals/DeleteMsg';
 
 type MessageItemProps = {
   message: Message;
@@ -16,6 +19,7 @@ type MessageItemProps = {
 const MessageItem: React.FC<MessageItemProps> = ({message}) => {
   const selectedChatData = useAppStore(state => state.selectedChatData);
   const isSender = message.sender === selectedChatData?._id;
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   const renderMsgs = (message: Message) => (
     <View
@@ -59,6 +63,10 @@ const MessageItem: React.FC<MessageItemProps> = ({message}) => {
           </TouchableOpacity>
         )}
 
+      {message.messageType === 'deleted' && (
+        <TextMsg isSender={isSender}>Message deleted</TextMsg>
+      )}
+
       <Text
         style={[
           styles.messageDate,
@@ -71,14 +79,45 @@ const MessageItem: React.FC<MessageItemProps> = ({message}) => {
     </View>
   );
 
+  // render delete icon
+  const renderRightActions = () => {
+    return (
+      <View style={styles.renderRightActions}>
+        <TouchableOpacity onPress={() => setShowModal(true)}>
+          <DeleteIcon width={17.5} height={21.5} />
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: isSender ? 'flex-start' : 'flex-end',
-      }}>
-      {renderMsgs(message)}
-    </View>
+    <>
+      {!isSender && message.messageType !== 'deleted' ? (
+        <Swipeable
+          renderRightActions={renderRightActions}
+          overshootRight={false}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: isSender ? 'flex-start' : 'flex-end',
+            }}>
+            {renderMsgs(message)}
+          </View>
+        </Swipeable>
+      ) : (
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: isSender ? 'flex-start' : 'flex-end',
+          }}>
+          {renderMsgs(message)}
+        </View>
+      )}
+
+      {showModal && (
+        <DeleteMsg msgId={message._id} setShowModal={setShowModal} />
+      )}
+    </>
   );
 };
 
@@ -120,6 +159,13 @@ const styles = StyleSheet.create({
   fileName: {
     fontSize: FONTSIZE.sm,
     fontWeight: '500',
+  },
+
+  renderRightActions: {
+    width: 50,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

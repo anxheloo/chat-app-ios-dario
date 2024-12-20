@@ -6,7 +6,6 @@ import Persona from '../../components/Persona/Persona';
 import {NavigationProps} from '../../utils/types';
 import {apiClient} from '../../api/apiClient';
 import {GET_CONTACTS_FOR_DM} from '../../api/apis';
-import {getToken} from '../../utils/TokenStorage';
 
 type ContentProps = {
   openBottomSheet: () => void;
@@ -17,14 +16,14 @@ const Content: React.FC<ContentProps> = ({openBottomSheet, navigation}) => {
   const directMessagesContacts = useAppStore(
     state => state.directMessagesContacts,
   );
+  const token = useAppStore(state => state.token);
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
   const selectedChatMessages = useAppStore(state => state.selectedChatMessages);
 
   // Get all contacts that we have sent a message
   useEffect(() => {
+    console.log('Inside get all contacts that we have sent message');
     const getContacts = async () => {
-      const token = await getToken();
-
       const res = await apiClient.get(GET_CONTACTS_FOR_DM, {
         headers: {
           Authorization: `Bearer ${token}`,

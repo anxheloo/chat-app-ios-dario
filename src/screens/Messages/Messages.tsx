@@ -14,7 +14,6 @@ import Header from '../../components/Header/Header';
 import ReusableInput from '../../components/ReusableInput';
 import SearchIcon from '../../assets/icons/messages/SearchIcon';
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
-import {getToken} from '../../utils/TokenStorage';
 import {apiClient} from '../../api/apiClient';
 import {GET_USER_INFO} from '../../api/apis';
 import {useAppStore} from '../../store';
@@ -30,6 +29,7 @@ const Messages: React.FC<MessagesScreenProps> = ({navigation}) => {
   const [search, setSearch] = useState<string>('');
   const bottomSheetRef = useRef<BottomSheet | null>(null);
   const setUserPersona = useAppStore(state => state.setUserPersona);
+  const token = useAppStore(state => state.token);
 
   // Socket initialization when user logs in.
   useSocket();
@@ -59,7 +59,6 @@ const Messages: React.FC<MessagesScreenProps> = ({navigation}) => {
   //  Get user info
   useEffect(() => {
     const getUserInfo = async () => {
-      const token = await getToken();
       const res = await apiClient.get(GET_USER_INFO, {
         headers: {
           Authorization: `Bearer ${token}`,

@@ -40,8 +40,6 @@ const Persona: React.FC<PersonaProps> = ({
     navigation?.navigate('Chat');
   };
 
-  // console.log('Persona:', contact);
-
   const renderLastMessage = () => {
     if (contact.lastMessageType === 'text') {
       return (
