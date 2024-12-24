@@ -13,6 +13,7 @@ type AvatarProps = {
   avatarHeight: number;
   backgroundColor?: string;
   routeName?: string;
+  onPress?: () => void;
 };
 
 const Avatar: React.FC<AvatarProps> = ({
@@ -22,6 +23,7 @@ const Avatar: React.FC<AvatarProps> = ({
   avatarHeight,
   backgroundColor = 'white',
   routeName,
+  onPress,
 }) => {
   const avatar = useAppStore(state => state.avatar);
 
@@ -30,7 +32,7 @@ const Avatar: React.FC<AvatarProps> = ({
   return (
     <View style={[styles.container, {backgroundColor, width, height}]}>
       {routeName === 'Profile' && (
-        <TouchableOpacity style={styles.editContainer}>
+        <TouchableOpacity style={styles.editContainer} onPress={onPress}>
           <EditIcon width={10} height={12} />
         </TouchableOpacity>
       )}

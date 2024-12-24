@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {
+  KeyboardAvoidingView,
   Platform,
   StyleSheet,
   Text,
@@ -93,24 +94,26 @@ const ChatFooter = () => {
   };
 
   return (
-    <View style={styles.footerContainer}>
-      <View style={{flex: 1}}>
-        <ReusableInput
-          placeholder="Write"
-          value={message}
-          onChange={setMessage}
-          icon2={<AddIcon width={21.5} height={21.5} />}
-          onSubmitEditing={sendMessage}
-        />
-      </View>
+    <KeyboardAvoidingView behavior="padding">
+      <View style={styles.footerContainer}>
+        <View style={{flex: 1}}>
+          <ReusableInput
+            placeholder="Write"
+            value={message}
+            onChange={setMessage}
+            icon2={<AddIcon width={21.5} height={21.5} />}
+            onSubmitEditing={sendMessage}
+          />
+        </View>
 
-      <TouchableOpacity>
-        <MicrophoneIcon width={24} height={24} />
-      </TouchableOpacity>
-      <TouchableOpacity onPress={handleCameraUpload}>
-        <CameraIcon width={24} height={24} />
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity>
+          <MicrophoneIcon width={24} height={24} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleCameraUpload}>
+          <CameraIcon width={24} height={24} />
+        </TouchableOpacity>
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -119,10 +122,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 15,
-    padding: 12,
+    paddingHorizontal: 12,
     borderTopWidth: 1,
     borderTopColor: '#E5E5E5',
-    paddingBottom: Platform.OS === 'ios' ? 0 : 30,
+    // paddingBottom: Platform.OS === 'ios' ? 0 : 30,
   },
 });
 

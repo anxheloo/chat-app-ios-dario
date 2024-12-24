@@ -16,17 +16,15 @@ const SelectAvatar: React.FC<SelectAvatarProps> = ({cancel, setFunc}) => {
   const setUserPersona = useAppStore(state => state.setUserPersona);
   const avatar = useAppStore(state => state.avatar);
 
-  const SelectedIcon = avatarUrls[avatar];
-
   return (
-    <>
+    <View style={styles.safeAreaView}>
       <View style={styles.header}>
         <ReusableText fontSize={FONTSIZE.md} fontWeight={300} onPress={cancel}>
           Cancel
         </ReusableText>
-        <ReusableText fontSize={FONTSIZE.md} fontWeight={500} onPress={setFunc}>
+        {/* <ReusableText fontSize={FONTSIZE.md} fontWeight={500} onPress={setFunc}>
           Set
-        </ReusableText>
+        </ReusableText> */}
       </View>
 
       <View style={styles.textContainer}>
@@ -53,8 +51,8 @@ const SelectAvatar: React.FC<SelectAvatarProps> = ({cancel, setFunc}) => {
           alignItems: 'center',
         }}>
         <View style={styles.avatarContainer}>
-          {avatarUrls.map((url, index) => {
-            const SelectedAvatar = url;
+          {avatarUrls.map((icon, index) => {
+            const SelectedAvatar = icon;
 
             return (
               <TouchableOpacity
@@ -71,11 +69,16 @@ const SelectAvatar: React.FC<SelectAvatarProps> = ({cancel, setFunc}) => {
         </View>
       </View>
       <ReusableButton text="Set" onPress={setFunc} />
-    </>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  safeAreaView: {
+    flex: 1,
+    // paddingBottom: Platform.OS === 'android' ? 50 : 0,
+  },
+
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',

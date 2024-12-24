@@ -1,5 +1,12 @@
 import React from 'react';
-import {Modal, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Dimensions,
+} from 'react-native';
 import {BORDERRADIUS, COLORS, FONTSIZE} from '../../theme/theme';
 import {apiClient} from '../../api/apiClient';
 import {DELETE_MESSAGE} from '../../api/apis';
@@ -7,10 +14,15 @@ import {useAppStore} from '../../store';
 
 type DeleteMsgProps = {
   msgId: string;
+  showModal: boolean;
   setShowModal: (value: boolean) => void;
 };
 
-const DeleteMsg: React.FC<DeleteMsgProps> = ({msgId, setShowModal}) => {
+const DeleteMsg: React.FC<DeleteMsgProps> = ({
+  msgId,
+  setShowModal,
+  showModal,
+}) => {
   const token = useAppStore(state => state.token);
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
   const {selectedChatMessages} = useAppStore.getState();
@@ -51,45 +63,50 @@ const DeleteMsg: React.FC<DeleteMsgProps> = ({msgId, setShowModal}) => {
   };
 
   return (
-    <Modal
-      animationType="fade"
-      onRequestClose={() => setShowModal(false)}
-      transparent>
-      <View style={styles.overlay}>
-        <View style={styles.content}>
-          <Text style={styles.title}>Are you sure?</Text>
+    <View>
+      <Modal
+        visible={showModal}
+        animationType="fade"
+        onRequestClose={() => setShowModal(false)}
+        transparent={true}>
+        <View style={styles.overlay}>
+          <View style={styles.content}>
+            <Text style={styles.title}>Are you sure?</Text>
 
-          <View style={styles.btnContainer}>
-            <TouchableOpacity
-              style={[styles.btn]}
-              onPress={() => {
-                setShowModal(false);
-              }}>
-              <Text style={{fontWeight: '300', fontSize: FONTSIZE.md}}>
-                Cancel
-              </Text>
-            </TouchableOpacity>
+            <View style={styles.btnContainer}>
+              <TouchableOpacity
+                style={[styles.btn]}
+                onPress={() => {
+                  setShowModal(false);
+                }}>
+                <Text style={{fontWeight: '300', fontSize: FONTSIZE.md}}>
+                  Cancel
+                </Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={handleDelete}
-              style={[styles.btn, {backgroundColor: 'white'}]}>
-              <Text style={{fontWeight: '500', fontSize: FONTSIZE.md}}>
-                Delete
-              </Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleDelete}
+                style={[styles.btn, {backgroundColor: 'white'}]}>
+                <Text style={{fontWeight: '500', fontSize: FONTSIZE.md}}>
+                  Delete
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </View>
-    </Modal>
+      </Modal>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   overlay: {
-    flex: 1,
+    height: Dimensions.get('window').height,
+    width: Dimensions.get('window').width,
     backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent black background
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 1,
   },
 
   content: {
@@ -101,6 +118,7 @@ const styles = StyleSheet.create({
     borderRadius: BORDERRADIUS.radius_14,
     justifyContent: 'space-around',
     alignItems: 'center',
+    zIndex: 2,
   },
 
   title: {

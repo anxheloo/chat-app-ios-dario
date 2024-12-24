@@ -91,7 +91,7 @@ const MessageItem: React.FC<MessageItemProps> = ({message}) => {
   };
 
   return (
-    <>
+    <View>
       {!isSender && message.messageType !== 'deleted' ? (
         <Swipeable
           renderRightActions={renderRightActions}
@@ -113,11 +113,12 @@ const MessageItem: React.FC<MessageItemProps> = ({message}) => {
           {renderMsgs(message)}
         </View>
       )}
-
-      {showModal && (
-        <DeleteMsg msgId={message._id} setShowModal={setShowModal} />
-      )}
-    </>
+      <DeleteMsg
+        msgId={message._id}
+        setShowModal={setShowModal}
+        showModal={showModal}
+      />
+    </View>
   );
 };
 

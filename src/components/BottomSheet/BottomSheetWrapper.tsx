@@ -10,7 +10,7 @@ type BottomSheetProps = {
 
 const BottomSheetWrapper = forwardRef<BottomSheet, BottomSheetProps>(
   ({children}, ref) => {
-    const snapPoints = useMemo(() => ['25%', '50%', '85%'], []);
+    const snapPoints = useMemo(() => ['25%', '50%', '75%'], []);
     const handleSheetChanges = useCallback((index: number) => {
       // console.log('handleSheetChanges', index);
     }, []);
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
       width: 0,
       height: 5,
     },
-    elevation: 35,
+    elevation: 25,
     shadowRadius: 10,
     shadowOpacity: 5,
     shadowColor: 'black',

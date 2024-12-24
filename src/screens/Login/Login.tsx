@@ -1,9 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import {
   Alert,
+  Dimensions,
   Keyboard,
   KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  StatusBar,
   StyleSheet,
+  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
@@ -53,7 +58,7 @@ const Login: React.FC<LoginScreenProps> = ({navigation}) => {
 
     try {
       const response = await apiClient.post(LOGIN_ROUTE, {username, pin});
-      // console.log('This is response: ', response);
+      console.log('This is response: ', response);
 
       if (response.status === 200) {
         updateKeys({loading: false, message: 'Login Successful'});
@@ -74,10 +79,10 @@ const Login: React.FC<LoginScreenProps> = ({navigation}) => {
         // console.log('This is res.data: ', response.data);
       }
     } catch (error: any) {
-      // console.log('This is error:', error);
-      // console.log('Error response:', error.response); // Log full response
-      // console.log('Error request:', error.request); // Log request details
-      // console.log('Error message:', error.message); // Log error message
+      console.log('This is error:', error);
+      console.log('Error response:', error.response); // Log full response
+      console.log('Error request:', error.request); // Log request details
+      console.log('Error message:', error.message); // Log error message
       updateKeys({loading: false, message: 'Login Failed'});
       Alert.alert('Login Error', error?.response.data.message);
     } finally {
@@ -101,60 +106,63 @@ const Login: React.FC<LoginScreenProps> = ({navigation}) => {
   }, []);
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={styles.safeAreaView}>
-      <TouchableWithoutFeedback onPressIn={Keyboard.dismiss}>
-        <View style={styles.container}>
-          <View style={styles.textContainer}>
-            <ReusableText fontSize={FONTSIZE.title} fontWeight={700}>
-              Login
-            </ReusableText>
-
-            <ReusableText
-              fontSize={14}
-              fontWeight={FONTWEIGHT[300]}
-              color={COLORS.LightGray}
-              textAlign="center">
-              Enter the correct credentials to log in
-            </ReusableText>
-          </View>
-
-          <View style={styles.contentContainer}>
-            <View style={styles.inputContainer}>
-              <ReusableInput
-                placeholder="username"
-                value={username}
-                onChange={setUsername}
-                icon1={<ReusableText fontSize={FONTSIZE.md}>@</ReusableText>}
-              />
-              <ReusableInput
-                placeholder="PIN"
-                value={pin}
-                onChange={setPin}
-                isPassword={true}
-              />
+    <SafeAreaView style={styles.safeAreaView}>
+      <KeyboardAvoidingView behavior="padding" style={{flex: 1}}>
+        <TouchableWithoutFeedback onPressIn={Keyboard.dismiss}>
+          <View style={styles.container}>
+            <View style={styles.textContainer}>
+              <ReusableText fontSize={FONTSIZE.title} fontWeight={700}>
+                Login
+              </ReusableText>
 
               <ReusableText
-                onPress={() => navigation.navigate('CreatePersona')}
-                textDecorationLine="underline"
+                fontSize={14}
                 fontWeight={FONTWEIGHT[300]}
-                color={COLORS.Black}>
-                Don't have an account? Sign up
+                color={COLORS.LightGray}
+                textAlign="center">
+                Enter the correct credentials to log in
               </ReusableText>
             </View>
 
-            <ReusableButton text="Login" onPress={onPress} />
+            <View style={styles.contentContainer}>
+              <View style={styles.inputContainer}>
+                <ReusableInput
+                  placeholder="username"
+                  value={username}
+                  onChange={setUsername}
+                  icon1={<ReusableText fontSize={FONTSIZE.md}>@</ReusableText>}
+                />
+                <ReusableInput
+                  placeholder="PIN"
+                  value={pin}
+                  onChange={setPin}
+                  isPassword={true}
+                />
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('CreatePersona')}>
+                  <ReusableText
+                    textDecorationLine="underline"
+                    fontWeight={FONTWEIGHT[300]}
+                    color={COLORS.Black}>
+                    Don't have an account? Sign up
+                  </ReusableText>
+                </TouchableOpacity>
+              </View>
+
+              <ReusableButton text="Login" onPress={onPress} />
+            </View>
           </View>
-        </View>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   safeAreaView: {
     flex: 1,
-    padding: 20,
     backgroundColor: 'white',
+    // paddingBottom: Platform.OS === 'android' ? 50 : 0,
   },
 
   container: {

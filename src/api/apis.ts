@@ -1,15 +1,21 @@
 import {API_BASE} from '@env';
 
-export const HOST = API_BASE;
+console.log('API_BASE:', API_BASE);
+
+export const HOST = 'http://172.16.0.73:8000';
 
 export const AUTH_ROUTES = 'api/auth';
 export const SIGNUP_ROUTES = `${AUTH_ROUTES}/signup`;
 export const LOGIN_ROUTE = `${AUTH_ROUTES}/login`;
 export const GET_USER_INFO = `${AUTH_ROUTES}/user_info`;
-export const GET_PROFILE_ROUTE = `${AUTH_ROUTES}/update-profile`;
-export const ADD_PROFILE_IMAGE_ROUTE = `${AUTH_ROUTES}/add-profile-image`;
-export const REMOVE_PROFILE_IMAGE_ROUTE = `${AUTH_ROUTES}/remove-profile-image`;
-export const LOGOUT_ROUTE = `${AUTH_ROUTES}/logout`;
+export const UPDATE_USER_PROFILE_PIC = `${AUTH_ROUTES}/update-profile-pic`;
+export const UPDATE_USERNAME = `${AUTH_ROUTES}/update-username`;
+export const UPDATE_PIN = `${AUTH_ROUTES}/update-pin`;
+export const UPDATE_DISSAPEARING_MESSAGES = `${AUTH_ROUTES}/update-dissappearing-messages`;
+// export const GET_PROFILE_ROUTE = `${AUTH_ROUTES}/update-profile`;
+// export const ADD_PROFILE_IMAGE_ROUTE = `${AUTH_ROUTES}/add-profile-image`;
+// export const REMOVE_PROFILE_IMAGE_ROUTE = `${AUTH_ROUTES}/remove-profile-image`;
+// export const LOGOUT_ROUTE = `${AUTH_ROUTES}/logout`;
 
 export const CONTACTS_ROUTES = 'api/contacts';
 export const SEARCH = `${CONTACTS_ROUTES}/search`;

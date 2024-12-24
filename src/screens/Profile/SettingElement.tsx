@@ -1,102 +1,54 @@
 import React from 'react';
-import {Alert, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {BORDERRADIUS, COLORS} from '../../theme/theme';
 import ScanIcon from '../../assets/icons/messages/ScanIcon';
 import LockIcon from '../../assets/icons/profile/LockIcon';
 import ClockIcon from '../../assets/icons/profile/ClockIcon';
 import RightIcon from '../../assets/icons/profile/RighArrow';
 import {useAppStore} from '../../store';
-import {removeToken} from '../../utils/TokenStorage';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
+
+type SettingType = 'username' | 'qr-code' | 'pin' | 'clock' | 'logout';
 
 type SettingProps = {
-  type: string;
+  type: SettingType;
+  onPress?: () => void;
 };
 
-export type RootStackParamList = {
-  Login: undefined; // Replace `undefined` with params if Login takes any
-  Home: undefined; // Add other screens here
-  Chat: undefined;
-};
-
-const SettingElement: React.FC<SettingProps> = ({type}) => {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+const SettingElement: React.FC<SettingProps> = ({type, onPress}) => {
   const username = useAppStore(state => state.username);
-  const setUserPersona = useAppStore(state => state.setUserPersona);
-  const setToken = useAppStore(state => state.setToken);
 
-  const onClick = (): void => {
-    Alert.alert('Logout', 'Are you sure you want to logout?', [
-      {
-        text: 'Cancel',
-        onPress: () => console.log('Cancel Pressed'),
-        style: 'cancel',
-      },
-      {
-        text: 'Yes',
-        onPress: () => handleLogout(),
-      },
-    ]);
+  const returnBasedOnType = {
+    username: {
+      icon: <Text style={styles.username}>@</Text>,
+      text: username,
+    },
+    'qr-code': {
+      icon: <ScanIcon width={16} height={16} />,
+      text: 'My QR Code',
+    },
+    pin: {
+      icon: <LockIcon width={16} height={16} />,
+      text: 'PIN',
+    },
+    clock: {
+      icon: <ClockIcon width={16} height={16} />,
+      text: 'Disappearing Messages',
+    },
+    logout: {
+      icon: null, // No icon for logout
+      text: 'Logout',
+      // action: handleLogout,
+    },
   };
 
-  const handleLogout = async () => {
-    await removeToken();
-    setToken(null);
-
-    setUserPersona({username: '', pin: '', avatar: 0});
-
-    navigation.reset({
-      index: 0, // The index of the current active route
-      routes: [{name: 'Login'}], // Replace the stack with the Login screen
-    });
-  };
-
-  const renderIcon = (): JSX.Element | null => {
-    switch (type) {
-      case 'username':
-        return (
-          <View style={styles.conditionalView}>
-            <Text style={styles.username}>@</Text>
-            <Text style={styles.username}>{username}</Text>
-          </View>
-        );
-      case 'qr-code':
-        return (
-          <View style={styles.conditionalView}>
-            <ScanIcon width={16} height={16} />
-            <Text style={styles.username}>My QR Code</Text>
-          </View>
-        );
-      case 'pin':
-        return (
-          <View style={styles.conditionalView}>
-            <LockIcon width={16} height={16} />
-            <Text style={styles.username}>PIN</Text>
-          </View>
-        );
-      case 'clock':
-        return (
-          <View style={styles.conditionalView}>
-            <ClockIcon width={16} height={16} />
-            <Text style={styles.username}>Dissapearing Messages</Text>
-          </View>
-        );
-      case 'logout':
-        return (
-          <View style={styles.conditionalView}>
-            {/* <ClockIcon width={16} height={16} /> */}
-            <Text style={styles.username}>logout</Text>
-          </View>
-        );
-      default:
-        return null;
-    }
-  };
+  const {icon, text} = returnBasedOnType[type];
 
   return (
-    <TouchableOpacity style={styles.container} onPress={onClick}>
-      {renderIcon()}
-
+    <TouchableOpacity style={styles.container} onPress={onPress}>
+      <View style={styles.conditionalView}>
+        {icon}
+        <Text style={styles.username}>{text}</Text>
+      </View>
       <RightIcon width={4} height={8} />
     </TouchableOpacity>
   );

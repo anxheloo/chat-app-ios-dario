@@ -30,7 +30,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5E5',
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    paddingTop: 10,
   },
 
   icon: {width: 24, height: 24, alignSelf: 'flex-end'},

@@ -8,6 +8,7 @@ type PersonaSlice = {
   avatar: number;
   pin: string;
   id: string | null;
+  dissappearingMessages: string;
   setUserPersona: (data: Partial<PersonaSlice>) => void;
 };
 
@@ -49,6 +50,7 @@ const createPersonaSlice: StateCreator<PersonaSlice> = set => ({
   avatar: 0,
   pin: '',
   id: null,
+  dissappearingMessages: 'none',
   setUserPersona: set,
 });
 

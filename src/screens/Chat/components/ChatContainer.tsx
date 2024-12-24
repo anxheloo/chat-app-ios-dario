@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   FlatList,
   Keyboard,
+  SafeAreaView,
   StyleSheet,
   Text,
   TouchableWithoutFeedback,
@@ -127,6 +128,7 @@ const ChatContainer = () => {
   };
 
   return (
+    // <SafeAreaView style={{flex: 1}}>
     <TouchableWithoutFeedback onPressIn={Keyboard.dismiss}>
       <FlatList
         ref={flatListRef}
@@ -144,6 +146,7 @@ const ChatContainer = () => {
         onStartReached={loadMoreItem}
       />
     </TouchableWithoutFeedback>
+    // </SafeAreaView>
   );
 };
 

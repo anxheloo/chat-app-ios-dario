@@ -60,7 +60,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
-    // flex: 1,
     height: 46,
     borderRadius: BORDERRADIUS.radius_14,
     paddingHorizontal: 15,
@@ -76,6 +75,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 10,
     height: '100%',
+    color: COLORS.Black,
   },
 });
 
