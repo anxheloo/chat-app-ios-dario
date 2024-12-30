@@ -17,23 +17,24 @@ export type NavigationProps = NativeStackNavigationProp<RootStackParamList>;
 
 export const MessageFromServer = {};
 
-export type Contact = {
-  _id: string;
-  username: string;
-  avatar: number;
-  lastMessageTime?: string;
-  lastMessageContent?: string | undefined;
-  lastMessageType?: 'text' | 'file';
-  lastMessageFileUrl?: string | undefined;
-};
-
-// export type LastMessage = {
+// export type Contact = {
 //   _id: string;
-//   lastMessageContent: string | null;
-//   lastMessageType: 'text' | 'file';
-//   lastMessageFileUrl?: string;
-//   createdAt: string;
+//   username: string;
+//   avatar: number;
+//   lastMessageTime?: string;
+//   lastMessageContent?: string | undefined;
+//   lastMessageType?: 'text' | 'file';
+//   lastMessageFileUrl?: string | undefined;
+//   // participants?: Contact[];
 // };
+
+export type LastMessage = {
+  _id: string;
+  content: string | null;
+  messageType: 'text' | 'file';
+  fileUrl?: string | null;
+  createdAt: string;
+};
 
 export type Message = {
   _id: string;
@@ -49,11 +50,18 @@ export type Message = {
   fileUrl: string;
 };
 
+export type Contact = {
+  _id: string;
+  username: string;
+  avatar: number;
+};
+
 export type Conversation = {
   _id: string;
   participants: Contact[];
-  // lastMessage: LastMessage | null;
-  lastMessage: Message | null;
-  lastMessageTime: string;
-  isEmpty: boolean;
+  lastMessageTime?: string | null;
+  // lastMessage?: string | null;
+  lastMessage?: LastMessage;
+  lastMessageType?: 'text' | 'file' | null;
+  lastMessageFileUrl?: string | null;
 };
