@@ -1,10 +1,9 @@
 import React, {useEffect} from 'react';
 import {
+  Keyboard,
   KeyboardAvoidingView,
-  Modal,
   SafeAreaView,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
 import ChatHeader from './components/ChatHeader';
@@ -23,19 +22,18 @@ const Chat = () => {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        behavior="padding"
-        style={styles.container}
-        // keyboardVerticalOffset={-10}
-      >
+    <KeyboardAvoidingView
+      behavior="padding"
+      style={{flex: 1}}
+      keyboardVerticalOffset={50}>
+      <SafeAreaView style={styles.container}>
         <View style={styles.container}>
           <ChatHeader />
           <ChatContainer />
           <ChatFooter />
         </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 

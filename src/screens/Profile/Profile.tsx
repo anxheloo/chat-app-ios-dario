@@ -1,6 +1,14 @@
 import {useRoute} from '@react-navigation/native';
 import React, {useRef, useState} from 'react';
-import {SafeAreaView, StyleSheet, Text, View} from 'react-native';
+import {
+  Alert,
+  Keyboard,
+  KeyboardAvoidingView,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import ReusableText from '../../components/ReusableText';
 import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import Header from '../../components/Header/Header';
@@ -13,34 +21,44 @@ import {removeToken} from '../../utils/TokenStorage';
 import {useAppStore} from '../../store';
 import {NavigationProps} from '../../utils/types';
 import {apiClient} from '../../api/apiClient';
-import {UPDATE_USER_PROFILE_PIC} from '../../api/apis';
+import {UPDATE_USER_PROFILE_PIC, UPDATE_USERNAME} from '../../api/apis';
+import ChangeUsername from '../../components/BottomSheet/ChangeUsername';
+import UpdatePin from '../../components/BottomSheet/UpdatePin';
+import UpdateDissapear from '../../components/BottomSheet/UpdateDissapear';
 
 type ProfileProps = {
   navigation: NavigationProps;
 };
 
 const Profile: React.FC<ProfileProps> = ({navigation}) => {
-  const setUserPersona = useAppStore(state => state.setUserPersona);
-  const setToken = useAppStore(state => state.setToken);
   const router = useRoute();
+  const setUserPersona = useAppStore(state => state.setUserPersona);
+  const updateKeys = useAppStore(state => state.updateKeys);
+  const setToken = useAppStore(state => state.setToken);
   const bottomSheetRef = useRef<BottomSheet | null>(null);
   const [clickedSetting, setClickedSetting] = useState<string | null>(null);
 
-  const selectedAvatar = useAppStore.getState();
+  // const {avatar} = useAppStore.getState();
+  const avatar = useAppStore(state => state.avatar);
   const token = useAppStore(state => state.token);
 
   console.log('This is the route', router.name);
 
   const cancel = (): void => {
+    Keyboard.dismiss();
     bottomSheetRef?.current?.close();
   };
 
-  const setFunc = async (): Promise<void> => {
+  const updateProfilePic = async (): Promise<void> => {
+    console.log('Inside setFunc');
+    console.log('This is selectedAvatar', avatar);
+    updateKeys({isUploading: true});
+
     try {
       const res = await apiClient.post(
         UPDATE_USER_PROFILE_PIC,
         {
-          avatar: selectedAvatar,
+          avatar: avatar,
         },
         {
           headers: {
@@ -52,14 +70,17 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
       console.log('This is res');
 
       if (res.status === 200) {
+        updateKeys({isUploading: false});
         console.log('This is res', res.data);
         setUserPersona({avatar: res.data.avatar});
+        bottomSheetRef?.current?.close();
+        Alert.alert('Profile Updated', 'Your avatar has been updated');
       }
-    } catch (e) {
-      console.log(e);
+    } catch (error: any) {
+      updateKeys({isUploading: false});
+      Alert.alert('Update Error', error.response.data.message);
+      // console.log(e);
     }
-
-    // bottomSheetRef?.current?.close();
   };
 
   const handleSettingClick = (type: string): void => {
@@ -135,15 +156,16 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
       </View>
 
       <BottomSheetWrapper ref={bottomSheetRef}>
-        {/* {clickedSetting === 'username' && <UsernameUpdate cancel={cancel} />} */}
+        {clickedSetting === 'username' && <ChangeUsername cancel={cancel} />}
         {clickedSetting === 'avatar' && (
-          <SelectAvatar cancel={cancel} setFunc={setFunc} />
+          <SelectAvatar cancel={cancel} setFunc={updateProfilePic} />
         )}
+        {clickedSetting === 'pin' && <UpdatePin cancel={cancel} />}
+        {clickedSetting === 'clock' && <UpdateDissapear cancel={cancel} />}
         {/* {clickedSetting === 'qr-code' && <QRCodeModal cancel={cancel} />}
-        {clickedSetting === 'pin' && <PinUpdate cancel={cancel} />}
         {clickedSetting === 'clock' && (
           <DisappearingMessagesDropdown cancel={cancel} />
-        )} */}
+        )}  */}
       </BottomSheetWrapper>
     </SafeAreaView>
   );

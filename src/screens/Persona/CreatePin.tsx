@@ -3,6 +3,7 @@ import {
   Alert,
   Keyboard,
   KeyboardAvoidingView,
+  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -17,6 +18,7 @@ import {apiClient} from '../../api/apiClient';
 import {SIGNUP_ROUTES} from '../../api/apis';
 import {saveToken} from '../../utils/TokenStorage';
 import {NavigationProps} from '../../utils/types';
+import ReusableButton from '../../components/ReusableButton';
 
 type CreatePinScreenProps = {
   navigation: NavigationProps;
@@ -91,62 +93,60 @@ const CreatePin: React.FC<CreatePinScreenProps> = ({navigation}) => {
   };
 
   return (
-    <KeyboardAvoidingView behavior={'padding'} style={styles.container}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={{flex: 1}}>
-          <View style={styles.header}>
-            <ReusableText
-              fontSize={FONTSIZE.md}
-              fontWeight={300}
-              onPress={cancel}>
-              Cancel
-            </ReusableText>
-            <ReusableText
-              fontSize={FONTSIZE.md}
-              fontWeight={500}
-              onPress={onPress}>
-              Set
-            </ReusableText>
-          </View>
-
-          <View style={styles.content}>
-            <View style={styles.textContainer}>
-              <ReusableText fontSize={FONTSIZE.title} fontWeight={700}>
-                Create Pin
+    <KeyboardAvoidingView behavior={'padding'} style={{flex: 1}}>
+      <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.container}>
+            <View style={styles.header}>
+              <ReusableText
+                fontSize={FONTSIZE.md}
+                fontWeight={300}
+                onPress={cancel}>
+                Cancel
               </ReusableText>
               <ReusableText
-                fontSize={14}
-                fontWeight={FONTWEIGHT[300]}
-                color={COLORS.LightGray}
-                textAlign="center">
-                Please enter a 4-digit PIN you can remeber
+                fontSize={FONTSIZE.md}
+                fontWeight={500}
+                onPress={onPress}>
+                Set
               </ReusableText>
             </View>
 
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <ReusableInput
-                value={pin}
-                onChange={onChange}
-                isPassword={true}
-              />
+            <View style={styles.content}>
+              <View style={styles.textContainer}>
+                <ReusableText fontSize={FONTSIZE.title} fontWeight={700}>
+                  Create Pin
+                </ReusableText>
+                <ReusableText
+                  fontSize={14}
+                  fontWeight={FONTWEIGHT[300]}
+                  color={COLORS.LightGray}
+                  textAlign="center">
+                  Please enter a 4-digit PIN you can remeber
+                </ReusableText>
+              </View>
 
-              {pinError && (
-                <Text style={styles.errorStyle}>PIN must be 4-Digits</Text>
-              )}
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <ReusableInput
+                  value={pin}
+                  onChange={onChange}
+                  isPassword={true}
+                />
+
+                {pinError && (
+                  <Text style={styles.errorStyle}>PIN must be 4-Digits</Text>
+                )}
+              </View>
             </View>
-          </View>
 
-          <TouchableOpacity style={styles.button} onPress={onPress}>
-            <ReusableText color="white" fontWeight={FONTWEIGHT[600]}>
-              Continue
-            </ReusableText>
-          </TouchableOpacity>
-        </View>
-      </TouchableWithoutFeedback>
+            <ReusableButton text="Continue" onPress={onPress} />
+          </View>
+        </TouchableWithoutFeedback>
+      </SafeAreaView>
     </KeyboardAvoidingView>
   );
 };
@@ -193,16 +193,6 @@ const styles = StyleSheet.create({
     fontSize: FONTSIZE.sm,
     textAlign: 'center',
     paddingVertical: 10,
-  },
-
-  button: {
-    width: '100%',
-    backgroundColor: COLORS.Black,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 46,
-    borderRadius: BORDERRADIUS.radius_14,
-    marginBottom: 20,
   },
 });
 

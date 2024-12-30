@@ -3,6 +3,7 @@ import {API_BASE} from '@env';
 console.log('API_BASE:', API_BASE);
 
 export const HOST = 'http://172.16.0.73:8000';
+// export const HOST = 'http://192.168.0.105:8000';
 
 export const AUTH_ROUTES = 'api/auth';
 export const SIGNUP_ROUTES = `${AUTH_ROUTES}/signup`;
@@ -20,6 +21,7 @@ export const UPDATE_DISSAPEARING_MESSAGES = `${AUTH_ROUTES}/update-dissappearing
 export const CONTACTS_ROUTES = 'api/contacts';
 export const SEARCH = `${CONTACTS_ROUTES}/search`;
 export const GET_CONTACTS_FOR_DM = `${CONTACTS_ROUTES}/get-contacts-for-dm`;
+export const GET_CONVERSATIONS = `${CONTACTS_ROUTES}/get-conversations`;
 export const GET_ALL_CONTACTS = `${CONTACTS_ROUTES}/get-all-contacts`;
 
 export const MESSAGES_ROUTES = 'api/messages';

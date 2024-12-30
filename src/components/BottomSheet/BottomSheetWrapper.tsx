@@ -1,8 +1,14 @@
 import BottomSheet, {BottomSheetView} from '@gorhom/bottom-sheet';
-import React, {forwardRef, useCallback, useMemo} from 'react';
-import {Platform, StyleSheet} from 'react-native';
+import React, {forwardRef, useCallback, useEffect, useMemo} from 'react';
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+} from 'react-native';
 import {COLORS} from '../../theme/theme';
 import {Portal, PortalHost} from '@gorhom/portal';
+import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 
 type BottomSheetProps = {
   children: React.ReactNode;
@@ -15,6 +21,12 @@ const BottomSheetWrapper = forwardRef<BottomSheet, BottomSheetProps>(
       // console.log('handleSheetChanges', index);
     }, []);
 
+    useEffect(() => {
+      return () => {
+        Keyboard.dismiss();
+      };
+    }, []);
+
     return (
       <>
         <Portal>
@@ -23,6 +35,7 @@ const BottomSheetWrapper = forwardRef<BottomSheet, BottomSheetProps>(
             onChange={handleSheetChanges}
             snapPoints={snapPoints}
             enablePanDownToClose
+            keyboardBehavior="extend"
             index={-1}
             handleIndicatorStyle={styles.handleIndicator}
             // handleComponent={null}
@@ -68,12 +81,13 @@ const styles = StyleSheet.create({
 
   contentContainer: {
     flex: 1,
-    paddingHorizontal: Platform.OS === 'ios' ? 20 : 40,
+    // paddingHorizontal: Platform.OS === 'ios' ? 20 : 40,
+    paddingHorizontal: 20,
     justifyContent: 'space-between',
     backgroundColor: COLORS.LightGray2,
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
-    paddingBottom: 20,
+    paddingBottom: 40,
   },
 });
 

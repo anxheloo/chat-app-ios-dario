@@ -2,7 +2,7 @@ import React from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Avatar from './Avatar';
 import {useAppStore} from '../../store';
-import {Contact, NavigationProps} from '../../utils/types';
+import {Contact, Conversation, NavigationProps} from '../../utils/types';
 import {COLORS, FONTSIZE} from '../../theme/theme';
 import moment from 'moment';
 import {checkIfImage, checkIfVideo} from '../../utils/helpers';
@@ -11,6 +11,7 @@ import VideoIcon from '../../assets/icons/Chat/VideoIcon';
 
 type PersonaProps = {
   contact: Contact;
+  // contact: Conversation | Contact ;
   navigation?: NavigationProps;
   cancel?: () => void;
   version: number;
@@ -82,6 +83,7 @@ const Persona: React.FC<PersonaProps> = ({
         avatarWidth={version === 2 ? 34 : 27}
         avatarHeight={version === 2 ? 34 : 27}
         backgroundColor={COLORS.LightGray2}
+        src={contact.avatar}
       />
       <View style={styles.secondContainer}>
         <Text style={styles.username}>@{contact.username}</Text>

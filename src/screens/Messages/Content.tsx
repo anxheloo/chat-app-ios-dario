@@ -5,7 +5,7 @@ import {useAppStore} from '../../store';
 import Persona from '../../components/Persona/Persona';
 import {NavigationProps} from '../../utils/types';
 import {apiClient} from '../../api/apiClient';
-import {GET_CONTACTS_FOR_DM} from '../../api/apis';
+import {GET_CONTACTS_FOR_DM, GET_CONVERSATIONS} from '../../api/apis';
 
 type ContentProps = {
   openBottomSheet: () => void;
@@ -38,6 +38,27 @@ const Content: React.FC<ContentProps> = ({openBottomSheet, navigation}) => {
 
     getContacts();
   }, [selectedChatMessages]);
+
+  // useEffect(() => {
+  //   console.log('Fetching conversations for DM');
+
+  //   const getConversations = async () => {
+  //     const res = await apiClient.get(GET_CONVERSATIONS, {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+
+  //     if (res.status === 200) {
+  //       // Update the store with the fetched conversations
+  //       updateFuncChat({directMessagesContacts: [...res.data.conversations]});
+  //     }
+  //   };
+
+  //   getConversations();
+  // }, [selectedChatMessages]);
+
+  // console.log('This is directMessagesContacts', directMessagesContacts[0]);
 
   if (directMessagesContacts.length > 0) {
     return (

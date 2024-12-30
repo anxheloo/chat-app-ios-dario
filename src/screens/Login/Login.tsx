@@ -1,12 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {
   Alert,
-  Dimensions,
   Keyboard,
   KeyboardAvoidingView,
-  Platform,
   SafeAreaView,
-  StatusBar,
   StyleSheet,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -106,9 +103,12 @@ const Login: React.FC<LoginScreenProps> = ({navigation}) => {
   }, []);
 
   return (
-    <SafeAreaView style={styles.safeAreaView}>
-      <KeyboardAvoidingView behavior="padding" style={{flex: 1}}>
-        <TouchableWithoutFeedback onPressIn={Keyboard.dismiss}>
+    <KeyboardAvoidingView
+      behavior="padding"
+      style={{flex: 1}}
+      keyboardVerticalOffset={50}>
+      <SafeAreaView style={styles.safeAreaView}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.container}>
             <View style={styles.textContainer}>
               <ReusableText fontSize={FONTSIZE.title} fontWeight={700}>
@@ -153,8 +153,8 @@ const Login: React.FC<LoginScreenProps> = ({navigation}) => {
             </View>
           </View>
         </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -162,7 +162,6 @@ const styles = StyleSheet.create({
   safeAreaView: {
     flex: 1,
     backgroundColor: 'white',
-    // paddingBottom: Platform.OS === 'android' ? 50 : 0,
   },
 
   container: {

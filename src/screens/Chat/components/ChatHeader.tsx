@@ -12,6 +12,8 @@ const ChatHeader = () => {
   const navigation = useNavigation();
   const selectedChatData = useAppStore(state => state.selectedChatData);
 
+  console.log('THE SELECTED CHAT DATA', selectedChatData);
+
   const goBack = () => {
     navigation.goBack();
   };
@@ -29,6 +31,7 @@ const ChatHeader = () => {
           avatarWidth={19.5}
           avatarHeight={19.5}
           backgroundColor={COLORS.LightGray2}
+          src={selectedChatData?.avatar}
         />
 
         <ReusableText fontWeight={500}>

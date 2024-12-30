@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  View,
 } from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Messages from '../screens/Messages/Messages';
@@ -32,11 +33,13 @@ const BottomTabNavigation = () => {
         component={Messages}
         options={{
           tabBarIcon: ({focused}) => (
-            <MessageIcon
-              width={20}
-              height={20}
-              fill={focused ? '#212121' : COLORS.LightGray}
-            />
+            <View style={styles.iconWrapper}>
+              <MessageIcon
+                width={20}
+                height={20}
+                fill={focused ? '#212121' : COLORS.LightGray}
+              />
+            </View>
           ),
           tabBarLabel: ({focused}) => (
             <Text
@@ -54,11 +57,13 @@ const BottomTabNavigation = () => {
         component={Calls}
         options={{
           tabBarIcon: ({focused}) => (
-            <CallIcon
-              width={20}
-              height={20}
-              fill={focused ? '#212121' : COLORS.LightGray}
-            />
+            <View style={styles.iconWrapper}>
+              <CallIcon
+                width={20}
+                height={20}
+                fill={focused ? '#212121' : COLORS.LightGray}
+              />
+            </View>
           ),
           tabBarLabel: ({focused}) => (
             <Text
@@ -76,11 +81,13 @@ const BottomTabNavigation = () => {
         component={Contacts}
         options={{
           tabBarIcon: ({focused}) => (
-            <ContactsIcon
-              width={20}
-              height={20}
-              fill={focused ? '#212121' : COLORS.LightGray}
-            />
+            <View style={styles.iconWrapper}>
+              <ContactsIcon
+                width={20}
+                height={20}
+                fill={focused ? '#212121' : COLORS.LightGray}
+              />
+            </View>
           ),
           tabBarLabel: ({focused}) => (
             <Text
@@ -98,11 +105,13 @@ const BottomTabNavigation = () => {
         component={Profile}
         options={{
           tabBarIcon: ({focused}) => (
-            <ProfileIcon
-              width={20}
-              height={20}
-              fill={focused ? '#212121' : COLORS.LightGray}
-            />
+            <View style={styles.iconWrapper}>
+              <ProfileIcon
+                width={20}
+                height={20}
+                fill={focused ? '#212121' : COLORS.LightGray}
+              />
+            </View>
           ),
           tabBarLabel: ({focused}) => (
             <Text
@@ -140,6 +149,13 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.2,
     shadowRadius: 10,
+  },
+
+  iconWrapper: {
+    width: 50,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   iconContainer: {

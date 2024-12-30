@@ -1,7 +1,7 @@
 import {io} from 'socket.io-client';
 import {create, StateCreator} from 'zustand';
 import {HOST} from '../api/apis';
-import {Contact, Message} from '../utils/types';
+import {Contact, Conversation, Message} from '../utils/types';
 
 type PersonaSlice = {
   username: string;
@@ -26,9 +26,13 @@ type StatusSlice = {
 };
 
 type ChatSlice = {
+  // selectedChatData: Conversation | Contact | null;
+  // directMessagesContacts: Conversation[];
+  // selectedChatMessages: Message[];
+
   selectedChatData: Contact | null;
-  selectedChatMessages: Message[];
   directMessagesContacts: Contact[];
+  selectedChatMessages: Message[];
   updateFuncChat: (data: Partial<ChatSlice>) => void;
   sortContactsByLastConversation: (message: Message) => void;
 };
@@ -50,7 +54,7 @@ const createPersonaSlice: StateCreator<PersonaSlice> = set => ({
   avatar: 0,
   pin: '',
   id: null,
-  dissappearingMessages: 'none',
+  dissappearingMessages: 'None',
   setUserPersona: set,
 });
 
@@ -60,7 +64,6 @@ const createTokenSlice: StateCreator<TokenSlice> = set => ({
 });
 
 const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
-  // selectedChatType: null,
   selectedChatData: null,
   // existing messages
   selectedChatMessages: [],
@@ -94,6 +97,29 @@ const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
     }
     set({directMessagesContacts: contacts});
   },
+
+  // sortContactsByLastConversation: (message: any) => {
+  //   const {id} = get() as CreateSlice;
+  //   const contacts = [...get().directMessagesContacts];
+
+  //   // Find the conversation involving this message
+  //   const conversationIndex = contacts.findIndex(contact =>
+  //     contact.participants.some(participant => participant._id === id),
+  //   );
+
+  //   if (conversationIndex !== -1) {
+  //     const [updatedConversation] = contacts.splice(conversationIndex, 1);
+
+  //     // Update lastMessage details
+  //     updatedConversation.lastMessageType = message._id;
+  //     updatedConversation.lastMessageTime = message.createdAt;
+
+  //     // Move the updated conversation to the top
+  //     contacts.unshift(updatedConversation);
+  //   }
+
+  //   set({directMessagesContacts: contacts});
+  // },
 });
 
 // Status Slice

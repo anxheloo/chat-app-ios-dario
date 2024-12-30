@@ -7,6 +7,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   Platform,
+  SafeAreaView,
 } from 'react-native';
 import ReusableText from '../../components/ReusableText';
 import {BORDERRADIUS, COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
@@ -18,7 +19,7 @@ import SelectAvatar from '../../components/BottomSheet/SelectAvatar';
 import ReusableInput from '../../components/ReusableInput';
 import ReusableButton from '../../components/ReusableButton';
 import {NavigationProps} from '../../utils/types';
-import {SafeAreaView} from 'react-native-safe-area-context';
+// import {SafeAreaView} from 'react-native-safe-area-context';
 
 type CreatePersonaScreenProps = {
   navigation: NavigationProps;
@@ -49,9 +50,12 @@ const CreatePersona: React.FC<CreatePersonaScreenProps> = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={styles.safeAreaView}>
-      <KeyboardAvoidingView behavior="padding" style={{flex: 1}}>
-        <TouchableWithoutFeedback onPressIn={Keyboard.dismiss}>
+    <KeyboardAvoidingView
+      behavior="padding"
+      style={{flex: 1}}
+      keyboardVerticalOffset={50}>
+      <SafeAreaView style={styles.safeAreaView}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.container}>
             <View style={styles.textContainer}>
               <ReusableText fontSize={FONTSIZE.title} fontWeight={700}>
@@ -103,8 +107,8 @@ const CreatePersona: React.FC<CreatePersonaScreenProps> = ({navigation}) => {
         <BottomSheetWrapper ref={bottomSheetRef}>
           <SelectAvatar cancel={cancel} setFunc={setFunc} />
         </BottomSheetWrapper>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 

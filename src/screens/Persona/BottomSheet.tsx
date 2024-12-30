@@ -11,6 +11,8 @@ const BottomSheet = () => {
   // ref
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
+  const snapPoints = useMemo(() => ['25%', '50%', '75%'], []);
+
   // callbacks
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
@@ -21,22 +23,23 @@ const BottomSheet = () => {
 
   // renders
   return (
-    <GestureHandlerRootView style={styles.container}>
-      <BottomSheetModalProvider>
-        <Button
-          onPress={handlePresentModalPress}
-          title="Present Modal"
-          color="black"
-        />
-        <BottomSheetModal
-          ref={bottomSheetModalRef}
-          onChange={handleSheetChanges}>
-          <BottomSheetView style={styles.contentContainer}>
-            <Text>Awesome 🎉</Text>
-          </BottomSheetView>
-        </BottomSheetModal>
-      </BottomSheetModalProvider>
-    </GestureHandlerRootView>
+    // <GestureHandlerRootView style={styles.container}>
+    <BottomSheetModalProvider>
+      <Button
+        onPress={handlePresentModalPress}
+        title="Present Modal"
+        color="black"
+      />
+      <BottomSheetModal
+        ref={bottomSheetModalRef}
+        onChange={handleSheetChanges}
+        snapPoints={snapPoints}>
+        <BottomSheetView style={styles.contentContainer}>
+          <Text>Awesome 🎉</Text>
+        </BottomSheetView>
+      </BottomSheetModal>
+    </BottomSheetModalProvider>
+    // </GestureHandlerRootView>
   );
 };
 

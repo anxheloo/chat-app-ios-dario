@@ -74,7 +74,8 @@ const MessageItem: React.FC<MessageItemProps> = ({message}) => {
             color: isSender ? COLORS.Black : 'white',
           },
         ]}>
-        {moment(message.timestamp).format('H:mm')}
+        {/* {moment(message.timestamp).format('H:mm')} */}
+        {moment(message.createdAt).format('H:mm')}
       </Text>
     </View>
   );

@@ -22,6 +22,9 @@ const ChatFooter = () => {
   const updateKeys = useAppStore(state => state.updateKeys);
   const token = useAppStore(state => state.token);
   const id = useAppStore(state => state.id);
+  const dissapearingTimeFrame = useAppStore(
+    state => state.dissappearingMessages,
+  );
   const selectedChatData = useAppStore(state => state.selectedChatData);
   const [message, setMessage] = useState('');
 
@@ -36,6 +39,7 @@ const ChatFooter = () => {
       recipient: selectedChatData?._id,
       messageType: 'text',
       fileUrl: undefined,
+      expiresAt: dissapearingTimeFrame,
     });
 
     setMessage('');
@@ -84,6 +88,7 @@ const ChatFooter = () => {
             recipient: selectedChatData?._id,
             messageType: 'file',
             fileUrl: uploadResponse.data.filePath,
+            expiresAt: dissapearingTimeFrame,
           });
         }
       }
@@ -94,26 +99,26 @@ const ChatFooter = () => {
   };
 
   return (
-    <KeyboardAvoidingView behavior="padding">
-      <View style={styles.footerContainer}>
-        <View style={{flex: 1}}>
-          <ReusableInput
-            placeholder="Write"
-            value={message}
-            onChange={setMessage}
-            icon2={<AddIcon width={21.5} height={21.5} />}
-            onSubmitEditing={sendMessage}
-          />
-        </View>
-
-        <TouchableOpacity>
-          <MicrophoneIcon width={24} height={24} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleCameraUpload}>
-          <CameraIcon width={24} height={24} />
-        </TouchableOpacity>
+    // <KeyboardAvoidingView behavior="padding">
+    <View style={styles.footerContainer}>
+      <View style={{flex: 1}}>
+        <ReusableInput
+          placeholder="Write"
+          value={message}
+          onChange={setMessage}
+          icon2={<AddIcon width={21.5} height={21.5} />}
+          onSubmitEditing={sendMessage}
+        />
       </View>
-    </KeyboardAvoidingView>
+
+      <TouchableOpacity>
+        <MicrophoneIcon width={24} height={24} />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={handleCameraUpload}>
+        <CameraIcon width={24} height={24} />
+      </TouchableOpacity>
+    </View>
+    // </KeyboardAvoidingView>
   );
 };
 

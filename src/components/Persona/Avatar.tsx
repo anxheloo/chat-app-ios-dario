@@ -14,6 +14,7 @@ type AvatarProps = {
   backgroundColor?: string;
   routeName?: string;
   onPress?: () => void;
+  src?: number;
 };
 
 const Avatar: React.FC<AvatarProps> = ({
@@ -24,10 +25,13 @@ const Avatar: React.FC<AvatarProps> = ({
   backgroundColor = 'white',
   routeName,
   onPress,
+  src,
 }) => {
   const avatar = useAppStore(state => state.avatar);
 
-  const Avatar = avatarUrls[avatar];
+  const Avatar = avatarUrls[src !== undefined ? src : avatar];
+
+  console.log('This is src', src);
 
   return (
     <View style={[styles.container, {backgroundColor, width, height}]}>

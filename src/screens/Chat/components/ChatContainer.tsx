@@ -83,7 +83,8 @@ const ChatContainer = () => {
     let lastMessageDate: string | null = null;
 
     return selectedChatMessages.map(message => {
-      const currentMessageDate = moment(message.timestamp).format('YYYY-MM-DD');
+      // const currentMessageDate = moment(message.timestamp).format('YYYY-MM-DD');
+      const currentMessageDate = moment(message.createdAt).format('YYYY-MM-DD');
       const showDate = currentMessageDate !== lastMessageDate;
       lastMessageDate = currentMessageDate;
 
@@ -129,7 +130,7 @@ const ChatContainer = () => {
 
   return (
     // <SafeAreaView style={{flex: 1}}>
-    <TouchableWithoutFeedback onPressIn={Keyboard.dismiss}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <FlatList
         ref={flatListRef}
         contentContainerStyle={styles.chatContainer}
