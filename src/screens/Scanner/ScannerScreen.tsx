@@ -2,9 +2,14 @@ import React from 'react';
 import {Alert, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import {RNCamera} from 'react-native-camera';
+import {NavigationProps} from '../../utils/types';
 
-const ScannerScreen = ({navigation}) => {
-  const onScanSuccess = e => {
+type ScannerScreenProps = {
+  navigation: NavigationProps;
+};
+
+const ScannerScreen: React.FC<ScannerScreenProps> = ({navigation}) => {
+  const onScanSuccess = (e: any) => {
     // Handle the scanned data (e.g., userId)
     const scannedData = e.data;
     Alert.alert('QR Code Scanned', `Data: ${scannedData}`);
