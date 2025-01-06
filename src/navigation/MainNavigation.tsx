@@ -7,6 +7,7 @@ import CreatePin from '../screens/Persona/CreatePin';
 import BottomTabNavigation from './BottomTabNavigation';
 import Login from '../screens/Login/Login';
 import Chat from '../screens/Chat/Chat';
+import ScannerScreen from '../screens/Scanner/ScannerScreen';
 
 const MainNavigation = () => {
   const Stack = createNativeStackNavigator();
@@ -38,6 +39,11 @@ const MainNavigation = () => {
           <Stack.Screen
             name="BottomTabNavigation"
             component={BottomTabNavigation}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Scanner"
+            component={ScannerScreen}
             options={{headerShown: false}}
           />
         </Stack.Navigator>

@@ -2,7 +2,9 @@ import {API_BASE} from '@env';
 
 console.log('API_BASE:', API_BASE);
 
-export const HOST = 'http://172.16.0.73:8000';
+// export const HOST = 'http://172.16.0.73:8000';
+export const HOST = 'http://172.16.0.21:8000';
+
 // export const HOST = 'http://192.168.0.105:8000';
 
 export const AUTH_ROUTES = 'api/auth';

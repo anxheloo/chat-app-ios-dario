@@ -31,19 +31,20 @@ const CreatePersona: React.FC<CreatePersonaScreenProps> = ({navigation}) => {
   const bottomSheetRef = useRef<BottomSheet | null>(null);
 
   const openBottomSheet = (): void => {
-    setUserPersona({username});
+    // setUserPersona({username});
     Keyboard.dismiss();
     bottomSheetRef.current?.expand();
   };
 
   const onChange = (text: string): void => {
-    setUserPersona({username: text});
+    setUserPersona({username: text.trim()});
   };
 
   const cancel = (): void => {
     bottomSheetRef?.current?.close();
   };
 
+  // close bottom sheet and go to CreatePin screen
   const setFunc = (): void => {
     bottomSheetRef?.current?.close();
     navigation.navigate('CreatePin');

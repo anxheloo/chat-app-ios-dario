@@ -25,18 +25,22 @@ const Persona: React.FC<PersonaProps> = ({
 }) => {
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
   const selectedChatData = useAppStore(state => state.selectedChatData);
+  const loggedInUserId = useAppStore(state => state.id);
 
   const isConversation = (
     contact: Contact | Conversation,
   ): contact is Conversation => 'participants' in contact;
 
-  // Extract data based on type
   const username = isConversation(contact)
-    ? contact.participants[1].username
+    ? contact.participants.filter(
+        participant => participant._id !== loggedInUserId,
+      )[0]?.username
     : contact.username;
 
   const avatar = isConversation(contact)
-    ? contact.participants[1].avatar
+    ? contact.participants.filter(
+        participant => participant._id !== loggedInUserId,
+      )[0]?.avatar
     : contact.avatar;
 
   const lastMessageTime = isConversation(contact)
@@ -58,7 +62,9 @@ const Persona: React.FC<PersonaProps> = ({
   // Select contact to update chat
   const selectContact = () => {
     const selectedContact = isConversation(contact)
-      ? contact.participants[1]
+      ? contact.participants.filter(
+          participant => participant._id !== loggedInUserId,
+        )[0]
       : contact;
 
     // updateFuncChat({selectedChatData: contact});
@@ -144,14 +150,13 @@ const styles = StyleSheet.create({
 
   secondContainer: {
     flex: 1,
-    gap: 5,
     justifyContent: 'space-between',
+    paddingTop: 6,
   },
 
   username: {
     fontWeight: '300',
     flex: 1,
-    paddingVertical: 6,
   },
 
   lastMessage: {

@@ -11,6 +11,7 @@ type RootStackParamList = {
   BottomTabNavigation: undefined;
   CreatePersona: undefined;
   CreatePin: undefined;
+  Scanner: undefined;
 };
 
 export type NavigationProps = NativeStackNavigationProp<RootStackParamList>;

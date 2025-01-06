@@ -72,7 +72,7 @@ const Messages: React.FC<MessagesScreenProps> = ({navigation}) => {
     };
 
     getUserInfo();
-  }, []);
+  }, [token]);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>

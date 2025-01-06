@@ -82,6 +82,8 @@ const Login: React.FC<LoginScreenProps> = ({navigation}) => {
       console.log('Error message:', error.message); // Log error message
       updateKeys({loading: false, message: 'Login Failed'});
       Alert.alert('Login Error', error?.response.data.message);
+      setUsername('');
+      setPin('');
     } finally {
       updateKeys({loading: false});
     }

@@ -86,6 +86,7 @@ const CreatePin: React.FC<CreatePinScreenProps> = ({navigation}) => {
       }
     } catch (error: any) {
       updateKeys({loading: false, message: 'Register Failed'});
+      setUserPersona({username: '', pin: '', avatar: 0});
       Alert.alert('Register Error', error?.response.data.message);
     } finally {
       updateKeys({loading: false});
