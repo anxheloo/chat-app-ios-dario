@@ -3,12 +3,12 @@ import {
   Alert,
   Keyboard,
   KeyboardAvoidingView,
-  SafeAreaView,
   StyleSheet,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import ReusableText from '../../components/ReusableText';
 import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import ReusableInput from '../../components/ReusableInput';
@@ -64,13 +64,16 @@ const Login: React.FC<LoginScreenProps> = ({navigation}) => {
         setToken(response.data.token);
         // console.log('THIS IS TOKEN: ', response.data.token);
 
-        const {username, avatar, id} = response.data.user;
+        // const {username, avatar, id, dissappearingMessages, qr_code} =
+        //   response.data.user;
 
-        setUserPersona({
-          username,
-          avatar,
-          id,
-        });
+        // setUserPersona({
+        //   username,
+        //   avatar,
+        //   id,
+        //   dissappearingMessages,
+        //   qr_code,
+        // });
 
         navigation.replace('BottomTabNavigation');
         // console.log('This is res.data: ', response.data);
@@ -105,10 +108,7 @@ const Login: React.FC<LoginScreenProps> = ({navigation}) => {
   }, []);
 
   return (
-    <KeyboardAvoidingView
-      behavior="padding"
-      style={{flex: 1}}
-      keyboardVerticalOffset={50}>
+    <KeyboardAvoidingView behavior="padding" style={{flex: 1}}>
       <SafeAreaView style={styles.safeAreaView}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.container}>

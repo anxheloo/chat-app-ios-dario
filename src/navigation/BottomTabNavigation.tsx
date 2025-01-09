@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  Image,
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Platform, StyleSheet, Text, View} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Messages from '../screens/Messages/Messages';
 import Calls from '../screens/Calls/Calls';
@@ -134,7 +127,7 @@ const styles = StyleSheet.create({
   container: {
     height: 56,
     position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 20 : 40,
+    bottom: 40,
     marginLeft: '5%',
     marginRight: '5%',
     borderRadius: 14,

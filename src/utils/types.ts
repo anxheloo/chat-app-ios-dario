@@ -12,6 +12,7 @@ type RootStackParamList = {
   CreatePersona: undefined;
   CreatePin: undefined;
   Scanner: undefined;
+  ScannedUser: undefined;
 };
 
 export type NavigationProps = NativeStackNavigationProp<RootStackParamList>;

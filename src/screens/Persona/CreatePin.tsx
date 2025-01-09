@@ -3,7 +3,6 @@ import {
   Alert,
   Keyboard,
   KeyboardAvoidingView,
-  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -19,6 +18,7 @@ import {SIGNUP_ROUTES} from '../../api/apis';
 import {saveToken} from '../../utils/TokenStorage';
 import {NavigationProps} from '../../utils/types';
 import ReusableButton from '../../components/ReusableButton';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 type CreatePinScreenProps = {
   navigation: NavigationProps;
@@ -71,15 +71,16 @@ const CreatePin: React.FC<CreatePinScreenProps> = ({navigation}) => {
         setToken(response.data.token);
         console.log('THIS IS TOKEN: ', response.data.token);
 
-        const {username, avatar, id} = response.data.user;
+        // const {username, avatar, id, qr_code} = response.data.user;
 
-        setUserPersona({
-          username,
-          avatar,
-          id,
-        });
+        // setUserPersona({
+        //   username,
+        //   avatar,
+        //   id,
+        //   qr_code,
+        // });
 
-        console.log('THIS IS response.data.user,: ', response.data.user);
+        // console.log('THIS IS response.data.user,: ', response.data.user);
 
         navigation.replace('BottomTabNavigation');
         console.log('This is res.data: ', response.data);

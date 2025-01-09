@@ -1,14 +1,7 @@
 import {useRoute} from '@react-navigation/native';
 import React, {useRef, useState} from 'react';
-import {
-  Alert,
-  Keyboard,
-  KeyboardAvoidingView,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import {Alert, Keyboard, StyleSheet, View} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import ReusableText from '../../components/ReusableText';
 import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import Header from '../../components/Header/Header';
@@ -25,6 +18,7 @@ import {UPDATE_USER_PROFILE_PIC, UPDATE_USERNAME} from '../../api/apis';
 import ChangeUsername from '../../components/BottomSheet/ChangeUsername';
 import UpdatePin from '../../components/BottomSheet/UpdatePin';
 import UpdateDissapear from '../../components/BottomSheet/UpdateDissapear';
+import QRCodeModal from '../../components/BottomSheet/QRCodeModal';
 
 type ProfileProps = {
   navigation: NavigationProps;
@@ -101,7 +95,7 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
       <View style={styles.container}>
         <Header />
 
@@ -162,7 +156,10 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
         )}
         {clickedSetting === 'pin' && <UpdatePin cancel={cancel} />}
         {clickedSetting === 'clock' && <UpdateDissapear cancel={cancel} />}
+
+        {clickedSetting === 'qr-code' && <QRCodeModal cancel={cancel} />}
         {/* {clickedSetting === 'qr-code' && <QRCodeModal cancel={cancel} />}
+
         {clickedSetting === 'clock' && (
           <DisappearingMessagesDropdown cancel={cancel} />
         )}  */}

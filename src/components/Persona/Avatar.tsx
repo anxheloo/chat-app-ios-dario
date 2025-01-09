@@ -28,10 +28,7 @@ const Avatar: React.FC<AvatarProps> = ({
   src,
 }) => {
   const avatar = useAppStore(state => state.avatar);
-
   const Avatar = avatarUrls[src !== undefined ? src : avatar];
-
-  console.log('This is src', src);
 
   return (
     <View style={[styles.container, {backgroundColor, width, height}]}>

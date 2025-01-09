@@ -1,12 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {
-  SafeAreaView,
   StyleSheet,
   View,
   TouchableWithoutFeedback,
   Keyboard,
+  ActivityIndicator,
 } from 'react-native';
-
+import {SafeAreaView} from 'react-native-safe-area-context';
 import BottomSheetWrapper from '../../components/BottomSheet/BottomSheetWrapper';
 import PersonasList from '../../components/BottomSheet/PersonasList';
 import BottomSheet from '@gorhom/bottom-sheet';
@@ -26,6 +26,7 @@ type MessagesScreenProps = {
 };
 
 const Messages: React.FC<MessagesScreenProps> = ({navigation}) => {
+  const [loading, setLoading] = useState<boolean>(true);
   const [search, setSearch] = useState<string>('');
   const bottomSheetRef = useRef<BottomSheet | null>(null);
   const setUserPersona = useAppStore(state => state.setUserPersona);
@@ -59,6 +60,8 @@ const Messages: React.FC<MessagesScreenProps> = ({navigation}) => {
   //  Get user info
   useEffect(() => {
     const getUserInfo = async () => {
+      setLoading(true);
+
       const res = await apiClient.get(GET_USER_INFO, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -66,8 +69,8 @@ const Messages: React.FC<MessagesScreenProps> = ({navigation}) => {
       });
 
       if (res.status === 200) {
-        // console.log('this is user info:', res.data);
         setUserPersona(res.data);
+        setLoading(false);
       }
     };
 
@@ -76,21 +79,32 @@ const Messages: React.FC<MessagesScreenProps> = ({navigation}) => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <SafeAreaView style={styles.container}>
-        <View style={styles.container}>
-          <Header />
+      <SafeAreaView style={{backgroundColor: 'white', flex: 1}}>
+        {loading && (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="black" />
+          </View>
+        )}
 
-          <ReusableInput
-            placeholder="Search"
-            value={search}
-            onChange={setSearch}
-            clearSearch={clearSearch}
-            icon1={<SearchIcon width={15} height={15} />}
-            icon2={<CloseIcon width={15} height={15} />}
-          />
+        {!loading && (
+          <View style={styles.container}>
+            <Header />
 
-          <Content openBottomSheet={openBottomSheet} navigation={navigation} />
-        </View>
+            <ReusableInput
+              placeholder="Search"
+              value={search}
+              onChange={setSearch}
+              clearSearch={clearSearch}
+              icon1={<SearchIcon width={15} height={15} />}
+              icon2={<CloseIcon width={15} height={15} />}
+            />
+
+            <Content
+              openBottomSheet={openBottomSheet}
+              navigation={navigation}
+            />
+          </View>
+        )}
 
         <BottomSheetWrapper ref={bottomSheetRef}>
           <PersonasList
@@ -115,6 +129,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 50,
+  },
+
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

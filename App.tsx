@@ -41,9 +41,8 @@ const App = () => {
 
   return (
     <GestureHandlerRootView style={{flex: 1}}>
-      <SafeAreaProvider
-        style={{paddingTop: StatusBar.currentHeight, backgroundColor: 'white'}}>
-        {Platform.OS === 'ios' ? (
+      <SafeAreaProvider>
+        {/* {Platform.OS === 'ios' ? (
           <CustomStatusBar
             backgroundColor="transparent"
             barStyle="dark-content"
@@ -54,7 +53,13 @@ const App = () => {
             backgroundColor="transparent"
             barStyle={'dark-content'}
           />
-        )}
+        )} */}
+
+        <StatusBar
+          translucent={true}
+          backgroundColor="transparent"
+          barStyle={'dark-content'}
+        />
 
         <PortalProvider>
           <MainNavigation />

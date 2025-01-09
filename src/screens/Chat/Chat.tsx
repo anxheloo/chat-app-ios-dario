@@ -1,15 +1,10 @@
 import React, {useEffect} from 'react';
-import {
-  Keyboard,
-  KeyboardAvoidingView,
-  SafeAreaView,
-  StyleSheet,
-  View,
-} from 'react-native';
+import {KeyboardAvoidingView, StyleSheet, View} from 'react-native';
 import ChatHeader from './components/ChatHeader';
 import ChatContainer from './components/ChatContainer';
 import ChatFooter from './components/ChatFooter';
 import {useAppStore} from '../../store';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 const Chat = () => {
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
@@ -25,8 +20,8 @@ const Chat = () => {
     <KeyboardAvoidingView
       behavior="padding"
       style={{flex: 1}}
-      keyboardVerticalOffset={50}>
-      <SafeAreaView style={styles.container}>
+      keyboardVerticalOffset={-30}>
+      <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
         <View style={styles.container}>
           <ChatHeader />
           <ChatContainer />

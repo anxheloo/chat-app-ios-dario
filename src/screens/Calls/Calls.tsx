@@ -1,12 +1,11 @@
 import React, {useRef, useState} from 'react';
 import {
   Keyboard,
-  SafeAreaView,
   StyleSheet,
-  Text,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import Header from '../../components/Header/Header';
 import BottomSheet from '@gorhom/bottom-sheet';
 import BottomSheetWrapper from '../../components/BottomSheet/BottomSheetWrapper';
@@ -25,7 +24,7 @@ const Calls = () => {
   };
 
   const addNew = (): void => {
-    // console.log('Add new');
+    console.log('Add new');
   };
 
   const cancel = (): void => {
@@ -33,6 +32,7 @@ const Calls = () => {
       bottomSheetRef.current.close();
     }
   };
+
   const clearSearch = (): void => {
     setSearch('');
   };

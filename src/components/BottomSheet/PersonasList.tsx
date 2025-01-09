@@ -20,7 +20,7 @@ import {useAppStore} from '../../store';
 type PersonasListProps = {
   cancel: () => void;
   addNew: () => void;
-  navigation: NavigationProps;
+  navigation?: NavigationProps;
 };
 
 const PersonasList: React.FC<PersonasListProps> = ({

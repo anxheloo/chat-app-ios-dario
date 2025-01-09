@@ -9,6 +9,7 @@ type PersonaSlice = {
   pin: string;
   id: string | null;
   dissappearingMessages: string;
+  qr_code: string;
   setUserPersona: (data: Partial<PersonaSlice>) => void;
 };
 
@@ -55,6 +56,7 @@ const createPersonaSlice: StateCreator<PersonaSlice> = set => ({
   pin: '',
   id: null,
   dissappearingMessages: 'None',
+  qr_code: '',
   setUserPersona: set,
 });
 

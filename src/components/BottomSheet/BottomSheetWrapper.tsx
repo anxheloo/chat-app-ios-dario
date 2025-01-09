@@ -1,11 +1,6 @@
 import BottomSheet, {BottomSheetView} from '@gorhom/bottom-sheet';
 import React, {forwardRef, useCallback, useEffect, useMemo} from 'react';
-import {
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-} from 'react-native';
+import {Keyboard, KeyboardAvoidingView, StyleSheet} from 'react-native';
 import {COLORS} from '../../theme/theme';
 import {Portal, PortalHost} from '@gorhom/portal';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
