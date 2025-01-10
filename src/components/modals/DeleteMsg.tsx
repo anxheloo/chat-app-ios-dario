@@ -40,8 +40,6 @@ const DeleteMsg: React.FC<DeleteMsgProps> = ({
       );
 
       if (res.status === 200) {
-        console.log(res.data.message);
-
         updateFuncChat({
           selectedChatMessages: selectedChatMessages.map(msg => {
             if (msg._id === msgId) {

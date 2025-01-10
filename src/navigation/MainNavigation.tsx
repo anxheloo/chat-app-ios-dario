@@ -9,9 +9,10 @@ import Login from '../screens/Login/Login';
 import Chat from '../screens/Chat/Chat';
 import ScannerScreen from '../screens/Scanner/ScannerScreen';
 import ScannedUser from '../screens/Scanner/ScannedUser';
+import {RootStackParamList} from '../utils/types';
 
 const MainNavigation = () => {
-  const Stack = createNativeStackNavigator();
+  const Stack = createNativeStackNavigator<RootStackParamList>();
 
   return (
     <NavigationContainer>

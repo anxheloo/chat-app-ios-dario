@@ -55,8 +55,6 @@ const CreatePin: React.FC<CreatePinScreenProps> = ({navigation}) => {
 
   const handleRegister = async () => {
     updateKeys({loading: true});
-    console.log('Inside handleRegister');
-
     try {
       const response = await apiClient.post(SIGNUP_ROUTES, {
         username,
@@ -69,21 +67,8 @@ const CreatePin: React.FC<CreatePinScreenProps> = ({navigation}) => {
 
         saveToken(response.data.token);
         setToken(response.data.token);
-        console.log('THIS IS TOKEN: ', response.data.token);
-
-        // const {username, avatar, id, qr_code} = response.data.user;
-
-        // setUserPersona({
-        //   username,
-        //   avatar,
-        //   id,
-        //   qr_code,
-        // });
-
-        // console.log('THIS IS response.data.user,: ', response.data.user);
 
         navigation.replace('BottomTabNavigation');
-        console.log('This is res.data: ', response.data);
       }
     } catch (error: any) {
       updateKeys({loading: false, message: 'Register Failed'});

@@ -29,8 +29,6 @@ const ChatFooter = () => {
   const [message, setMessage] = useState('');
 
   const sendMessage = async () => {
-    console.log('INside contact sendMessage');
-
     if (message.trim() === '') return;
 
     socket?.emit('sendMessage', {

@@ -35,7 +35,7 @@ const ChatContainer = () => {
     try {
       const response = await apiClient.post(
         GET_ALL_MESSAGES,
-        {id: selectedChatData?._id, page: page},
+        {id: selectedChatData?._id, page},
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -74,7 +74,7 @@ const ChatContainer = () => {
     if (flatListRef.current && selectedChatMessages.length > 0) {
       setTimeout(() => {
         flatListRef.current?.scrollToEnd({animated: true});
-      }, 200); // Add a slight delay to ensure the layout is finalized
+      }, 500); // Add a slight delay to ensure the layout is finalized
     }
   }, [selectedChatMessages]);
 
@@ -122,6 +122,7 @@ const ChatContainer = () => {
     ) : null;
   };
 
+  // Load more items on scroll up
   const loadMoreItem = () => {
     if (!isLoading && hasMore) {
       getAllMessages();

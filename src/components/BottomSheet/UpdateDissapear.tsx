@@ -87,10 +87,7 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = ({cancel}) => {
     }
   };
 
-  console.log('This is dissappearingMessages', dissappearingMessages);
-
   const updateMessages = async (): Promise<void> => {
-    console.log('Inside update message function');
     setIsLoading(true);
 
     try {
@@ -105,8 +102,6 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = ({cancel}) => {
           },
         },
       );
-
-      console.log('This is res');
 
       if (res.status === 200) {
         console.log('This is res', res.data);

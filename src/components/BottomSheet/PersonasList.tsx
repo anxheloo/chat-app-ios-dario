@@ -113,12 +113,7 @@ const PersonasList: React.FC<PersonasListProps> = ({
           contentContainerStyle={styles.list}
           data={searchedContacts}
           renderItem={({item}) => (
-            <Persona
-              contact={item}
-              navigation={navigation}
-              cancel={cancel}
-              version={1}
-            />
+            <Persona contact={item} navigation={navigation} cancel={cancel} />
           )}
           keyExtractor={item => item._id}
           extraData={searchedContacts}

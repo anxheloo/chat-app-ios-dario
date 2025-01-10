@@ -11,8 +11,7 @@ const Chat = () => {
 
   useEffect(() => {
     return () => {
-      console.log('unmounting');
-      updateFuncChat({selectedChatMessages: []});
+      updateFuncChat({selectedChatMessages: [], selectedChatData: null});
     };
   }, []);
 

@@ -36,16 +36,12 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
   const avatar = useAppStore(state => state.avatar);
   const token = useAppStore(state => state.token);
 
-  console.log('This is the route', router.name);
-
   const cancel = (): void => {
     Keyboard.dismiss();
     bottomSheetRef?.current?.close();
   };
 
   const updateProfilePic = async (): Promise<void> => {
-    console.log('Inside setFunc');
-    console.log('This is selectedAvatar', avatar);
     updateKeys({isUploading: true});
 
     try {
@@ -61,11 +57,8 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
         },
       );
 
-      console.log('This is res');
-
       if (res.status === 200) {
         updateKeys({isUploading: false});
-        console.log('This is res', res.data);
         setUserPersona({avatar: res.data.avatar});
         bottomSheetRef?.current?.close();
         Alert.alert('Profile Updated', 'Your avatar has been updated');
@@ -73,7 +66,6 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
     } catch (error: any) {
       updateKeys({isUploading: false});
       Alert.alert('Update Error', error.response.data.message);
-      // console.log(e);
     }
   };
 

@@ -51,38 +51,18 @@ const Login: React.FC<LoginScreenProps> = ({navigation}) => {
   // Login
   const handleLogin = async () => {
     updateKeys({loading: true});
-    console.log('Inside handleLogin');
-
     try {
       const response = await apiClient.post(LOGIN_ROUTE, {username, pin});
-      console.log('This is response: ', response);
 
       if (response.status === 200) {
         updateKeys({loading: false, message: 'Login Successful'});
 
         await saveToken(response.data.token);
         setToken(response.data.token);
-        // console.log('THIS IS TOKEN: ', response.data.token);
-
-        // const {username, avatar, id, dissappearingMessages, qr_code} =
-        //   response.data.user;
-
-        // setUserPersona({
-        //   username,
-        //   avatar,
-        //   id,
-        //   dissappearingMessages,
-        //   qr_code,
-        // });
 
         navigation.replace('BottomTabNavigation');
-        // console.log('This is res.data: ', response.data);
       }
     } catch (error: any) {
-      console.log('This is error:', error);
-      console.log('Error response:', error.response); // Log full response
-      console.log('Error request:', error.request); // Log request details
-      console.log('Error message:', error.message); // Log error message
       updateKeys({loading: false, message: 'Login Failed'});
       Alert.alert('Login Error', error?.response.data.message);
       setUsername('');

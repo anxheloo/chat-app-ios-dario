@@ -32,7 +32,8 @@ type ChatSlice = {
   // selectedChatMessages: Message[];
 
   selectedChatData: Contact | null;
-  directMessagesContacts: Contact[];
+  // directMessagesContacts: Contact[];
+  directMessagesContacts: Conversation[];
   selectedChatMessages: Message[];
   updateFuncChat: (data: Partial<ChatSlice>) => void;
   sortContactsByLastConversation: (message: Message) => void;
@@ -80,25 +81,35 @@ const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
   // updateFuncChat: typeOrData => set(typeOrData),
   updateFuncChat: set,
 
-  sortContactsByLastConversation: (message: any) => {
-    const {id} = get() as CreateSlice;
-    const fromId =
-      message.sender._id === id ? message.recipient._id : message.sender._id;
-    const fromData =
-      message.sender._id === id ? message.recipient : message.sender;
-    const contacts = [...get().directMessagesContacts];
-    const data = contacts.find(contact => contact._id === fromId);
-    const index = contacts.findIndex(contact => contact._id === fromId);
-    if (index !== -1 && index !== undefined) {
-      contacts.splice(index, 1);
-      if (data) {
-        contacts.unshift(data);
-      }
-    } else {
-      contacts.unshift(fromData);
-    }
-    set({directMessagesContacts: contacts});
+  sortContactsByLastConversation: message => {
+    const {directMessagesContacts} = get();
+    const sortedContacts = [...directMessagesContacts].sort((a, b) => {
+      if (a._id === message.conversationId) return -1;
+      if (b._id === message.conversationId) return 1;
+      return 0;
+    });
+    set({directMessagesContacts: sortedContacts});
   },
+
+  // sortContactsByLastConversation: (message: any) => {
+  //   const {id} = get() as CreateSlice;
+  //   const fromId =
+  //     message.sender._id === id ? message.recipient._id : message.sender._id;
+  //   const fromData =
+  //     message.sender._id === id ? message.recipient : message.sender;
+  //   const contacts = [...get().directMessagesContacts];
+  //   const data = contacts.find(contact => contact._id === fromId);
+  //   const index = contacts.findIndex(contact => contact._id === fromId);
+  //   if (index !== -1 && index !== undefined) {
+  //     contacts.splice(index, 1);
+  //     if (data) {
+  //       contacts.unshift(data);
+  //     }
+  //   } else {
+  //     contacts.unshift(fromData);
+  //   }
+  //   set({directMessagesContacts: contacts});
+  // },
 
   // sortContactsByLastConversation: (message: any) => {
   //   const {id} = get() as CreateSlice;

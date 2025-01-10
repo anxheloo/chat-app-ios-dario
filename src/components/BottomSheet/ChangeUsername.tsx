@@ -28,7 +28,6 @@ const ChangeUsername: React.FC<ChangeUsernameProps> = ({cancel}) => {
   const [loading, setIsLoading] = useState<boolean>(false);
 
   const updateUsername = async (): Promise<void> => {
-    console.log('Inside username');
     setIsLoading(true);
 
     try {
@@ -44,20 +43,13 @@ const ChangeUsername: React.FC<ChangeUsernameProps> = ({cancel}) => {
         },
       );
 
-      console.log('This is res');
-
       if (res.status === 200) {
-        console.log('This is res', res.data);
         setIsLoading(false);
         setUserPersona({username: res.data.username});
         cancel();
         Alert.alert('Username Updated', 'Your username has been updated');
       }
     } catch (error: any) {
-      // console.log('Error response:', error.response); // Log full response
-      // console.log('Error res:', error.res); // Log full response
-      // console.log('Error request:', error.request); // Log request details
-      // console.log('Error message:', error.message); // Log error message
       setIsLoading(false);
       Alert.alert('Update Error', error.response.data.message);
     }

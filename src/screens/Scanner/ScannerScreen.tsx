@@ -32,26 +32,26 @@ import {BlurView} from '@react-native-community/blur';
 import {BORDERRADIUS} from '../../theme/theme';
 import ReusableText from '../../components/ReusableText';
 
-const showCodeAlert = (value: string, onDismissed: () => void): void => {
-  const buttons: AlertButton[] = [
-    {
-      text: 'Close',
-      style: 'cancel',
-      onPress: onDismissed,
-    },
-  ];
-  if (value.startsWith('http')) {
-    console.log('This is a URL');
-    buttons.push({
-      text: 'Open URL',
-      onPress: () => {
-        Linking.openURL(value);
-        onDismissed();
-      },
-    });
-  }
-  Alert.alert('Scanned Code', value, buttons);
-};
+// const showCodeAlert = (value: string, onDismissed: () => void): void => {
+//   const buttons: AlertButton[] = [
+//     {
+//       text: 'Close',
+//       style: 'cancel',
+//       onPress: onDismissed,
+//     },
+//   ];
+//   if (value.startsWith('http')) {
+//     console.log('This is a URL');
+//     buttons.push({
+//       text: 'Open URL',
+//       onPress: () => {
+//         Linking.openURL(value);
+//         onDismissed();
+//       },
+//     });
+//   }
+//   Alert.alert('Scanned Code', value, buttons);
+// };
 
 // type Props = NativeStackScreenProps<Routes, 'CodeScannerPage'>;
 
@@ -73,25 +73,26 @@ function ScannerScreen({navigation}: ScannerScreenProps): React.ReactElement {
   // 4. On code scanned, we show an aler to the user
   const isShowingAlert = useRef(false);
 
-  const onCodeScanned = useCallback((codes: Code[]) => {
-    // console.log(`Scanned ${codes.length} codes:`, codes);
-    console.log(`Scanned ${codes[0].value}!`);
-    const value = codes[0]?.value;
-    if (value == null) return;
-    if (isShowingAlert.current) return;
-    showCodeAlert(value, () => {
-      isShowingAlert.current = false;
-    });
-    isShowingAlert.current = true;
-  }, []);
+  // const onCodeScanned = useCallback((codes: Code[]) => {
+  //   // console.log(`Scanned ${codes.length} codes:`, codes);
+  //   console.log(`Scanned ${codes[0].value}!`);
+  //   const value = codes[0]?.value;
+  //   if (value == null) return;
+  //   if (isShowingAlert.current) return;
+  //   showCodeAlert(value, () => {
+  //     isShowingAlert.current = false;
+  //   });
+  //   isShowingAlert.current = true;
+  // }, []);
 
   // Inside onCodeScanned
-  // const onCodeScanned = useCallback((codes: Code[]) => {
-  //   const userId = codes[0]?.value; // Extract userId from QR code
-  //   if (!userId) return;
 
-  //   navigation.navigate('UserDetails', {userId}); // Navigate to UserDetailsScreen
-  // }, []);
+  const onCodeScanned = useCallback((codes: Code[]) => {
+    const userId = codes[0]?.value; // Extract userId from QR code
+    if (!userId) return;
+
+    navigation.navigate('ScannedUser', {userId}); // Navigate to UserDetailsScreen
+  }, []);
 
   // 5. Initialize the Code Scanner to scan QR codes and Barcodes
   const codeScanner = useCodeScanner({
@@ -108,20 +109,14 @@ function ScannerScreen({navigation}: ScannerScreenProps): React.ReactElement {
           fontSize={26}
           fontWeight={700}
           color={'white'}
-          textAlign={'center'}
-          // style={}
-          // textDecorationLine={}
-        >
+          textAlign={'center'}>
           Scan Persona
         </ReusableText>
         <ReusableText
           fontSize={14}
           fontWeight={300}
           color={'white'}
-          textAlign={'center'}
-          // style={}
-          // textDecorationLine={}
-        >
+          textAlign={'center'}>
           Place the camera on the other person's QR code
         </ReusableText>
       </View>

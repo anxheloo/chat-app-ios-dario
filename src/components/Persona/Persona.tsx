@@ -2,139 +2,53 @@ import React from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Avatar from './Avatar';
 import {useAppStore} from '../../store';
-import {Contact, Conversation, NavigationProps} from '../../utils/types';
+import {Contact, NavigationProps} from '../../utils/types';
 import {COLORS, FONTSIZE} from '../../theme/theme';
-import moment from 'moment';
-import {checkIfImage, checkIfVideo} from '../../utils/helpers';
-import CameraIcon from '../../assets/icons/Chat/CameraIcon';
-import VideoIcon from '../../assets/icons/Chat/VideoIcon';
 
 type PersonaProps = {
-  // contact: Contact;
-  contact: Contact | Conversation;
+  contact: Contact;
   navigation?: NavigationProps;
+  backgroundColor?: string;
   cancel?: () => void;
-  version: number;
 };
 
 const Persona: React.FC<PersonaProps> = ({
   contact,
   navigation,
+  backgroundColor,
   cancel,
-  version,
 }) => {
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
-  const selectedChatData = useAppStore(state => state.selectedChatData);
-  const loggedInUserId = useAppStore(state => state.id);
-
-  const isConversation = (
-    contact: Contact | Conversation,
-  ): contact is Conversation => 'participants' in contact;
-
-  const username = isConversation(contact)
-    ? contact.participants.filter(
-        participant => participant._id !== loggedInUserId,
-      )[0]?.username
-    : contact.username;
-
-  const avatar = isConversation(contact)
-    ? contact.participants.filter(
-        participant => participant._id !== loggedInUserId,
-      )[0]?.avatar
-    : contact.avatar;
-
-  const lastMessageTime = isConversation(contact)
-    ? contact.lastMessageTime
-    : undefined;
-
-  const content = isConversation(contact)
-    ? contact?.lastMessage?.content
-    : undefined;
-
-  const messageType = isConversation(contact)
-    ? contact.lastMessage?.messageType
-    : undefined;
-
-  const fileUrl = isConversation(contact)
-    ? contact.lastMessage?.fileUrl
-    : undefined;
 
   // Select contact to update chat
   const selectContact = () => {
-    const selectedContact = isConversation(contact)
-      ? contact.participants.filter(
-          participant => participant._id !== loggedInUserId,
-        )[0]
-      : contact;
+    updateFuncChat({selectedChatData: contact});
+    navigation?.navigate('Chat');
 
-    // updateFuncChat({selectedChatData: contact});
-    updateFuncChat({selectedChatData: selectedContact});
-    // console.log('Selected contact:', contact);
     if (cancel) {
       cancel();
-    }
-    if (selectedChatData && selectedChatData._id !== contact._id) {
-      updateFuncChat({selectedChatMessages: []});
-    }
-    navigation?.navigate('Chat');
-  };
-
-  const renderLastMessage = () => {
-    if (messageType === 'text') {
-      return (
-        <Text style={styles.lastMessage} numberOfLines={1}>
-          {content}
-        </Text>
-      );
-    }
-
-    if (messageType === 'file' && fileUrl) {
-      if (checkIfImage(fileUrl)) {
-        return (
-          <View style={styles.lastMessage}>
-            <CameraIcon width={12} height={12} />
-            <Text style={styles.lastMessage}>Image</Text>
-          </View>
-        );
-      } else if (checkIfVideo(fileUrl)) {
-        return (
-          <View style={styles.lastMessage}>
-            <VideoIcon width={15} height={15} />
-            <Text style={styles.lastMessage}>Video</Text>
-          </View>
-        );
-      } else {
-        return (
-          <View style={styles.lastMessage}>
-            <Text style={styles.lastMessage}>File</Text>
-          </View>
-        );
-      }
     }
   };
 
   return (
-    <TouchableOpacity style={styles.container} onPress={selectContact}>
+    <TouchableOpacity
+      activeOpacity={0.9}
+      style={[
+        styles.container,
+        {backgroundColor: backgroundColor ?? 'transparent'},
+      ]}
+      onPress={selectContact}>
       <Avatar
-        width={version === 2 ? 46 : 36}
-        height={version === 2 ? 46 : 36}
-        avatarWidth={version === 2 ? 34 : 27}
-        avatarHeight={version === 2 ? 34 : 27}
+        width={36}
+        height={36}
+        avatarWidth={27}
+        avatarHeight={27}
         backgroundColor={COLORS.LightGray2}
-        // src={contact.avatar}
-        src={avatar}
+        src={contact.avatar}
       />
       <View style={styles.secondContainer}>
-        {/* <Text style={styles.username}>@{contact.username}</Text> */}
-        <Text style={styles.username}>@{username}</Text>
-        <View>{version === 2 && renderLastMessage()}</View>
+        <Text style={styles.username}>@{contact.username}</Text>
       </View>
-
-      {version === 2 && (
-        <Text style={[styles.messageDate]}>
-          {moment(lastMessageTime).format('H:mm')}
-        </Text>
-      )}
     </TouchableOpacity>
   );
 };
@@ -143,7 +57,6 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'transparent',
     padding: 6,
     gap: 15,
   },

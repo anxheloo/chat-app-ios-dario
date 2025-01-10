@@ -26,7 +26,6 @@ const UpdatePin: React.FC<UpdatePinProps> = ({cancel}) => {
   const [loading, setIsLoading] = useState<boolean>(false);
 
   const updatePin = async (): Promise<void> => {
-    console.log('Inside username');
     setIsLoading(true);
 
     try {

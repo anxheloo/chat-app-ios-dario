@@ -12,8 +12,6 @@ const ChatHeader = () => {
   const navigation = useNavigation();
   const selectedChatData = useAppStore(state => state.selectedChatData);
 
-  console.log('THE SELECTED CHAT DATA', selectedChatData);
-
   const goBack = () => {
     navigation.goBack();
   };

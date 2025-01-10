@@ -1,6 +1,6 @@
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
-type RootStackParamList = {
+export type RootStackParamList = {
   Home: undefined;
   Chat: undefined;
   Profile: undefined;
@@ -12,7 +12,7 @@ type RootStackParamList = {
   CreatePersona: undefined;
   CreatePin: undefined;
   Scanner: undefined;
-  ScannedUser: undefined;
+  ScannedUser: {userId: string};
 };
 
 export type NavigationProps = NativeStackNavigationProp<RootStackParamList>;
@@ -42,6 +42,7 @@ export type Message = {
   _id: string;
   // sender: Contact;
   // recipient: Contact;
+  conversationId: string;
   sender: string;
   recipient: string;
   content: string;
@@ -56,6 +57,7 @@ export type Contact = {
   _id: string;
   username: string;
   avatar: number;
+  // conversationId?: string;
 };
 
 export type Conversation = {
