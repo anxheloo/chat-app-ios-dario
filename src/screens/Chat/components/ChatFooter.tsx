@@ -16,17 +16,46 @@ import {useAppStore} from '../../../store';
 import {apiClient} from '../../../api/apiClient';
 import {UPLOAD_FILE} from '../../../api/apis';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {Image, Video, Audio} from 'react-native-compressor';
+import {Message} from '../../../utils/types';
 
 const ChatFooter = () => {
   const socket = useAppStore(state => state.socket);
   const updateKeys = useAppStore(state => state.updateKeys);
+  const updateFuncChat = useAppStore(state => state.updateFuncChat);
   const token = useAppStore(state => state.token);
   const id = useAppStore(state => state.id);
   const dissapearingTimeFrame = useAppStore(
     state => state.dissappearingMessages,
   );
   const selectedChatData = useAppStore(state => state.selectedChatData);
+  const selectedChatMessages = useAppStore(state => state.selectedChatMessages);
   const [message, setMessage] = useState('');
+
+  const compressFile = async (uri: string, type: string) => {
+    if (type?.startsWith('image')) {
+      // Compress image
+      return await Image.compress(uri, {
+        compressionMethod: 'auto',
+        quality: 0.8, // Adjust quality as needed
+      });
+    } else if (type.startsWith('video')) {
+      // Compress video
+      return await Video.compress(
+        uri,
+        {compressionMethod: 'auto'},
+        progress => {
+          console.log('Video compression progress:', progress);
+        },
+      );
+    } else if (type.startsWith('audio')) {
+      // Compress audio
+      return await Audio.compress(uri, {
+        quality: 'medium', // Options: 'low', 'medium', 'high'
+      });
+    }
+    return uri; // For unsupported files, return the original URI
+  };
 
   const sendMessage = async () => {
     if (message.trim() === '') return;
@@ -49,19 +78,46 @@ const ChatFooter = () => {
     try {
       const res = await launchImageLibrary({
         mediaType: 'mixed',
+        // videoQuality: 'low',
+        // quality: 0.5,
+        // presentationStyle: 'currentContext',
+        // formatAsMp4: true,
+        // includeExtra: true,
       });
 
       console.log('This is res: ', res);
 
       if (res.assets?.length) {
+        const file = res.assets[0];
+
+        // Create a temporary message object
+        // const tempMessage = {
+        //   sender: id,
+        //   content: undefined,
+        //   recipient: selectedChatData?._id,
+        //   messageType: 'file',
+        //   fileUrl: null,
+        //   expiresAt: dissapearingTimeFrame,
+        //   uploading: true,
+        // };
+
+        // Emit the temporary message
+        // socket?.emit('sendMessage', tempMessage);
+
+        // Compress the file based on type
+        // if (file.uri && file.type) {
+        //   const compressedUri = await compressFile(file.uri, file.type);
+        //   console.log('Compressed file URI:', compressedUri);
+        //   console.log(' file URI:', file.uri);
+        //   console.log(' file.type:', file.type);
+
         const formData = new FormData();
         formData.append('file', {
-          uri: res.assets[0].uri,
-          name: res.assets[0].fileName,
-          type: res.assets[0].type,
+          uri: file.uri,
+          name: file.fileName,
+          type: file.type,
         });
-
-        updateKeys({isUploading: true});
+        console.log('This is formData object:', formData);
 
         const uploadResponse = await apiClient.post(UPLOAD_FILE, formData, {
           headers: {
@@ -77,8 +133,10 @@ const ChatFooter = () => {
             }),
         });
 
+        // updateKeys({isUploading: true});
+
         if (uploadResponse.status === 200) {
-          updateKeys({isUploading: false});
+          // updateKeys({isUploading: false});
 
           socket?.emit('sendMessage', {
             sender: id,
@@ -88,16 +146,18 @@ const ChatFooter = () => {
             fileUrl: uploadResponse.data.filePath,
             expiresAt: dissapearingTimeFrame,
           });
+        } else {
+          console.error('File upload failed:', uploadResponse);
         }
       }
+      // }
     } catch (err) {
-      updateKeys({isUploading: false});
+      // updateKeys({isUploading: false});
       console.error('Camera upload error:', err);
     }
   };
 
   return (
-    // <KeyboardAvoidingView behavior="padding">
     <View style={styles.footerContainer}>
       <View style={{flex: 1}}>
         <ReusableInput
@@ -116,7 +176,6 @@ const ChatFooter = () => {
         <CameraIcon width={24} height={24} />
       </TouchableOpacity>
     </View>
-    // </KeyboardAvoidingView>
   );
 };
 
@@ -128,7 +187,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderTopWidth: 1,
     borderTopColor: '#E5E5E5',
-    // paddingBottom: Platform.OS === 'ios' ? 0 : 30,
   },
 });
 

@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {StatusBar, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {Camera} from 'react-native-vision-camera';
 import {
@@ -6,7 +6,7 @@ import {
   CONTROL_BUTTON_SIZE,
   SAFE_AREA_PADDING,
 } from './Constants';
-import {NavigationProps, RootStackParamList} from '../../utils/types';
+import {Contact, NavigationProps, RootStackParamList} from '../../utils/types';
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
 import {BORDERRADIUS} from '../../theme/theme';
 import ReusableText from '../../components/ReusableText';
@@ -18,10 +18,6 @@ import {apiClient} from '../../api/apiClient';
 import ReusableButton from '../../components/ReusableButton';
 import {useAppStore} from '../../store';
 
-// type ScannedUserStackParamList = {
-//   ScannedUser: {userId: string};
-// };
-
 type ScannedUserProps = NativeStackScreenProps<
   RootStackParamList,
   'ScannedUser'
@@ -30,6 +26,12 @@ type ScannedUserProps = NativeStackScreenProps<
 const ScannedUser: React.FC<ScannedUserProps> = ({route, navigation}) => {
   const {userId} = route.params;
   const token = useAppStore(state => state.token);
+
+  const [scannedUser, setScannedUser] = useState({
+    username: '',
+    avatar: '',
+    id: '',
+  });
 
   useEffect(() => {
     const getScannerUserDetails = async () => {
@@ -43,6 +45,7 @@ const ScannedUser: React.FC<ScannedUserProps> = ({route, navigation}) => {
 
         if (response.status === 200) {
           const {username, avatar, id} = response.data;
+          setScannedUser({username, avatar, id});
         }
       } catch (error) {
         console.log(error);
@@ -62,11 +65,11 @@ const ScannedUser: React.FC<ScannedUserProps> = ({route, navigation}) => {
           height={70}
           avatarWidth={52.5}
           avatarHeight={52.5}
-          // src={}
+          src={Number(scannedUser?.avatar)}
         />
 
         <ReusableText fontSize={20} fontWeight={700}>
-          John Doe
+          {scannedUser?.username}
         </ReusableText>
 
         <ReusableButton

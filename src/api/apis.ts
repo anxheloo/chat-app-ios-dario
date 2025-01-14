@@ -1,4 +1,4 @@
-export const HOST = 'http://172.16.0.127:8000';
+export const HOST = 'http://172.16.0.24:8000';
 
 export const AUTH_ROUTES = 'api/auth';
 export const SIGNUP_ROUTES = `${AUTH_ROUTES}/signup`;

@@ -83,11 +83,19 @@ const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
 
   sortContactsByLastConversation: message => {
     const {directMessagesContacts} = get();
-    const sortedContacts = [...directMessagesContacts].sort((a, b) => {
-      if (a._id === message.conversationId) return -1;
-      if (b._id === message.conversationId) return 1;
-      return 0;
+    // const sortedContacts = [...directMessagesContacts].sort((a, b) => {
+    //   if (a._id === message.conversationId) return -1;
+    //   if (b._id === message.conversationId) return 1;
+    //   return 0;
+    // });
+
+    const sortedContacts = directMessagesContacts.sort((a, b) => {
+      const dateA = +Date.parse(a?.lastMessage?.createdAt ?? '');
+      const dateB = +Date.parse(b?.lastMessage?.createdAt ?? '');
+
+      return dateA - dateB;
     });
+
     set({directMessagesContacts: sortedContacts});
   },
 

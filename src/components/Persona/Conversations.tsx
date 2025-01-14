@@ -45,11 +45,15 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   // Select contact to update chat
   const selectContact = () => {
+    const conversationId = conversation._id;
+
     const selectedContact = conversation.participants.filter(
       participant => participant._id !== loggedInUserId,
     )[0];
 
-    updateFuncChat({selectedChatData: selectedContact});
+    updateFuncChat({selectedChatData: {...selectedContact, conversationId}});
+
+    console.log('This is the seelcted chat conversation:');
 
     navigation?.navigate('Chat');
 

@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   FlatList,
   Keyboard,
-  SafeAreaView,
   StyleSheet,
   Text,
   TouchableWithoutFeedback,
@@ -16,21 +15,26 @@ import MessageItem from './MessageItem';
 import moment from 'moment';
 
 const ChatContainer = () => {
+  const updateFuncChat = useAppStore(state => state.updateFuncChat);
+  const updateKeys = useAppStore(state => state.updateKeys);
   const selectedChatData = useAppStore(state => state.selectedChatData);
   const selectedChatMessages = useAppStore(state => state.selectedChatMessages);
-  const updateKeys = useAppStore(state => state.updateKeys);
-  const updateFuncChat = useAppStore(state => state.updateFuncChat);
   const token = useAppStore(state => state.token);
   const flatListRef = useRef<FlatList>(null);
-  const [page, setPage] = useState(0);
+  // const loading = useAppStore(state => state.loading);
   const [isLoading, setIsLoading] = useState(false);
+  const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
 
-  // get all messages
+  console.log('This is selected Chat Data:', selectedChatData);
+
+  // Get all messages function
   const getAllMessages = async () => {
     if (isLoading || !hasMore) return;
+    // if (loading || !hasMore) return;
 
     setIsLoading(true);
+    // updateKeys({loading: true});
 
     try {
       const response = await apiClient.post(
@@ -55,21 +59,24 @@ const ChatContainer = () => {
         setHasMore(updatedHasMore);
       }
     } catch (error) {
-      updateKeys({message: 'Something went wrong!'});
+      // updateKeys({message: 'Something went wrong!', loading: false});
       setIsLoading(false);
     } finally {
-      setIsLoading(false);
+      setTimeout(() => {
+        setIsLoading(false);
+        // updateKeys({loading: false});
+      }, 2000);
     }
   };
 
-  // get all messages
+  // Get all messages the moment we mount
   useEffect(() => {
     if (selectedChatData?._id) {
       getAllMessages();
     }
   }, [selectedChatData]);
 
-  // scroll to end
+  // Scroll to end
   useEffect(() => {
     if (flatListRef.current && selectedChatMessages.length > 0) {
       setTimeout(() => {
@@ -78,7 +85,7 @@ const ChatContainer = () => {
     }
   }, [selectedChatMessages]);
 
-  // preprocess messages
+  // Preprocess messages to include date labels
   const preprocessMessages = () => {
     let lastMessageDate: string | null = null;
 
@@ -95,6 +102,8 @@ const ChatContainer = () => {
     });
   };
   const processedMessages = preprocessMessages();
+
+  // Render message item
   const renderMessageItem = ({item}: {item: any}) => (
     <View>
       {item.showDate && (
@@ -113,9 +122,10 @@ const ChatContainer = () => {
     </View>
   );
 
-  // render loader on scroll up to show other messages
+  // Render loader on scroll up to show other messages
   const renderLoader = () => {
     return isLoading ? (
+      // return loading ? (
       <View>
         <ActivityIndicator size={'small'} color={'black'} />
       </View>
@@ -125,12 +135,12 @@ const ChatContainer = () => {
   // Load more items on scroll up
   const loadMoreItem = () => {
     if (!isLoading && hasMore) {
+      // if (!loading && hasMore) {
       getAllMessages();
     }
   };
 
   return (
-    // <SafeAreaView style={{flex: 1}}>
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <FlatList
         ref={flatListRef}
@@ -148,7 +158,6 @@ const ChatContainer = () => {
         onStartReached={loadMoreItem}
       />
     </TouchableWithoutFeedback>
-    // </SafeAreaView>
   );
 };
 

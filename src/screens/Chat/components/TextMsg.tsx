@@ -14,7 +14,7 @@ const TextMsg: React.FC<TextMsgProps> = ({isSender, children}) => {
       style={[
         styles.messageText,
         {
-          color: isSender ? COLORS.Black : 'white',
+          color: isSender ? 'white' : COLORS.Black,
         },
       ]}>
       {children}

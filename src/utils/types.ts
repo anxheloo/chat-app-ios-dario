@@ -19,17 +19,6 @@ export type NavigationProps = NativeStackNavigationProp<RootStackParamList>;
 
 export const MessageFromServer = {};
 
-// export type Contact = {
-//   _id: string;
-//   username: string;
-//   avatar: number;
-//   lastMessageTime?: string;
-//   lastMessageContent?: string | undefined;
-//   lastMessageType?: 'text' | 'file';
-//   lastMessageFileUrl?: string | undefined;
-//   // participants?: Contact[];
-// };
-
 export type LastMessage = {
   _id: string;
   content: string | null;
@@ -40,8 +29,6 @@ export type LastMessage = {
 
 export type Message = {
   _id: string;
-  // sender: Contact;
-  // recipient: Contact;
   conversationId: string;
   sender: string;
   recipient: string;
@@ -51,20 +38,20 @@ export type Message = {
   expiresAt: string;
   messageType: string;
   fileUrl: string;
+  uploading?: boolean;
 };
 
 export type Contact = {
+  conversationId?: string;
   _id: string;
   username: string;
   avatar: number;
-  // conversationId?: string;
 };
 
 export type Conversation = {
   _id: string;
   participants: Contact[];
   lastMessageTime?: string | null;
-  // lastMessage?: string | null;
   lastMessage?: LastMessage;
   lastMessageType?: 'text' | 'file' | null;
   lastMessageFileUrl?: string | null;

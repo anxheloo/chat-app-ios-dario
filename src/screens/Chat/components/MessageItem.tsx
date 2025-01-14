@@ -1,24 +1,25 @@
 import React, {useState} from 'react';
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {Message} from '../../../utils/types';
 import moment from 'moment';
 import {useAppStore} from '../../../store';
 import {BORDERRADIUS, COLORS, FONTSIZE} from '../../../theme/theme';
-import {HOST} from '../../../api/apis';
 import TextMsg from './TextMsg';
-import Video from 'react-native-video';
 import {checkIfImage, checkIfVideo} from '../../../utils/helpers';
-import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
+// import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
+import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import DeleteIcon from '../../../assets/icons/Chat/DeleteIcon';
 import DeleteMsg from '../../../components/modals/DeleteMsg';
+import ImageComponent from './MessageComponent/ImageComponent';
+import VideoComponent from './MessageComponent/VideoComponent';
 
 type MessageItemProps = {
   message: Message;
 };
 
 const MessageItem: React.FC<MessageItemProps> = ({message}) => {
-  const selectedChatData = useAppStore(state => state.selectedChatData);
-  const isSender = message.sender === selectedChatData?._id;
+  const loggedInUserId = useAppStore(state => state.id);
+  const isSender = message?.sender === loggedInUserId;
   const [showModal, setShowModal] = useState<boolean>(false);
 
   const renderMsgs = (message: Message) => (
@@ -26,7 +27,7 @@ const MessageItem: React.FC<MessageItemProps> = ({message}) => {
       style={[
         styles.messageContainer,
         {
-          backgroundColor: isSender ? COLORS.LightGray2 : COLORS.Black,
+          backgroundColor: isSender ? COLORS.Black : COLORS.LightGray2,
         },
       ]}>
       {message.messageType === 'text' && (
@@ -34,20 +35,11 @@ const MessageItem: React.FC<MessageItemProps> = ({message}) => {
       )}
 
       {message.messageType === 'file' && checkIfImage(message.fileUrl) && (
-        <Image
-          source={{uri: `${HOST}/${message.fileUrl}`}}
-          style={styles.image}
-          resizeMode="cover"
-        />
+        <ImageComponent fileUrl={message.fileUrl} />
       )}
 
       {message.messageType === 'file' && checkIfVideo(message.fileUrl) && (
-        <Video
-          source={{uri: `${HOST}/${message.fileUrl}`}}
-          style={styles.image}
-          controls={true} // Add controls for play/pause/seek
-          resizeMode="contain"
-        />
+        <VideoComponent fileUrl={message.fileUrl} />
       )}
 
       {message.messageType === 'file' &&
@@ -71,10 +63,9 @@ const MessageItem: React.FC<MessageItemProps> = ({message}) => {
         style={[
           styles.messageDate,
           {
-            color: isSender ? COLORS.Black : 'white',
+            color: isSender ? 'white' : COLORS.Black,
           },
         ]}>
-        {/* {moment(message.timestamp).format('H:mm')} */}
         {moment(message.createdAt).format('H:mm')}
       </Text>
     </View>
@@ -92,34 +83,36 @@ const MessageItem: React.FC<MessageItemProps> = ({message}) => {
   };
 
   return (
-    <View>
-      {!isSender && message.messageType !== 'deleted' ? (
-        <Swipeable
+    <>
+      {isSender && message.messageType !== 'deleted' ? (
+        <ReanimatedSwipeable
           renderRightActions={renderRightActions}
           overshootRight={false}>
           <View
             style={{
+              width: '100%',
               flexDirection: 'row',
-              justifyContent: isSender ? 'flex-start' : 'flex-end',
+              justifyContent: isSender ? 'flex-end' : 'flex-start',
             }}>
             {renderMsgs(message)}
           </View>
-        </Swipeable>
+        </ReanimatedSwipeable>
       ) : (
         <View
           style={{
             flexDirection: 'row',
-            justifyContent: isSender ? 'flex-start' : 'flex-end',
+            justifyContent: isSender ? 'flex-end' : 'flex-start',
           }}>
           {renderMsgs(message)}
         </View>
       )}
+
       <DeleteMsg
         msgId={message._id}
         setShowModal={setShowModal}
         showModal={showModal}
       />
-    </View>
+    </>
   );
 };
 
@@ -151,13 +144,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
 
-  image: {
-    width: 220,
-    height: 150,
-    borderTopLeftRadius: BORDERRADIUS.radius_13,
-    borderTopRightRadius: BORDERRADIUS.radius_13,
-  },
-
   fileName: {
     fontSize: FONTSIZE.sm,
     fontWeight: '500',
@@ -169,6 +155,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
+  // loading: {
+  //   width: 220,
+  //   height: 150,
+  // },
 });
 
 export default MessageItem;

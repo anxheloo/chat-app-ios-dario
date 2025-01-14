@@ -23,8 +23,8 @@ export const useSocket = () => {
       conversation => conversation._id === message.conversationId,
     );
 
+    // Update the existing conversation
     if (existingConversationIndex !== -1) {
-      // Update the existing conversation
       conversations[existingConversationIndex] = {
         ...directMessagesContacts[existingConversationIndex],
         lastMessage: message,
@@ -51,7 +51,7 @@ export const useSocket = () => {
     ) {
       updateFuncChat({
         selectedChatMessages: [
-          ...selectedChatMessages,
+          ...selectedChatMessages.filter(msg => msg._id !== message._id),
           {
             ...message,
             recipient: message.recipient._id,
