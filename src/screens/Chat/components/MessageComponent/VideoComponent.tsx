@@ -34,6 +34,7 @@ const VideoComponent: React.FC<VideoProps> = ({fileUrl}) => {
   return (
     <View style={styles.imageContainer}>
       {loading && (
+        // {(loading || !fileUrl) && (
         <ActivityIndicator
           size="small"
           color="#fff"
@@ -63,7 +64,7 @@ const VideoComponent: React.FC<VideoProps> = ({fileUrl}) => {
         onLoad={() => setIsLoading(false)}
         onError={() => {
           setIsLoading(false);
-          console.log('Error loading image');
+          console.log('Error loading video');
         }}
       />
     </View>

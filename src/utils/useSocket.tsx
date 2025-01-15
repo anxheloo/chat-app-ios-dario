@@ -49,6 +49,9 @@ export const useSocket = () => {
       selectedChatData?._id === message.recipient._id ||
       selectedChatData?._id === message.sender._id
     ) {
+      // if (!selectedChatMessages.some(msg => msg._id === message._id)) {
+      //   return;
+      // } else {
       updateFuncChat({
         selectedChatMessages: [
           ...selectedChatMessages.filter(msg => msg._id !== message._id),
@@ -59,6 +62,7 @@ export const useSocket = () => {
           },
         ],
       });
+      // }
     }
 
     // -----------------------------------------------------

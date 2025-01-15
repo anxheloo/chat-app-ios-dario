@@ -10,9 +10,6 @@ type ImageProps = {
 const ImageComponent: React.FC<ImageProps> = ({fileUrl}) => {
   const [loading, setIsLoading] = useState(false);
 
-  console.log('This is fileUrl inside ImageComponent:', fileUrl);
-  console.log('This is loading inside ImageComponent:', loading);
-
   return (
     <View style={styles.imageContainer}>
       {loading && (
@@ -27,10 +24,9 @@ const ImageComponent: React.FC<ImageProps> = ({fileUrl}) => {
       )}
 
       <Image
-        source={{uri: `${HOST}/${fileUrl}`}}
+        // source={{uri: `${HOST}/${fileUrl}`}}
+        source={{uri: fileUrl}}
         style={{
-          // width: !loading ? '100%' : 0,
-          // height: !loading ? '100%' : 0,
           width: 220,
           height: 150,
           borderTopLeftRadius: BORDERRADIUS.radius_13,

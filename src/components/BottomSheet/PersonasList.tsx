@@ -103,7 +103,7 @@ const PersonasList: React.FC<PersonasListProps> = ({
             setSearch(value);
             searchContact(value);
           }}
-          clearSearch={clearSearch}
+          onPress={clearSearch}
           backgroundColor="white"
           icon1={<SearchIcon width={15} height={15} />}
           icon2={<CloseIcon width={15} height={15} />}

@@ -7,7 +7,7 @@ type PersonaSlice = {
   username: string;
   avatar: number;
   pin: string;
-  id: string | null;
+  id: string;
   dissappearingMessages: string;
   qr_code: string;
   setUserPersona: (data: Partial<PersonaSlice>) => void;
@@ -36,6 +36,9 @@ type ChatSlice = {
   directMessagesContacts: Conversation[];
   selectedChatMessages: Message[];
   updateFuncChat: (data: Partial<ChatSlice>) => void;
+  updateSelectedChatMessages: (
+    updateFunction: (currentMessages: Message[]) => Message[],
+  ) => void;
   sortContactsByLastConversation: (message: Message) => void;
 };
 
@@ -55,7 +58,7 @@ const createPersonaSlice: StateCreator<PersonaSlice> = set => ({
   username: '',
   avatar: 0,
   pin: '',
-  id: null,
+  id: '',
   dissappearingMessages: 'None',
   qr_code: '',
   setUserPersona: set,
@@ -80,6 +83,14 @@ const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
   // channels: [],
   // updateFuncChat: typeOrData => set(typeOrData),
   updateFuncChat: set,
+
+  updateSelectedChatMessages: (
+    updateFunction: (currentMessages: Message[]) => Message[],
+  ) => {
+    const currentMessages = get().selectedChatMessages;
+    const updatedMessages = updateFunction(currentMessages);
+    set({selectedChatMessages: updatedMessages});
+  },
 
   sortContactsByLastConversation: message => {
     const {directMessagesContacts} = get();

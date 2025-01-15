@@ -26,8 +26,6 @@ const ChatContainer = () => {
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
 
-  console.log('This is selected Chat Data:', selectedChatData);
-
   // Get all messages function
   const getAllMessages = async () => {
     if (isLoading || !hasMore) return;

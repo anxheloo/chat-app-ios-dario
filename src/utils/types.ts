@@ -32,7 +32,7 @@ export type Message = {
   conversationId: string;
   sender: string;
   recipient: string;
-  content: string;
+  content?: string;
   timestamp: string;
   createdAt: string;
   expiresAt: string;

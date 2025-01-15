@@ -149,10 +149,12 @@ const styles = StyleSheet.create({
   },
 
   renderRightActions: {
-    width: 50,
+    paddingHorizontal: 10,
+    width: 100,
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'black',
   },
 });
 

@@ -9,7 +9,7 @@ type inputProps = {
   backgroundColor?: string;
   icon1?: React.ReactNode;
   icon2?: React.ReactNode;
-  clearSearch?: () => void;
+  onPress?: () => void;
   onChange: (value: string) => void;
   onSubmitEditing?: () => void;
 };
@@ -21,7 +21,7 @@ const ReusableInput: React.FC<inputProps> = ({
   backgroundColor = COLORS.LightGray2,
   icon1,
   icon2,
-  clearSearch,
+  onPress,
   onChange,
   onSubmitEditing,
 }) => {
@@ -48,9 +48,7 @@ const ReusableInput: React.FC<inputProps> = ({
         onSubmitEditing={onSubmitEditing}
       />
 
-      {icon2 && (
-        <TouchableOpacity onPress={clearSearch}>{icon2}</TouchableOpacity>
-      )}
+      {icon2 && <TouchableOpacity onPress={onPress}>{icon2}</TouchableOpacity>}
     </View>
   );
 };

@@ -47,7 +47,7 @@ const Calls = () => {
             placeholder="Search"
             value={search}
             onChange={setSearch}
-            clearSearch={clearSearch}
+            onPress={clearSearch}
             icon1={<SearchIcon width={15} height={15} />}
             icon2={<CloseIcon width={15} height={15} />}
           />

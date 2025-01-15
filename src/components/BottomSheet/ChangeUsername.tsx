@@ -98,7 +98,7 @@ const ChangeUsername: React.FC<ChangeUsernameProps> = ({cancel}) => {
               placeholder="Enter username"
               value={username}
               onChange={setUsername}
-              clearSearch={clearSearch}
+              onPress={clearSearch}
               backgroundColor="white"
               icon1={<ReusableText fontSize={FONTSIZE.md}>@</ReusableText>}
               icon2={<CloseIcon width={15} height={15} />}
