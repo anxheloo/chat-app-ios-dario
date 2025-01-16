@@ -1,6 +1,6 @@
 import {useCallback, useEffect} from 'react';
 import {useAppStore} from '../store';
-import {Message} from './types';
+import {Message, Conversation} from './types';
 
 export const useSocket = () => {
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
@@ -65,34 +65,28 @@ export const useSocket = () => {
       // }
     }
 
-    // -----------------------------------------------------
-    // Update the last message in conversations
-    // const updatedConversations = directMessagesContacts.map(conversation => {
-    //   console.log('THIS IS CONVERSATION AND MESSAGE', conversation, message);
-
-    //   if (conversation._id === message.conversationId) {
-    //     return {
-    //       ...conversation,
-    //       lastMessage: message,
-    //       lastMessageTime: message.createdAt,
-    //     };
-    //   }
-    //   return conversation;
-    // });
-
-    // Add the conversation if it's not already in the list
-    // if (!directMessagesContacts.some(c => c._id === updatedConversations._id)) {
-    //   updatedContacts.unshift(updatedConversation);
-    // }
-
-    // updateFuncChat({
-    //   directMessagesContacts: updatedConversations,
-    // });
-
-    // -----------------------------------------------------
-
     sortContactsByLastConversation(message);
   }, []);
+
+  // const handleConversationUpdated = useCallback(
+  //   ({conversationId, lastMessage, lastMessageTime}:{conversationId: string, lastMessage: any, lastMessageTime: string}) => {
+  //     const {directMessagesContacts} = useAppStore.getState();
+
+  //     const updatedContacts = directMessagesContacts.map(conversation => {
+  //       if (conversation._id === conversationId) {
+  //         return {
+  //           ...conversation,
+  //           lastMessage,
+  //           lastMessageTime,
+  //         };
+  //       }
+  //       return conversation;
+  //     });
+
+  //     updateFuncChat({directMessagesContacts: updatedContacts});
+  //   },
+  //   [],
+  // );
 
   // Handle message deletion
   const handleMessageDeleted = useCallback(
@@ -110,14 +104,40 @@ export const useSocket = () => {
           messageToDelete.recipient === selectedChatData?._id)
       ) {
         updateFuncChat({
-          selectedChatMessages: selectedChatMessages.filter(
-            (message: Message) => message._id !== messageId,
-          ),
+          selectedChatMessages: selectedChatMessages.map(msg => {
+            if (msg._id === messageId) {
+              return {
+                ...msg,
+                messageType: 'deleted',
+                content: 'Message deleted',
+              };
+            }
+            return msg;
+          }),
         });
       }
     },
     [],
   );
+
+  const handleConverationUpdated = useCallback((conversation: Conversation) => {
+    console.log('Conversation emited from backend:', conversation);
+
+    const {directMessagesContacts} = useAppStore.getState();
+    const existingConversations = directMessagesContacts.map(item => {
+      if (item._id === conversation._id) {
+        return {
+          ...item,
+          lastMessage: conversation.lastMessage,
+          lastMessageTime: conversation.lastMessageTime,
+        };
+      }
+
+      return item;
+    });
+
+    updateFuncChat({directMessagesContacts: existingConversations});
+  }, []);
 
   useEffect(() => {
     const socket = initializeSocket();
@@ -125,6 +145,7 @@ export const useSocket = () => {
     if (socket) {
       socket.on('receiveMessage', handleReceiveMessage);
       socket.on('messageDeleted', handleMessageDeleted);
+      socket.on('conversationUpdated', handleConverationUpdated);
     }
 
     return () => disconnectSocket();

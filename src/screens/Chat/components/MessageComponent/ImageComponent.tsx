@@ -26,12 +26,7 @@ const ImageComponent: React.FC<ImageProps> = ({fileUrl}) => {
       <Image
         // source={{uri: `${HOST}/${fileUrl}`}}
         source={{uri: fileUrl}}
-        style={{
-          width: 220,
-          height: 150,
-          borderTopLeftRadius: BORDERRADIUS.radius_13,
-          borderTopRightRadius: BORDERRADIUS.radius_13,
-        }}
+        style={styles.image}
         resizeMode="cover"
         onLoadStart={() => setIsLoading(true)}
         onLoad={() => setIsLoading(false)}
@@ -49,6 +44,13 @@ const styles = StyleSheet.create({
   imageContainer: {
     width: 220,
     height: 150,
+  },
+
+  image: {
+    width: 220,
+    height: 150,
+    borderTopLeftRadius: BORDERRADIUS.radius_13,
+    borderTopRightRadius: BORDERRADIUS.radius_13,
   },
 });
 

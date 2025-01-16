@@ -131,21 +131,24 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
           });
         }
       } catch (error) {
+        setLoading(false);
         Alert.alert('Could not delete the conversation. Please try again.');
       }
     };
 
     const renderRightActions = (id: string) => {
       return (
-        <View style={styles.renderRightActions}>
-          <TouchableOpacity onPress={() => deleteConversation(id)}>
-            {loading ? (
-              <ActivityIndicator size="small" color="white" />
-            ) : (
-              <DeleteIcon width={17.5} height={21.5} />
-            )}
-          </TouchableOpacity>
-        </View>
+        // <View style={styles.renderRightActions}>
+        <TouchableOpacity
+          onPress={() => deleteConversation(id)}
+          style={styles.renderRightActions}>
+          {loading ? (
+            <ActivityIndicator size="small" color="white" />
+          ) : (
+            <DeleteIcon width={17.5} height={21.5} color={'#FFFFFF'} />
+          )}
+        </TouchableOpacity>
+        // </View>
       );
     };
 

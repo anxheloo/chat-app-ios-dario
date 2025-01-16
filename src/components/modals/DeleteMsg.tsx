@@ -28,6 +28,7 @@ const DeleteMsg: React.FC<DeleteMsgProps> = ({
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
   const {selectedChatMessages} = useAppStore.getState();
   const socket = useAppStore(state => state.socket);
+  const id = useAppStore(state => state.id);
 
   // Delete Specific message
   const handleDelete = async () => {
@@ -43,6 +44,7 @@ const DeleteMsg: React.FC<DeleteMsgProps> = ({
       );
 
       if (res.status === 200) {
+        console.log('This is the new conversation:', res.data.conversation);
         updateFuncChat({
           selectedChatMessages: selectedChatMessages.map(msg => {
             if (msg._id === msgId) {
@@ -56,7 +58,12 @@ const DeleteMsg: React.FC<DeleteMsgProps> = ({
           }),
         });
 
-        socket?.emit('deleteSpecificMessage', {messageId: msgId});
+        socket?.emit('deleteSpecificMessage', {
+          messageId: msgId,
+          senderId: id,
+          recipientId: res.data.recipientId,
+          conversation: res.data.conversation,
+        });
 
         setShowModal(false);
       }

@@ -14,22 +14,22 @@ const VideoComponent: React.FC<VideoProps> = ({fileUrl}) => {
 
   console.log('This is fileUrl:', fileUrl);
 
-  const controlsStyles = {
-    hidePosition: false,
-    hidePlayPause: false,
-    hideForward: false,
-    hideRewind: false,
-    hideNext: false,
-    hidePrevious: false,
-    hideFullscreen: false,
-    hideSeekBar: false,
-    hideDuration: false,
-    hideNavigationBarOnFullScreenMode: true,
-    hideNotificationBarOnFullScreenMode: true,
-    hideSettingButton: true,
-    seekIncrementMS: 10000,
-    liveLabel: 'LIVE',
-  };
+  // const controlsStyles = {
+  //   hidePosition: false,
+  //   hidePlayPause: false,
+  //   hideForward: false,
+  //   hideRewind: false,
+  //   hideNext: false,
+  //   hidePrevious: false,
+  //   hideFullscreen: false,
+  //   hideSeekBar: false,
+  //   hideDuration: false,
+  //   hideNavigationBarOnFullScreenMode: true,
+  //   hideNotificationBarOnFullScreenMode: true,
+  //   hideSettingButton: true,
+  //   seekIncrementMS: 10000,
+  //   liveLabel: 'LIVE',
+  // };
 
   return (
     <View style={styles.imageContainer}>
@@ -46,17 +46,13 @@ const VideoComponent: React.FC<VideoProps> = ({fileUrl}) => {
       )}
       <Video
         fullscreenOrientation="all"
-        source={{uri: `${HOST}/${fileUrl}`}}
-        style={{
-          width: 220,
-          height: 150,
-          borderTopLeftRadius: BORDERRADIUS.radius_13,
-          borderTopRightRadius: BORDERRADIUS.radius_13,
-        }}
-        repeat={true}
-        controlsStyles={controlsStyles}
-        playInBackground={false}
-        paused={true}
+        // source={{uri: `${HOST}/${fileUrl}`}}
+        source={{uri: fileUrl}}
+        style={styles.videoContainer}
+        repeat={false}
+        // controlsStyles={controlsStyles}
+        // playInBackground={false}
+        // paused={true}
         controls={true}
         fullscreen={true}
         resizeMode="cover"
@@ -78,6 +74,13 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: BORDERRADIUS.radius_13,
     borderTopRightRadius: BORDERRADIUS.radius_13,
     overflow: 'hidden',
+  },
+
+  videoContainer: {
+    width: 220,
+    height: 150,
+    borderTopLeftRadius: BORDERRADIUS.radius_13,
+    borderTopRightRadius: BORDERRADIUS.radius_13,
   },
 });
 

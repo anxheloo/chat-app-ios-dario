@@ -76,7 +76,7 @@ const MessageItem: React.FC<MessageItemProps> = React.memo(({message}) => {
     return (
       <View style={styles.renderRightActions}>
         <TouchableOpacity onPress={() => setShowModal(true)}>
-          <DeleteIcon width={17.5} height={21.5} />
+          <DeleteIcon width={17.5} height={21.5} color={'red'} />
         </TouchableOpacity>
       </View>
     );
