@@ -29,15 +29,12 @@ type ImagePickerType = 'capture' | 'library';
 
 const ChatFooter = () => {
   const socket = useAppStore(state => state.socket);
-  const updateKeys = useAppStore(state => state.updateKeys);
-  const updateFuncChat = useAppStore(state => state.updateFuncChat);
   const token = useAppStore(state => state.token);
   const id = useAppStore(state => state.id);
   const dissapearingTimeFrame = useAppStore(
     state => state.dissappearingMessages,
   );
   const selectedChatData = useAppStore(state => state.selectedChatData);
-  // const selectedChatMessages = useAppStore(state => state.selectedChatMessages);
   const [message, setMessage] = useState('');
   const [cameraOptions, setCameraOptions] = useState(false);
 
@@ -69,13 +66,18 @@ const ChatFooter = () => {
   const sendMessage = async () => {
     if (message.trim() === '') return;
 
+    // Emit the single text message wrapped in an array
     socket?.emit('sendMessage', {
-      sender: id,
-      content: message,
-      recipient: selectedChatData?._id,
-      messageType: 'text',
-      fileUrl: undefined,
-      expiresAt: dissapearingTimeFrame,
+      messages: [
+        {
+          sender: id,
+          content: message,
+          recipient: selectedChatData?._id,
+          messageType: 'text',
+          fileUrl: undefined,
+          expiresAt: dissapearingTimeFrame,
+        },
+      ],
     });
 
     setMessage('');
@@ -419,7 +421,6 @@ const ChatFooter = () => {
           placeholder="Write"
           value={message}
           onChange={setMessage}
-          // icon2={<AddIcon width={21.5} height={21.5} />}
           onSubmitEditing={sendMessage}
         />
       </View>

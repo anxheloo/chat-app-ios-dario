@@ -94,14 +94,27 @@ export const useSocket = () => {
     sortContactsByLastConversation(message);
   }, []);
 
+  // Handle message deletion
   const handleMessageDeleted = useCallback(
     ({messageId}: {messageId: string}) => {
-      const {selectedChatMessages} = useAppStore.getState();
-      updateFuncChat({
-        selectedChatMessages: selectedChatMessages.filter(
-          (message: Message) => message._id !== messageId,
-        ),
-      });
+      const {selectedChatMessages, selectedChatData} = useAppStore.getState();
+
+      // Find the message in the current chat
+      const messageToDelete = selectedChatMessages.find(
+        (message: Message) => message._id === messageId,
+      );
+
+      if (
+        messageToDelete &&
+        (messageToDelete.sender === selectedChatData?._id ||
+          messageToDelete.recipient === selectedChatData?._id)
+      ) {
+        updateFuncChat({
+          selectedChatMessages: selectedChatMessages.filter(
+            (message: Message) => message._id !== messageId,
+          ),
+        });
+      }
     },
     [],
   );

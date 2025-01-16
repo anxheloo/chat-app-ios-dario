@@ -1,5 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {StatusBar, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {
+  Alert,
+  StatusBar,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {Camera} from 'react-native-vision-camera';
 import {
   CONTENT_SPACING,
@@ -26,6 +32,8 @@ type ScannedUserProps = NativeStackScreenProps<
 const ScannedUser: React.FC<ScannedUserProps> = ({route, navigation}) => {
   const {userId} = route.params;
   const token = useAppStore(state => state.token);
+  const id = useAppStore(state => state.id);
+  const socket = useAppStore(state => state.socket);
 
   const [scannedUser, setScannedUser] = useState({
     username: '',
@@ -55,6 +63,14 @@ const ScannedUser: React.FC<ScannedUserProps> = ({route, navigation}) => {
     getScannerUserDetails();
   }, []);
 
+  const addFriend = async () => {
+    try {
+      socket?.emit('addFriend', {recipientId: userId, senderId: id});
+    } catch (error) {
+      Alert.alert('Error', 'Failed to send request');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar hidden />
@@ -72,12 +88,7 @@ const ScannedUser: React.FC<ScannedUserProps> = ({route, navigation}) => {
           {scannedUser?.username}
         </ReusableText>
 
-        <ReusableButton
-          text="Send Request"
-          onPress={() => {
-            console.log('sending request');
-          }}
-        />
+        <ReusableButton text="Send Request" onPress={addFriend} />
       </View>
 
       {/* Back Button */}

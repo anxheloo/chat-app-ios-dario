@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   View,
   Dimensions,
+  Alert,
 } from 'react-native';
 import {BORDERRADIUS, COLORS, FONTSIZE} from '../../theme/theme';
 import {apiClient} from '../../api/apiClient';
@@ -26,7 +27,9 @@ const DeleteMsg: React.FC<DeleteMsgProps> = ({
   const token = useAppStore(state => state.token);
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
   const {selectedChatMessages} = useAppStore.getState();
+  const socket = useAppStore(state => state.socket);
 
+  // Delete Specific message
   const handleDelete = async () => {
     try {
       const res = await apiClient.post(
@@ -53,10 +56,13 @@ const DeleteMsg: React.FC<DeleteMsgProps> = ({
           }),
         });
 
+        socket?.emit('deleteSpecificMessage', {messageId: msgId});
+
         setShowModal(false);
       }
     } catch (error) {
-      console.log(error);
+      setShowModal(false);
+      Alert.alert('Error', 'Unable to delete the message. Please try again.');
     }
   };
 

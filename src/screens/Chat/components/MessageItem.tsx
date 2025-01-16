@@ -17,7 +17,7 @@ type MessageItemProps = {
   message: Message;
 };
 
-const MessageItem: React.FC<MessageItemProps> = ({message}) => {
+const MessageItem: React.FC<MessageItemProps> = React.memo(({message}) => {
   const loggedInUserId = useAppStore(state => state.id);
   const isSender = message?.sender === loggedInUserId;
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -114,7 +114,7 @@ const MessageItem: React.FC<MessageItemProps> = ({message}) => {
       />
     </>
   );
-};
+});
 
 const styles = StyleSheet.create({
   dateContainer: {
