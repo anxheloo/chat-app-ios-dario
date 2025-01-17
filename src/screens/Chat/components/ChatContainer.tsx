@@ -1,16 +1,22 @@
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   FlatList,
   Keyboard,
   StyleSheet,
+  Touchable,
+  TouchableOpacity,
   TouchableWithoutFeedback,
+  View,
 } from 'react-native';
 import {apiClient} from '../../../api/apiClient';
 import {GET_ALL_MESSAGES} from '../../../api/apis';
 import {useAppStore} from '../../../store';
 import MessageItem from './MessageComponent/MessageItem';
 import {preprocessMessages} from '../../../utils/helpers';
+import {COLORS} from '../../../theme/theme';
+import RightIcon from '../../../assets/icons/profile/RighArrow';
+import ScrollToBottom from './ScrollToBottom';
 
 const ChatContainer = () => {
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
@@ -21,6 +27,7 @@ const ChatContainer = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [isNearBottom, setIsNearBottom] = useState(true);
 
   // Get all messages function
   const getAllMessages = async () => {
@@ -44,15 +51,7 @@ const ChatContainer = () => {
         const {messages, hasMore: updatedHasMore} = response.data;
 
         if (messages.length > 0) {
-          // const existingMessageIds = new Set(
-          //   selectedChatMessages.map(msg => msg._id),
-          // );
-
-          // const uniqueMessages = [
-          //   ...messages.filter((msg: any) => !existingMessageIds.has(msg._id)),
-          //   ...selectedChatMessages,
-          // ];
-
+          // Remove duplicate messages
           const uniqueMessages = [
             ...messages,
             ...selectedChatMessages.filter(
@@ -64,6 +63,7 @@ const ChatContainer = () => {
             selectedChatMessages: uniqueMessages,
           });
 
+          setIsLoading(false);
           setPage(prev => prev + 1);
         }
         setHasMore(updatedHasMore);
@@ -84,13 +84,18 @@ const ChatContainer = () => {
     }
   }, [selectedChatData]);
 
-  // Scroll to end
-  useEffect(() => {
+  // Scroll to end function
+  const scrollToBottom = useCallback((time: number = 0) => {
     if (flatListRef.current) {
       setTimeout(() => {
         flatListRef.current?.scrollToEnd({animated: true});
-      }, 500); // Add a slight delay to ensure the layout is finalized
+      }, time);
     }
+  }, []);
+
+  // Scroll to end on mount
+  useEffect(() => {
+    scrollToBottom(1000);
   }, []);
 
   //  Messages to render
@@ -106,25 +111,44 @@ const ChatContainer = () => {
     }
   };
 
-  const renderLoader = () => {
-    return isLoading ? (
-      <ActivityIndicator size={'small'} color={'black'} />
-    ) : null;
+  // Check if user is near the bottom of the list
+  const handleScroll = (event: any) => {
+    const {layoutMeasurement, contentOffset, contentSize} = event.nativeEvent;
+    const distanceFromBottom =
+      contentSize.height - (layoutMeasurement.height + contentOffset.y);
+
+    // Update the `isNearBottom` flag based on scroll position
+    setTimeout(() => {
+      setIsNearBottom(distanceFromBottom < 200);
+    }, 200);
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <FlatList
-        refreshing={isLoading}
-        onRefresh={loadMoreItem}
-        ref={flatListRef}
-        contentContainerStyle={styles.chatContainer}
-        data={messagesData}
-        renderItem={({item}) => <MessageItem message={item} />}
-        keyExtractor={item => item._id}
-        initialNumToRender={20}
-      />
-    </TouchableWithoutFeedback>
+    <>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <FlatList
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+          removeClippedSubviews={true}
+          refreshing={isLoading}
+          onRefresh={loadMoreItem}
+          ref={flatListRef}
+          contentContainerStyle={styles.chatContainer}
+          data={messagesData}
+          renderItem={({item}) => <MessageItem message={item} />}
+          keyExtractor={item => item._id}
+          // onViewableItemsChanged={onViewableItemsChanged}
+          // viewabilityConfig={{itemVisiblePercentThreshold: 100}}
+          onContentSizeChange={() => {
+            if (isNearBottom) {
+              scrollToBottom(1000);
+            }
+          }}
+          initialNumToRender={20}
+        />
+      </TouchableWithoutFeedback>
+      {!isNearBottom && <ScrollToBottom onPress={scrollToBottom} />}
+    </>
   );
 };
 

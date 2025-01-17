@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {memo} from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {useAppStore} from '../../store';
 import {avatarUrls} from '../../utils/constants';
@@ -17,30 +17,32 @@ type AvatarProps = {
   src?: number;
 };
 
-const Avatar: React.FC<AvatarProps> = ({
-  width,
-  height,
-  avatarWidth,
-  avatarHeight,
-  backgroundColor = 'white',
-  routeName,
-  onPress,
-  src,
-}) => {
-  const avatar = useAppStore(state => state.avatar);
-  const Avatar = avatarUrls[src !== undefined ? src : avatar];
+const Avatar: React.FC<AvatarProps> = memo(
+  ({
+    width,
+    height,
+    avatarWidth,
+    avatarHeight,
+    backgroundColor = 'white',
+    routeName,
+    onPress,
+    src,
+  }) => {
+    const avatar = useAppStore(state => state.avatar);
+    const Avatar = avatarUrls[src !== undefined ? src : avatar];
 
-  return (
-    <View style={[styles.container, {backgroundColor, width, height}]}>
-      {routeName === 'Profile' && (
-        <TouchableOpacity style={styles.editContainer} onPress={onPress}>
-          <EditIcon width={10} height={12} />
-        </TouchableOpacity>
-      )}
-      <Avatar width={avatarWidth} height={avatarHeight} />
-    </View>
-  );
-};
+    return (
+      <View style={[styles.container, {backgroundColor, width, height}]}>
+        {routeName === 'Profile' && (
+          <TouchableOpacity style={styles.editContainer} onPress={onPress}>
+            <EditIcon width={10} height={12} />
+          </TouchableOpacity>
+        )}
+        <Avatar width={avatarWidth} height={avatarHeight} />
+      </View>
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   container: {

@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -15,7 +15,9 @@ import moment from 'moment';
 import {checkIfImage, checkIfVideo} from '../../utils/helpers';
 import CameraIcon from '../../assets/icons/Chat/CameraIcon';
 import VideoIcon from '../../assets/icons/Chat/VideoIcon';
-import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
+import Swipeable, {
+  SwipeableRef,
+} from 'react-native-gesture-handler/ReanimatedSwipeable';
 import DeleteIcon from '../../assets/icons/Chat/DeleteIcon';
 import {DELETE_CONVERSATION} from '../../api/apis';
 import {apiClient} from '../../api/apiClient';
@@ -37,13 +39,14 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
     );
     const [loading, setLoading] = useState(false);
 
-    const username = conversation.participants.filter(
-      participant => participant._id !== loggedInUserId,
-    )[0]?.username;
+    const participant = useMemo(() => {
+      return conversation.participants.find(
+        participant => participant._id !== loggedInUserId,
+      );
+    }, [conversation, loggedInUserId]);
 
-    const avatar = conversation.participants.filter(
-      participant => participant._id !== loggedInUserId,
-    )[0]?.avatar;
+    const username = participant?.username;
+    const avatar = participant?.avatar;
 
     const lastMessageTime = conversation.lastMessageTime;
 
@@ -54,23 +57,18 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
     const fileUrl = conversation.lastMessage?.fileUrl;
 
     // Select contact to update chat
-    const selectContact = () => {
-      const conversationId = conversation._id;
+    const selectContact = useCallback(() => {
+      if (!participant) return;
 
-      const selectedContact = conversation.participants.filter(
-        participant => participant._id !== loggedInUserId,
-      )[0];
-
-      updateFuncChat({selectedChatData: {...selectedContact, conversationId}});
-
-      console.log('This is the seelcted chat conversation:');
-
+      updateFuncChat({
+        selectedChatData: {
+          ...participant,
+          conversationId: conversation._id,
+        },
+      });
       navigation?.navigate('Chat');
-
-      if (cancel) {
-        cancel();
-      }
-    };
+      cancel?.();
+    }, [conversation._id, participant, updateFuncChat, navigation, cancel]);
 
     const renderLastMessage = useMemo(() => {
       if (messageType === 'text') {
@@ -104,15 +102,17 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
           );
         }
       }
+
+      return null;
     }, [messageType, fileUrl, content]);
 
-    const deleteConversation = async (id: string) => {
+    const deleteConversation = useCallback(async () => {
       setLoading(true);
 
       try {
         const res = await apiClient.post(
           DELETE_CONVERSATION,
-          {conversationId: id},
+          {conversationId: conversation._id},
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -126,7 +126,7 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
           // Update the UI
           updateFuncChat({
             directMessagesContacts: directMessagesContacts.filter(
-              conversation => conversation._id !== id,
+              item => item._id !== conversation._id,
             ),
           });
         }
@@ -134,13 +134,12 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
         setLoading(false);
         Alert.alert('Could not delete the conversation. Please try again.');
       }
-    };
+    }, [conversation._id, loading]);
 
-    const renderRightActions = (id: string) => {
+    const renderRightActions = useCallback(() => {
       return (
-        // <View style={styles.renderRightActions}>
         <TouchableOpacity
-          onPress={() => deleteConversation(id)}
+          onPress={deleteConversation}
           style={styles.renderRightActions}>
           {loading ? (
             <ActivityIndicator size="small" color="white" />
@@ -148,16 +147,15 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
             <DeleteIcon width={17.5} height={21.5} color={'#FFFFFF'} />
           )}
         </TouchableOpacity>
-        // </View>
       );
-    };
+    }, [loading, deleteConversation]);
+
+    if (!participant) return null;
 
     return (
-      <Swipeable
-        renderRightActions={() => renderRightActions(conversation._id)}
-        overshootRight={false}>
+      <Swipeable renderRightActions={renderRightActions} overshootRight={false}>
         <TouchableOpacity
-          activeOpacity={0.9}
+          activeOpacity={1}
           style={[
             styles.container,
             {backgroundColor: backgroundColor ?? 'transparent'},
@@ -189,8 +187,11 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     gap: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.LightGray2,
   },
 
   secondContainer: {

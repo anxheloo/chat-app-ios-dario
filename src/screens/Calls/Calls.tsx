@@ -14,6 +14,7 @@ import EmptyCall from './EmptyCall';
 import ReusableInput from '../../components/ReusableInput';
 import SearchIcon from '../../assets/icons/messages/SearchIcon';
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
+import Layout from '../../components/Layout/Layout';
 
 const Calls = () => {
   const [search, setSearch] = useState<string>('');
@@ -38,30 +39,26 @@ const Calls = () => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <SafeAreaView style={styles.container}>
-        <View style={styles.container}>
-          <Header />
+    <Layout>
+      <View style={styles.container}>
+        <ReusableInput
+          placeholder="Search"
+          value={search}
+          onChange={setSearch}
+          onPress={clearSearch}
+          icon1={<SearchIcon width={15} height={15} />}
+          icon2={<CloseIcon width={15} height={15} />}
+        />
 
-          <ReusableInput
-            placeholder="Search"
-            value={search}
-            onChange={setSearch}
-            onPress={clearSearch}
-            icon1={<SearchIcon width={15} height={15} />}
-            icon2={<CloseIcon width={15} height={15} />}
-          />
-
-          <View style={styles.content}>
-            <EmptyCall openBottomSheet={openBottomSheet} />
-          </View>
+        <View style={styles.content}>
+          <EmptyCall openBottomSheet={openBottomSheet} />
         </View>
+      </View>
 
-        <BottomSheetWrapper ref={bottomSheetRef}>
-          <PersonasList cancel={cancel} addNew={addNew} />
-        </BottomSheetWrapper>
-      </SafeAreaView>
-    </TouchableWithoutFeedback>
+      <BottomSheetWrapper ref={bottomSheetRef}>
+        <PersonasList cancel={cancel} addNew={addNew} />
+      </BottomSheetWrapper>
+    </Layout>
   );
 };
 

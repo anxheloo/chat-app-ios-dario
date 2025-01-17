@@ -19,13 +19,14 @@ import ChangeUsername from '../../components/BottomSheet/ChangeUsername';
 import UpdatePin from '../../components/BottomSheet/UpdatePin';
 import UpdateDissapear from '../../components/BottomSheet/UpdateDissapear';
 import QRCodeModal from '../../components/BottomSheet/QRCodeModal';
+import Layout from '../../components/Layout/Layout';
 
 type ProfileProps = {
   navigation: NavigationProps;
 };
 
 const Profile: React.FC<ProfileProps> = ({navigation}) => {
-  const router = useRoute();
+  // const router = useRoute();
   const setUserPersona = useAppStore(state => state.setUserPersona);
   const updateKeys = useAppStore(state => state.updateKeys);
   const setToken = useAppStore(state => state.setToken);
@@ -87,10 +88,8 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
+    <Layout>
       <View style={styles.container}>
-        <Header />
-
         <View style={styles.content}>
           <View style={styles.textContainer}>
             <ReusableText fontSize={FONTSIZE.title} fontWeight={700}>
@@ -156,7 +155,7 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
           <DisappearingMessagesDropdown cancel={cancel} />
         )}  */}
       </BottomSheetWrapper>
-    </SafeAreaView>
+    </Layout>
   );
 };
 

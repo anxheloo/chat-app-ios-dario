@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {FlatList, StyleSheet, View} from 'react-native';
 import EmptyChat from './EmptyChat';
 import {useAppStore} from '../../store';
@@ -19,9 +19,8 @@ const Content: React.FC<ContentProps> = ({openBottomSheet, navigation}) => {
   const token = useAppStore(state => state.token);
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
 
-  // Get all contacts that we have sent a message
-  useEffect(() => {
-    const getConversations = async () => {
+  const getConversations = useCallback(async () => {
+    try {
       const res = await apiClient.get(GET_CONVERSATIONS, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -29,12 +28,15 @@ const Content: React.FC<ContentProps> = ({openBottomSheet, navigation}) => {
       });
 
       if (res.status === 200) {
-        // Update the store with the fetched conversations
-        // updateFuncChat({directMessagesContacts: [...res.data.conversations]});
         updateFuncChat({directMessagesContacts: res.data.conversations});
       }
-    };
+    } catch (error) {
+      console.error('Error fetching conversations:', error);
+    }
+  }, [token, updateFuncChat]);
 
+  // Get all contacts that we have sent a message
+  useEffect(() => {
     getConversations();
   }, []);
 
@@ -74,7 +76,6 @@ const styles = StyleSheet.create({
 
   content: {
     flex: 1,
-    padding: 20,
   },
 });
 
