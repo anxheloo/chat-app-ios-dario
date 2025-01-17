@@ -49,7 +49,7 @@ export const useSocket = () => {
       selectedChatData?._id === message.recipient._id ||
       selectedChatData?._id === message.sender._id
     ) {
-      // if (!selectedChatMessages.some(msg => msg._id === message._id)) {
+      // if (selectedChatMessages.some(msg => msg._id === message._id)) {
       //   return;
       // } else {
       updateFuncChat({
@@ -63,6 +63,15 @@ export const useSocket = () => {
         ],
       });
       // }
+
+      // useAppStore.getState().updateSelectedChatMessages(currentMessages => [
+      //   ...currentMessages,
+      //   {
+      //     ...message,
+      //     recipient: message.recipient._id,
+      //     sender: message.sender._id,
+      //   },
+      // ]);
     }
 
     sortContactsByLastConversation(message);

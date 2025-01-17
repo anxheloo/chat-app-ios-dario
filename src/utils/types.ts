@@ -39,6 +39,7 @@ export type Message = {
   messageType: string;
   fileUrl: string;
   uploading?: boolean;
+  showDate?: boolean;
 };
 
 export type Contact = {

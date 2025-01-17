@@ -19,62 +19,58 @@ type DeleteMsgProps = {
   setShowModal: (value: boolean) => void;
 };
 
-const DeleteMsg: React.FC<DeleteMsgProps> = ({
-  msgId,
-  setShowModal,
-  showModal,
-}) => {
-  const token = useAppStore(state => state.token);
-  const updateFuncChat = useAppStore(state => state.updateFuncChat);
-  const {selectedChatMessages} = useAppStore.getState();
-  const socket = useAppStore(state => state.socket);
-  const id = useAppStore(state => state.id);
+const DeleteMsg: React.FC<DeleteMsgProps> = React.memo(
+  ({msgId, setShowModal, showModal}) => {
+    const token = useAppStore(state => state.token);
+    const updateFuncChat = useAppStore(state => state.updateFuncChat);
+    const {selectedChatMessages} = useAppStore.getState();
+    const socket = useAppStore(state => state.socket);
+    const id = useAppStore(state => state.id);
 
-  // Delete Specific message
-  const handleDelete = async () => {
-    try {
-      const res = await apiClient.post(
-        DELETE_MESSAGE,
-        {msgId: msgId},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
+    // Delete Specific message
+    const handleDelete = async () => {
+      try {
+        const res = await apiClient.post(
+          DELETE_MESSAGE,
+          {msgId: msgId},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
-        },
-      );
+        );
 
-      if (res.status === 200) {
-        console.log('This is the new conversation:', res.data.conversation);
-        updateFuncChat({
-          selectedChatMessages: selectedChatMessages.map(msg => {
-            if (msg._id === msgId) {
-              return {
-                ...msg,
-                messageType: 'deleted',
-                content: 'Message deleted',
-              };
-            }
-            return msg;
-          }),
-        });
+        if (res.status === 200) {
+          console.log('This is the new conversation:', res.data.conversation);
+          updateFuncChat({
+            selectedChatMessages: selectedChatMessages.map(msg => {
+              if (msg._id === msgId) {
+                return {
+                  ...msg,
+                  messageType: 'deleted',
+                  content: 'Message deleted',
+                };
+              }
+              return msg;
+            }),
+          });
 
-        socket?.emit('deleteSpecificMessage', {
-          messageId: msgId,
-          senderId: id,
-          recipientId: res.data.recipientId,
-          conversation: res.data.conversation,
-        });
+          socket?.emit('deleteSpecificMessage', {
+            messageId: msgId,
+            senderId: id,
+            recipientId: res.data.recipientId,
+            conversation: res.data.conversation,
+          });
 
+          setShowModal(false);
+        }
+      } catch (error) {
         setShowModal(false);
+        Alert.alert('Error', 'Unable to delete the message. Please try again.');
       }
-    } catch (error) {
-      setShowModal(false);
-      Alert.alert('Error', 'Unable to delete the message. Please try again.');
-    }
-  };
+    };
 
-  return (
-    <View>
+    return (
       <Modal
         visible={showModal}
         animationType="fade"
@@ -106,9 +102,9 @@ const DeleteMsg: React.FC<DeleteMsgProps> = ({
           </View>
         </View>
       </Modal>
-    </View>
-  );
-};
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   overlay: {
