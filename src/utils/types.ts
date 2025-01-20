@@ -13,6 +13,7 @@ export type RootStackParamList = {
   CreatePin: undefined;
   Scanner: undefined;
   ScannedUser: {userId: string};
+  FullScreenMedia: {fileUrl: string; type: string};
 };
 
 export type NavigationProps = NativeStackNavigationProp<RootStackParamList>;
@@ -38,7 +39,8 @@ export type Message = {
   expiresAt: string;
   messageType: string;
   fileUrl: string;
-  uploading?: boolean;
+  thumbnailUrl: string;
+  uploading: boolean;
   showDate?: boolean;
 };
 

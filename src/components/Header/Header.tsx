@@ -15,6 +15,8 @@ import {PERMISSIONS, request, RESULTS} from 'react-native-permissions';
 import {useSocket} from '../../utils/useSocket';
 import {apiClient} from '../../api/apiClient';
 import {GET_USER_INFO} from '../../api/apis';
+import {usePermission} from '../../utils/usePermission';
+// import {requestCameraPermission} from '../../utils/helpers';
 
 const Header = () => {
   const username = useAppStore(state => state.username);
@@ -24,6 +26,9 @@ const Header = () => {
   const navigation = useNavigation<NavigationProps>();
   useSocket();
 
+  const {requestCameraPermission} = usePermission();
+
+  // Get user info function
   const getUserInfo = useCallback(async () => {
     updateKeys({loading: true});
 
@@ -47,48 +52,18 @@ const Header = () => {
     }
   }, [token]);
 
-  //  Get user info
+  //Get user info
   useEffect(() => {
     getUserInfo();
   }, [token]);
 
-  const requestCameraPermission = useCallback(async (): Promise<boolean> => {
-    try {
-      const permission =
-        Platform.OS === 'android'
-          ? PERMISSIONS.ANDROID.CAMERA
-          : PERMISSIONS.IOS.CAMERA;
-
-      const result = await request(permission);
-
-      if (result === RESULTS.GRANTED) {
-        console.log('Camera permission granted');
-        return true;
-      } else if (result === RESULTS.DENIED) {
-        Alert.alert(
-          'Permission Denied',
-          'Camera access is required to scan QR codes.',
-        );
-      } else if (result === RESULTS.BLOCKED) {
-        Alert.alert(
-          'Permission Blocked',
-          'Please enable camera access from settings.',
-        );
-      }
-      return false;
-    } catch (error) {
-      console.error('Error requesting camera permission:', error);
-      Alert.alert('Permission Error', 'Error requesting camera permission');
-      return false;
-    }
-  }, []);
-
+  //Open Scanner
   const openScanner = useCallback(async () => {
     const hasPermission = await requestCameraPermission();
     if (hasPermission) {
       navigation.navigate('Scanner'); // Navigate to the scanner screen
     }
-  }, [navigation, requestCameraPermission]);
+  }, [navigation]);
 
   return (
     <View style={styles.container}>

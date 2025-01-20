@@ -12,9 +12,11 @@ const FullScreenLoader = () => {
 const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
-    backgroundColor: 'white',
+    position: 'absolute',
+    inset: 0,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
   },
 });
 

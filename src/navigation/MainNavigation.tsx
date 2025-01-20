@@ -10,6 +10,7 @@ import Chat from '../screens/Chat/Chat';
 import ScannerScreen from '../screens/Scanner/ScannerScreen';
 import ScannedUser from '../screens/Scanner/ScannedUser';
 import {RootStackParamList} from '../utils/types';
+import FullScreenMedia from '../screens/FullScreenMedia/FullScreenMedia';
 
 const MainNavigation = () => {
   const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -35,6 +36,11 @@ const MainNavigation = () => {
         <Stack.Screen
           name="Chat"
           component={Chat}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="FullScreenMedia"
+          component={FullScreenMedia}
           options={{headerShown: false}}
         />
         <Stack.Screen

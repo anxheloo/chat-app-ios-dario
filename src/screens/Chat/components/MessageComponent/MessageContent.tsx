@@ -1,28 +1,30 @@
 import React, {memo} from 'react';
 import MessageTime from './MessageTime';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, TouchableWithoutFeedback, View} from 'react-native';
 import {BORDERRADIUS, COLORS} from '../../../../theme/theme';
 
 type Props = {
   isSender: boolean;
-  renderMessageContent: React.JSX.Element | null;
+  children: React.ReactNode;
   createdAt: string;
 };
 
 const MessageContent: React.FC<Props> = memo(
-  ({isSender, renderMessageContent, createdAt}) => (
-    <View
-      style={[
-        styles.messageContainer,
-        {
-          backgroundColor: isSender ? COLORS.Black : COLORS.LightGray2,
-          alignSelf: isSender ? 'flex-end' : 'flex-start',
-        },
-      ]}>
-      {renderMessageContent}
-      <MessageTime createdAt={createdAt} isSender={isSender} />
-    </View>
-  ),
+  ({isSender, children, createdAt}) => {
+    return (
+      <View
+        style={[
+          styles.messageContainer,
+          {
+            backgroundColor: isSender ? COLORS.Black : COLORS.LightGray2,
+            alignSelf: isSender ? 'flex-end' : 'flex-start',
+          },
+        ]}>
+        {children}
+        <MessageTime createdAt={createdAt} isSender={isSender} />
+      </View>
+    );
+  },
 );
 
 const styles = StyleSheet.create({

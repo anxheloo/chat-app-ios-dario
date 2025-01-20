@@ -1,7 +1,6 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
-import {BORDERRADIUS, COLORS, FONTSIZE} from '../../../theme/theme';
-import moment from 'moment';
+import {StyleSheet, Text} from 'react-native';
+import {COLORS, BORDERRADIUS, FONTSIZE} from '../../../../theme/theme';
 
 type TextMsgProps = {
   isSender: boolean;
@@ -23,6 +22,14 @@ const TextMsg: React.FC<TextMsgProps> = ({isSender, children}) => {
 };
 
 const styles = StyleSheet.create({
+  messageContainer: {
+    borderRadius: BORDERRADIUS.radius_14,
+    padding: 2,
+    minWidth: 100,
+    maxWidth: '70%',
+    overflow: 'hidden',
+  },
+
   messageText: {
     fontWeight: 300,
     fontSize: FONTSIZE.sm,

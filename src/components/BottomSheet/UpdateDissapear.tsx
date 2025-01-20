@@ -9,6 +9,7 @@ import {
   Animated,
   Easing,
   useAnimatedValue,
+  ActivityIndicator,
 } from 'react-native';
 import React, {useMemo, useRef, useState} from 'react';
 import ReusableText from '../ReusableText';
@@ -133,7 +134,11 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = ({cancel}) => {
               fontSize={FONTSIZE.md}
               fontWeight={500}
               onPress={updateMessages}>
-              {!loading ? 'Set' : 'Processing...'}
+              {!loading ? (
+                'Set'
+              ) : (
+                <ActivityIndicator size="small" color="black" />
+              )}
             </ReusableText>
           </View>
 
@@ -159,7 +164,6 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = ({cancel}) => {
                 fontSize={FONTSIZE.md}
                 style={{flex: 1}}>
                 {dissappearingMessages}
-                {/* {selectableOption} */}
               </ReusableText>
               <View
                 style={{

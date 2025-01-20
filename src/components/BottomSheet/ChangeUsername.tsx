@@ -6,6 +6,7 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import React, {useState} from 'react';
 import ReusableText from '../ReusableText';
@@ -75,7 +76,11 @@ const ChangeUsername: React.FC<ChangeUsernameProps> = ({cancel}) => {
               fontSize={FONTSIZE.md}
               fontWeight={500}
               onPress={updateUsername}>
-              {!loading ? 'Set' : 'Processing...'}
+              {!loading ? (
+                'Set'
+              ) : (
+                <ActivityIndicator size="small" color="black" />
+              )}
             </ReusableText>
           </View>
 

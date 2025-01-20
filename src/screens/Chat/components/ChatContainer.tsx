@@ -1,11 +1,8 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
-  ActivityIndicator,
   FlatList,
   Keyboard,
   StyleSheet,
-  Touchable,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
@@ -14,8 +11,6 @@ import {GET_ALL_MESSAGES} from '../../../api/apis';
 import {useAppStore} from '../../../store';
 import MessageItem from './MessageComponent/MessageItem';
 import {preprocessMessages} from '../../../utils/helpers';
-import {COLORS} from '../../../theme/theme';
-import RightIcon from '../../../assets/icons/profile/RighArrow';
 import ScrollToBottom from './ScrollToBottom';
 
 const ChatContainer = () => {
@@ -129,7 +124,6 @@ const ChatContainer = () => {
         <FlatList
           onScroll={handleScroll}
           scrollEventThrottle={16}
-          removeClippedSubviews={true}
           refreshing={isLoading}
           onRefresh={loadMoreItem}
           ref={flatListRef}
@@ -137,14 +131,9 @@ const ChatContainer = () => {
           data={messagesData}
           renderItem={({item}) => <MessageItem message={item} />}
           keyExtractor={item => item._id}
-          // onViewableItemsChanged={onViewableItemsChanged}
-          // viewabilityConfig={{itemVisiblePercentThreshold: 100}}
-          onContentSizeChange={() => {
-            if (isNearBottom) {
-              scrollToBottom(1000);
-            }
-          }}
+          onContentSizeChange={() => isNearBottom && scrollToBottom()}
           initialNumToRender={20}
+          maxToRenderPerBatch={20}
         />
       </TouchableWithoutFeedback>
       {!isNearBottom && <ScrollToBottom onPress={scrollToBottom} />}

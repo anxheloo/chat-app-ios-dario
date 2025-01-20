@@ -1,10 +1,8 @@
 import {useRoute} from '@react-navigation/native';
 import React, {useRef, useState} from 'react';
 import {Alert, Keyboard, StyleSheet, View} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import ReusableText from '../../components/ReusableText';
 import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
-import Header from '../../components/Header/Header';
 import Avatar from '../../components/Persona/Avatar';
 import SettingElement from './SettingElement';
 import BottomSheetWrapper from '../../components/BottomSheet/BottomSheetWrapper';
@@ -14,7 +12,7 @@ import {removeToken} from '../../utils/TokenStorage';
 import {useAppStore} from '../../store';
 import {NavigationProps} from '../../utils/types';
 import {apiClient} from '../../api/apiClient';
-import {UPDATE_USER_PROFILE_PIC, UPDATE_USERNAME} from '../../api/apis';
+import {UPDATE_USER_PROFILE_PIC} from '../../api/apis';
 import ChangeUsername from '../../components/BottomSheet/ChangeUsername';
 import UpdatePin from '../../components/BottomSheet/UpdatePin';
 import UpdateDissapear from '../../components/BottomSheet/UpdateDissapear';
@@ -26,14 +24,11 @@ type ProfileProps = {
 };
 
 const Profile: React.FC<ProfileProps> = ({navigation}) => {
-  // const router = useRoute();
   const setUserPersona = useAppStore(state => state.setUserPersona);
   const updateKeys = useAppStore(state => state.updateKeys);
   const setToken = useAppStore(state => state.setToken);
   const bottomSheetRef = useRef<BottomSheet | null>(null);
   const [clickedSetting, setClickedSetting] = useState<string | null>(null);
-
-  // const {avatar} = useAppStore.getState();
   const avatar = useAppStore(state => state.avatar);
   const token = useAppStore(state => state.token);
 
@@ -147,13 +142,7 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
         )}
         {clickedSetting === 'pin' && <UpdatePin cancel={cancel} />}
         {clickedSetting === 'clock' && <UpdateDissapear cancel={cancel} />}
-
         {clickedSetting === 'qr-code' && <QRCodeModal cancel={cancel} />}
-        {/* {clickedSetting === 'qr-code' && <QRCodeModal cancel={cancel} />}
-
-        {clickedSetting === 'clock' && (
-          <DisappearingMessagesDropdown cancel={cancel} />
-        )}  */}
       </BottomSheetWrapper>
     </Layout>
   );

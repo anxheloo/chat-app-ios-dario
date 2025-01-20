@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Platform,
-  SafeAreaView,
-  StatusBar,
-  StatusBarStyle,
-  View,
-} from 'react-native';
+import {StatusBar, StatusBarStyle, View} from 'react-native';
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
@@ -13,6 +7,7 @@ import {
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import MainNavigation from './src/navigation/MainNavigation';
 import {PortalProvider} from '@gorhom/portal';
+import InternetPopup from './src/components/Internet/InternetPopup';
 
 const App = () => {
   const CustomStatusBar = ({
@@ -64,6 +59,7 @@ const App = () => {
         <PortalProvider>
           <MainNavigation />
         </PortalProvider>
+        {/* <InternetPopup /> */}
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

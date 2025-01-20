@@ -6,19 +6,19 @@
 
 	<!-- Required with iOS 10 and higher -->
 	<key>NSCameraUsageDescription</key>
-	<string>Your message to user when the camera is accessed for the first time</string>
+	<string>Camera access is required to capture photos and videos.</string>
 
 	<!-- Required with iOS 11 and higher: include this only if you are planning to use the camera roll -->
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Your message to user when the photo library is accessed for the first time</string>
+	<string>Photo Library access is required to select photos and videos.</string>
 
 	<!-- Include this only if you are planning to use the camera roll -->
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Your message to user when the photo library is accessed for the first time</string>
+	<string>Photo Library access is required to select photos and videos.</string>
 
 	<!-- Include this only if you are planning to use the microphone for video recording -->
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Your message to user when the microphone is accessed for the first time</string>
+	<string>Microphone access is required to record voice.</string>
 
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>

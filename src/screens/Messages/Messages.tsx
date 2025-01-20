@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {StyleSheet, View, ActivityIndicator} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import BottomSheetWrapper from '../../components/BottomSheet/BottomSheetWrapper';
 import PersonasList from '../../components/BottomSheet/PersonasList';
 import BottomSheet from '@gorhom/bottom-sheet';

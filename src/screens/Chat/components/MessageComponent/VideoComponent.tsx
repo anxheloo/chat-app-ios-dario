@@ -1,86 +1,89 @@
-import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
-import React, {useState} from 'react';
+import {
+  StyleSheet,
+  ActivityIndicator,
+  TouchableOpacity,
+  Image,
+  View,
+} from 'react-native';
+import React, {useCallback, useState} from 'react';
 import Video from 'react-native-video';
 import {BORDERRADIUS} from '../../../../theme/theme';
-import {HOST} from '../../../../api/apis';
+import {Message, NavigationProps} from '../../../../utils/types';
+import {useNavigation} from '@react-navigation/native';
 
 type VideoProps = {
-  fileUrl: string;
+  message: Message;
+  uploading: boolean;
 };
 
-const VideoComponent: React.FC<VideoProps> = ({fileUrl}) => {
-  const [loading, setIsLoading] = useState(false);
-  const [err, setErr] = useState<any | null>(null);
+const VideoComponent: React.FC<VideoProps> = ({message, uploading}) => {
+  const navigation = useNavigation<NavigationProps>();
 
-  console.log('This is fileUrl:', fileUrl);
+  // add the play icon to the video, if play icon clicked, open video.
 
-  // const controlsStyles = {
-  //   hidePosition: false,
-  //   hidePlayPause: false,
-  //   hideForward: false,
-  //   hideRewind: false,
-  //   hideNext: false,
-  //   hidePrevious: false,
-  //   hideFullscreen: false,
-  //   hideSeekBar: false,
-  //   hideDuration: false,
-  //   hideNavigationBarOnFullScreenMode: true,
-  //   hideNotificationBarOnFullScreenMode: true,
-  //   hideSettingButton: true,
-  //   seekIncrementMS: 10000,
-  //   liveLabel: 'LIVE',
-  // };
+  const openVideo = useCallback(() => {
+    if (!uploading) {
+      navigation.navigate('FullScreenMedia', {
+        fileUrl: message.fileUrl,
+        type: 'video',
+      });
+    }
+  }, [uploading, message.fileUrl]);
 
   return (
-    <View style={styles.imageContainer}>
-      {loading && (
-        // {(loading || !fileUrl) && (
-        <ActivityIndicator
-          size="small"
-          color="#fff"
-          style={{
-            position: 'absolute',
-            inset: 0,
-          }}
-        />
+    <TouchableOpacity
+      style={styles.container}
+      onPress={openVideo}
+      activeOpacity={1}>
+      {uploading ? (
+        // <ActivityIndicator
+        //   size="small"
+        //   color="#fff"
+        //   style={{
+        //     position: 'absolute',
+        //     inset: 0,
+        //   }}
+        // />
+        <Image
+          source={{uri: message.thumbnailUrl}}
+          style={styles.thumbnail}
+          resizeMode="cover"></Image>
+      ) : (
+        <Video
+          fullscreenOrientation="all"
+          source={{uri: message.fileUrl}}
+          style={styles.video}
+          // fullscreen={true}
+          resizeMode="cover"
+          paused={true}
+          // onLoadStart={() => setIsLoading(true)}
+          // onLoad={() => setIsLoading(false)}
+          // onError={() => {
+          //   setIsLoading(false);
+          //   console.log('Error loading video');
+          // }}
+        ></Video>
       )}
-      <Video
-        fullscreenOrientation="all"
-        // source={{uri: `${HOST}/${fileUrl}`}}
-        source={{uri: fileUrl}}
-        style={styles.videoContainer}
-        repeat={false}
-        // controlsStyles={controlsStyles}
-        // playInBackground={false}
-        // paused={true}
-        controls={true}
-        fullscreen={true}
-        resizeMode="cover"
-        onLoadStart={() => setIsLoading(true)}
-        onLoad={() => setIsLoading(false)}
-        onError={() => {
-          setIsLoading(false);
-          console.log('Error loading video');
-        }}
-      />
-    </View>
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  imageContainer: {
+  container: {
     width: 220,
     height: 150,
     borderTopLeftRadius: BORDERRADIUS.radius_13,
     borderTopRightRadius: BORDERRADIUS.radius_13,
-    overflow: 'hidden',
+    // overflow: 'hidden',
   },
 
-  videoContainer: {
-    width: 220,
-    height: 150,
-    borderTopLeftRadius: BORDERRADIUS.radius_13,
-    borderTopRightRadius: BORDERRADIUS.radius_13,
+  thumbnail: {
+    width: '100%',
+    height: '100%',
+  },
+  video: {
+    width: '100%',
+    height: '100%',
   },
 });
 

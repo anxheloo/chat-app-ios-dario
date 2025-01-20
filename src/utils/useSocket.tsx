@@ -8,10 +8,13 @@ export const useSocket = () => {
   const initializeSocket = useAppStore(state => state.initializeSocket);
   const disconnectSocket = useAppStore(state => state.disconnectSocket);
 
+  const updateSelectedChatMessages = useAppStore(
+    state => state.updateSelectedChatMessages,
+  );
+
   const handleReceiveMessage = useCallback((message: any) => {
     const {
       directMessagesContacts,
-      selectedChatMessages,
       selectedChatData,
       sortContactsByLastConversation,
     } = useAppStore.getState();
@@ -49,9 +52,8 @@ export const useSocket = () => {
       selectedChatData?._id === message.recipient._id ||
       selectedChatData?._id === message.sender._id
     ) {
-      // Try this
-      useAppStore.getState().updateSelectedChatMessages(currentMessages => [
-        ...currentMessages.filter(msg => msg._id !== message._id),
+      updateSelectedChatMessages(current => [
+        ...current.filter(msg => msg._id !== message._id),
         {
           ...message,
           recipient: message.recipient._id,
@@ -59,19 +61,7 @@ export const useSocket = () => {
         },
       ]);
 
-      // If not work , use this
-
-      // updateFuncChat({
-      //   selectedChatMessages: [
-      //     ...selectedChatMessages.filter(msg => msg._id !== message._id),
-      //     {
-      //       ...message,
-      //       recipient: message.recipient._id,
-      //       sender: message.sender._id,
-      //     },
-      //   ],
-      // });
-      // }
+      // updateKeys({loading: false});
     }
 
     sortContactsByLastConversation(message);

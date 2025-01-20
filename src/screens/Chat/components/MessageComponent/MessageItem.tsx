@@ -1,9 +1,8 @@
 import React, {useCallback, useMemo, useState} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity} from 'react-native';
 import {Message} from '../../../../utils/types';
 import {useAppStore} from '../../../../store';
 import {BORDERRADIUS, FONTSIZE} from '../../../../theme/theme';
-import TextMsg from '../TextMsg';
 import {checkIfImage, checkIfVideo} from '../../../../utils/helpers';
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import DeleteIcon from '../../../../assets/icons/Chat/DeleteIcon';
@@ -12,6 +11,7 @@ import ImageComponent from './ImageComponent';
 import VideoComponent from './VideoComponent';
 import moment from 'moment';
 import MessageContent from './MessageContent';
+import TextMsg from './TextMsg';
 
 type MessageItemProps = {
   message: Message;
@@ -34,10 +34,14 @@ const MessageItem: React.FC<MessageItemProps> = React.memo(({message}) => {
         return <TextMsg isSender={isSender}>{message.content}</TextMsg>;
       case 'file':
         if (checkIfImage(message.fileUrl)) {
-          return <ImageComponent fileUrl={message.fileUrl} />;
+          return (
+            <ImageComponent message={message} uploading={message?.uploading} />
+          );
         }
         if (checkIfVideo(message.fileUrl)) {
-          return <VideoComponent fileUrl={message.fileUrl} />;
+          return (
+            <VideoComponent message={message} uploading={message?.uploading} />
+          );
         }
         return (
           <TouchableOpacity
@@ -86,18 +90,14 @@ const MessageItem: React.FC<MessageItemProps> = React.memo(({message}) => {
         <ReanimatedSwipeable
           renderRightActions={renderRightActions}
           overshootRight={false}>
-          <MessageContent
-            isSender={isSender}
-            renderMessageContent={renderMessageContent}
-            createdAt={message.createdAt}
-          />
+          <MessageContent isSender={isSender} createdAt={message.createdAt}>
+            {renderMessageContent}
+          </MessageContent>
         </ReanimatedSwipeable>
       ) : (
-        <MessageContent
-          isSender={isSender}
-          renderMessageContent={renderMessageContent}
-          createdAt={message.createdAt}
-        />
+        <MessageContent isSender={isSender} createdAt={message.createdAt}>
+          {renderMessageContent}
+        </MessageContent>
       )}
 
       <DeleteMsg
