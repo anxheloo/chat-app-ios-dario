@@ -1,5 +1,5 @@
-export const HOST = 'http://172.16.0.24:8000';
-// export const HOST = 'http://192.168.0.103:8000';
+// export const HOST = 'http://172.16.0.217:8000';
+export const HOST = 'http://172.20.10.2:8000';
 
 export const AUTH_ROUTES = 'api/auth';
 export const SIGNUP_ROUTES = `${AUTH_ROUTES}/signup`;
@@ -15,8 +15,10 @@ export const SEARCH = `${CONTACTS_ROUTES}/search`;
 export const GET_CONTACTS_FOR_DM = `${CONTACTS_ROUTES}/get-contacts-for-dm`;
 export const GET_CONVERSATIONS = `${CONTACTS_ROUTES}/get-conversations`;
 export const DELETE_CONVERSATION = `${CONTACTS_ROUTES}/delete-conversation`;
-export const GET_ALL_CONTACTS = `${CONTACTS_ROUTES}/get-all-contacts`;
+export const GET_ALL_FRIENDS = `${CONTACTS_ROUTES}/get-all-friends`;
 export const GET_SCANNED_USER = `${CONTACTS_ROUTES}/get-scanner-user`;
+export const ADD_FRIEND = `${CONTACTS_ROUTES}/add-friend`;
+export const DELETE_FRIEND = `${CONTACTS_ROUTES}/delete-friend`;
 
 export const MESSAGES_ROUTES = 'api/messages';
 export const GET_ALL_MESSAGES = `${MESSAGES_ROUTES}/get-messages`;

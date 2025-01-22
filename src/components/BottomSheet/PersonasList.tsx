@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   FlatList,
   Keyboard,
@@ -16,29 +16,25 @@ import {apiClient} from '../../api/apiClient';
 import {SEARCH} from '../../api/apis';
 import {Contact, NavigationProps} from '../../utils/types';
 import {useAppStore} from '../../store';
+import AddIcon from '../../assets/icons/AddIcon';
 
 type PersonasListProps = {
   cancel: () => void;
-  addNew: () => void;
   navigation?: NavigationProps;
 };
 
-const PersonasList: React.FC<PersonasListProps> = ({
-  cancel,
-  addNew,
-  navigation,
-}) => {
+const PersonasList: React.FC<PersonasListProps> = ({cancel, navigation}) => {
   const [search, setSearch] = useState<string>('');
-  const [searchedContacts, setSearchContacts] = useState<Contact[]>([]);
+  const [searchedFriends, setSearchFriends] = useState<Contact[]>([]);
   const token = useAppStore(state => state.token);
 
-  const clearSearch = (): void => {
+  const clearSearch = useCallback((): void => {
     setSearch('');
-    setSearchContacts([]);
+    setSearchFriends([]);
     Keyboard.dismiss();
-  };
+  }, []);
 
-  const searchContact = async (search: string) => {
+  const searchFriends = async (search: string) => {
     if (search.length > 0) {
       try {
         const res = await apiClient.post(
@@ -52,7 +48,7 @@ const PersonasList: React.FC<PersonasListProps> = ({
         );
 
         if (res.status === 200) {
-          setSearchContacts(res.data.contacts);
+          setSearchFriends(res.data.contacts);
         } else {
           console.log('error searching contacts');
         }
@@ -60,9 +56,22 @@ const PersonasList: React.FC<PersonasListProps> = ({
         console.error('API call error:', error);
       }
     } else {
-      setSearchContacts([]);
+      setSearchFriends([]);
     }
   };
+
+  const addNew = useCallback(async () => {
+    cancel();
+    navigation?.navigate('Scanner');
+  }, [cancel]);
+
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      searchFriends(search);
+    }, 300);
+
+    return () => clearTimeout(delay);
+  }, [search]);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -74,12 +83,7 @@ const PersonasList: React.FC<PersonasListProps> = ({
             onPress={cancel}>
             Cancel
           </ReusableText>
-          {/* <ReusableText
-            fontSize={FONTSIZE.md}
-            fontWeight={500}
-            onPress={addNew}>
-            Add New
-          </ReusableText> */}
+          <AddIcon width={17.5} height={17.5} onPress={addNew} />
         </View>
 
         <View style={styles.textContainer}>
@@ -99,10 +103,7 @@ const PersonasList: React.FC<PersonasListProps> = ({
         <ReusableInput
           placeholder="Search"
           value={search}
-          onChange={value => {
-            setSearch(value);
-            searchContact(value);
-          }}
+          onChange={setSearch}
           onPress={clearSearch}
           backgroundColor="white"
           icon1={<SearchIcon width={15} height={15} />}
@@ -111,12 +112,17 @@ const PersonasList: React.FC<PersonasListProps> = ({
 
         <FlatList
           contentContainerStyle={styles.list}
-          data={searchedContacts}
+          data={searchedFriends}
           renderItem={({item}) => (
-            <Persona contact={item} navigation={navigation} cancel={cancel} />
+            <Persona
+              contact={item}
+              navigation={navigation}
+              cancel={cancel}
+              version="search"
+            />
           )}
           keyExtractor={item => item._id}
-          extraData={searchedContacts}
+          // extraData={searchedFriends}
           // ListEmptyComponent={<Text>ska kontakte</Text>}
           initialNumToRender={10}
         />

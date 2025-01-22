@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {
   StyleSheet,
   View,
@@ -30,24 +30,24 @@ const CreatePersona: React.FC<CreatePersonaScreenProps> = ({navigation}) => {
   const bottomSheetRef = useRef<BottomSheet | null>(null);
 
   const openBottomSheet = (): void => {
-    // setUserPersona({username});
     Keyboard.dismiss();
     bottomSheetRef.current?.expand();
   };
-
   const onChange = (text: string): void => {
     setUserPersona({username: text.trim()});
   };
-
-  const cancel = (): void => {
-    bottomSheetRef?.current?.close();
-  };
-
-  // close bottom sheet and go to CreatePin screen
+  const cancel = () => bottomSheetRef?.current?.close();
+  // Close bottom sheet and go to CreatePin screen
   const setFunc = (): void => {
     bottomSheetRef?.current?.close();
     navigation.navigate('CreatePin');
   };
+
+  useEffect(() => {
+    return () => {
+      setUserPersona({username: ''});
+    };
+  }, []);
 
   return (
     <KeyboardAvoidingView behavior="padding" style={{flex: 1}}>

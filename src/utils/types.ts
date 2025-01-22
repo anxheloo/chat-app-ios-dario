@@ -8,11 +8,14 @@ export type RootStackParamList = {
   Calls: undefined;
   Contacts: undefined;
   Login: undefined;
-  BottomTabNavigation: undefined;
+  // BottomTabNavigation: undefined;
+  BottomTabNavigation: {
+    screen?: 'Messages' | 'Calls' | 'Contacts' | 'Profile';
+  };
   CreatePersona: undefined;
   CreatePin: undefined;
   Scanner: undefined;
-  ScannedUser: {userId: string};
+  ScannedUser: {recipientId: string};
   FullScreenMedia: {fileUrl: string; type: string};
 };
 
@@ -59,3 +62,5 @@ export type Conversation = {
   lastMessageType?: 'text' | 'file' | null;
   lastMessageFileUrl?: string | null;
 };
+
+export type SettingType = 'username' | 'qr-code' | 'pin' | 'clock' | 'logout';

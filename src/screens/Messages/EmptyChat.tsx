@@ -10,7 +10,7 @@ type EmptyChatProps = {
 
 const EmptyChat: React.FC<EmptyChatProps> = ({openBottomSheet}) => {
   return (
-    <>
+    <View style={styles.emptyChat}>
       <View style={{alignItems: 'center', gap: 10}}>
         <MessagingIcon width={47} height={45} />
         <ReusableText fontSize={FONTSIZE.lg} fontWeight={400}>
@@ -34,10 +34,17 @@ const EmptyChat: React.FC<EmptyChatProps> = ({openBottomSheet}) => {
         onPress={openBottomSheet}>
         Start Conversation
       </ReusableText>
-    </>
+    </View>
   );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  emptyChat: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 50,
+  },
+});
 
 export default EmptyChat;

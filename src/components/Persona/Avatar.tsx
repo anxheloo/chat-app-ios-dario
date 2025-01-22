@@ -3,7 +3,6 @@ import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {useAppStore} from '../../store';
 import {avatarUrls} from '../../utils/constants';
 import {BORDERRADIUS} from '../../theme/theme';
-import {useRoute} from '@react-navigation/native';
 import EditIcon from '../../assets/icons/profile/EditIcon';
 
 type AvatarProps = {

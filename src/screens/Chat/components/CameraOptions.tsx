@@ -1,12 +1,5 @@
-import React from 'react';
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  TextStyle,
-  View,
-  ViewStyle,
-} from 'react-native';
+import React, {memo} from 'react';
+import {StyleSheet, Text, View} from 'react-native';
 import * as ImagePicker from 'react-native-image-picker';
 
 /* toggle includeExtra */
@@ -27,7 +20,8 @@ const actions: Action[] = [
       mediaType: 'mixed',
       formatAsMp4: true,
       // includeExtra,
-      quality: 0.4,
+      quality: 0.3,
+      videoQuality: 'low',
       assetRepresentationMode: 'current',
     },
   },
@@ -40,7 +34,8 @@ const actions: Action[] = [
       formatAsMp4: true,
       // includeExtra,
       assetRepresentationMode: 'current',
-      quality: 0.4,
+      quality: 0.3,
+      videoQuality: 'low',
     },
   },
 ];
@@ -52,7 +47,7 @@ type Props = {
   ) => void;
 };
 
-const CameraOptions: React.FC<Props> = ({onButtonPress}) => {
+const CameraOptions: React.FC<Props> = memo(({onButtonPress}) => {
   return (
     <View style={styles.container}>
       {actions.map(({title, type, options}) => {
@@ -67,7 +62,7 @@ const CameraOptions: React.FC<Props> = ({onButtonPress}) => {
       })}
     </View>
   );
-};
+});
 
 export default CameraOptions;
 

@@ -4,7 +4,7 @@ import {ActivityIndicator, StyleSheet, View} from 'react-native';
 const FullScreenLoader = () => {
   return (
     <View style={styles.loadingContainer}>
-      <ActivityIndicator size="large" color="black" />
+      <ActivityIndicator size="large" color="white" />
     </View>
   );
 };
@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
     inset: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
   },
 });
 

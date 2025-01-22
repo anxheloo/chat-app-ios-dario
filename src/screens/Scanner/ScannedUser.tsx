@@ -1,28 +1,14 @@
-import React, {useEffect, useState} from 'react';
-import {
-  Alert,
-  StatusBar,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import {Camera} from 'react-native-vision-camera';
-import {
-  CONTENT_SPACING,
-  CONTROL_BUTTON_SIZE,
-  SAFE_AREA_PADDING,
-} from './Constants';
-import {Contact, NavigationProps, RootStackParamList} from '../../utils/types';
+import React from 'react';
+import {StatusBar, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {SAFE_AREA_PADDING} from './Constants';
+import {RootStackParamList} from '../../utils/types';
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
-import {BORDERRADIUS} from '../../theme/theme';
 import ReusableText from '../../components/ReusableText';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import Avatar from '../../components/Persona/Avatar';
-import {GET_SCANNED_USER} from '../../api/apis';
-import axios from 'axios';
-import {apiClient} from '../../api/apiClient';
-import ReusableButton from '../../components/ReusableButton';
-import {useAppStore} from '../../store';
+import useScannedUser from '../../utils/hooks/useScannedUser';
+import FullScreenLoader from '../../components/Loading/FullScreenLoader';
+import {BlurView} from '@react-native-community/blur';
 
 type ScannedUserProps = NativeStackScreenProps<
   RootStackParamList,
@@ -30,68 +16,56 @@ type ScannedUserProps = NativeStackScreenProps<
 >;
 
 const ScannedUser: React.FC<ScannedUserProps> = ({route, navigation}) => {
-  const {userId} = route.params;
-  const token = useAppStore(state => state.token);
-  const id = useAppStore(state => state.id);
-  const socket = useAppStore(state => state.socket);
+  const {recipientId} = route.params;
+  const {loading, scannedUser, addFriend} = useScannedUser(
+    recipientId,
+    navigation,
+  );
 
-  const [scannedUser, setScannedUser] = useState({
-    username: '',
-    avatar: '',
-    id: '',
-  });
-
-  useEffect(() => {
-    const getScannerUserDetails = async () => {
-      // Fetch user details from server
-      try {
-        const response = await apiClient.get(`${GET_SCANNED_USER}/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.status === 200) {
-          const {username, avatar, id} = response.data;
-          setScannedUser({username, avatar, id});
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    getScannerUserDetails();
-  }, []);
-
-  const addFriend = async () => {
-    try {
-      socket?.emit('addFriend', {recipientId: userId, senderId: id});
-    } catch (error) {
-      Alert.alert('Error', 'Failed to send request');
-    }
-  };
+  if (loading) return <FullScreenLoader />;
 
   return (
-    <View style={styles.container}>
+    <View style={styles.content}>
       <StatusBar hidden />
 
-      <View style={styles.content}>
-        <Avatar
-          width={70}
-          height={70}
-          avatarWidth={52.5}
-          avatarHeight={52.5}
-          src={Number(scannedUser?.avatar)}
+      <View style={StyleSheet.absoluteFill}>
+        <BlurView
+          style={StyleSheet.absoluteFill}
+          blurType="dark"
+          blurAmount={20}
+          reducedTransparencyFallbackColor="black"
         />
-
-        <ReusableText fontSize={20} fontWeight={700}>
-          {scannedUser?.username}
-        </ReusableText>
-
-        <ReusableButton text="Send Request" onPress={addFriend} />
       </View>
+      <Avatar
+        width={70}
+        height={70}
+        avatarWidth={52.5}
+        avatarHeight={52.5}
+        src={Number(scannedUser?.avatar)}
+      />
 
-      {/* Back Button */}
+      <ReusableText fontSize={26} fontWeight={700} color="white">
+        @{scannedUser?.username}
+      </ReusableText>
+
+      <ReusableText
+        fontSize={14}
+        fontWeight={300}
+        color="white"
+        textAlign="center">
+        This persona will be notified if you choose to send a friend request
+      </ReusableText>
+
+      <ReusableText
+        style={{paddingTop: 20}}
+        fontSize={16}
+        fontWeight={400}
+        color="white"
+        textDecorationLine="underline"
+        onPress={addFriend}>
+        Send Request
+      </ReusableText>
+
       <TouchableOpacity style={styles.backButton} onPress={navigation.goBack}>
         <CloseIcon width={35} height={35} />
       </TouchableOpacity>
@@ -102,16 +76,15 @@ const ScannedUser: React.FC<ScannedUserProps> = ({route, navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'rgba(140, 140, 140, 0.3)',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 
   content: {
     flex: 1,
+    backgroundColor: 'rgba(140, 140, 140, 0.3)',
     justifyContent: 'center',
     alignItems: 'center',
     gap: 20,
+    padding: 20,
   },
 
   backButton: {

@@ -1,5 +1,5 @@
 import BottomSheet, {BottomSheetView} from '@gorhom/bottom-sheet';
-import React, {forwardRef, useCallback, useEffect, useMemo} from 'react';
+import React, {forwardRef, memo, useCallback, useEffect, useMemo} from 'react';
 import {Keyboard, KeyboardAvoidingView, StyleSheet} from 'react-native';
 import {COLORS} from '../../theme/theme';
 import {Portal, PortalHost} from '@gorhom/portal';
@@ -9,8 +9,8 @@ type BottomSheetProps = {
   children: React.ReactNode;
 };
 
-const BottomSheetWrapper = forwardRef<BottomSheet, BottomSheetProps>(
-  ({children}, ref) => {
+const BottomSheetWrapper = memo(
+  forwardRef<BottomSheet, BottomSheetProps>(({children}, ref) => {
     const snapPoints = useMemo(() => ['25%', '50%', '75%'], []);
     const handleSheetChanges = useCallback((index: number) => {}, []);
 
@@ -43,7 +43,7 @@ const BottomSheetWrapper = forwardRef<BottomSheet, BottomSheetProps>(
         <PortalHost name="BottomSheetWrapper" />
       </>
     );
-  },
+  }),
 );
 
 const styles = StyleSheet.create({

@@ -1,15 +1,29 @@
-import React from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, {useCallback, useState} from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Avatar from './Avatar';
 import {useAppStore} from '../../store';
 import {Contact, NavigationProps} from '../../utils/types';
 import {COLORS, FONTSIZE} from '../../theme/theme';
+import Swipeable, {
+  SwipeableRef,
+} from 'react-native-gesture-handler/ReanimatedSwipeable';
+import DeleteIcon from '../../assets/icons/Chat/DeleteIcon';
+import {DELETE_FRIEND} from '../../api/apis';
+import {apiClient} from '../../api/apiClient';
 
 type PersonaProps = {
   contact: Contact;
   navigation?: NavigationProps;
   backgroundColor?: string;
   cancel?: () => void;
+  version?: string;
 };
 
 const Persona: React.FC<PersonaProps> = ({
@@ -17,8 +31,12 @@ const Persona: React.FC<PersonaProps> = ({
   navigation,
   backgroundColor,
   cancel,
+  version,
 }) => {
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
+  const token = useAppStore(state => state.token);
+  const updateFriends = useAppStore(state => state.updateFriends);
+  const [loading, setLoading] = useState(false);
 
   // Select contact to update chat
   const selectContact = () => {
@@ -30,26 +48,71 @@ const Persona: React.FC<PersonaProps> = ({
     }
   };
 
+  const deleteContact = useCallback(async () => {
+    setLoading(true);
+
+    try {
+      const res = await apiClient.post(
+        DELETE_FRIEND,
+        {friendId: contact._id},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (res.status === 200) {
+        setLoading(false);
+
+        updateFriends(current =>
+          current.filter(item => item._id !== contact._id),
+        );
+      }
+    } catch (error) {
+      setLoading(false);
+      Alert.alert('Could not delete contact. Please try again.');
+    }
+  }, [contact._id, loading]);
+
+  const renderRightActions = useCallback(() => {
+    return (
+      <TouchableOpacity
+        onPress={deleteContact}
+        style={styles.renderRightActions}>
+        {loading ? (
+          <ActivityIndicator size="small" color="white" />
+        ) : (
+          <DeleteIcon width={17.5} height={21.5} color={'#FFFFFF'} />
+        )}
+      </TouchableOpacity>
+    );
+  }, [loading, deleteContact]);
+
   return (
-    <TouchableOpacity
-      activeOpacity={0.9}
-      style={[
-        styles.container,
-        {backgroundColor: backgroundColor ?? 'transparent'},
-      ]}
-      onPress={selectContact}>
-      <Avatar
-        width={36}
-        height={36}
-        avatarWidth={27}
-        avatarHeight={27}
-        backgroundColor={COLORS.LightGray2}
-        src={contact.avatar}
-      />
-      <View style={styles.secondContainer}>
-        <Text style={styles.username}>@{contact.username}</Text>
-      </View>
-    </TouchableOpacity>
+    <Swipeable renderRightActions={renderRightActions} overshootRight={false}>
+      <TouchableOpacity
+        activeOpacity={1}
+        style={[
+          version && version === 'search'
+            ? styles.container
+            : styles.containerVersion2,
+          {backgroundColor: backgroundColor ?? 'transparent'},
+        ]}
+        onPress={selectContact}>
+        <Avatar
+          width={36}
+          height={36}
+          avatarWidth={27}
+          avatarHeight={27}
+          backgroundColor={COLORS.LightGray2}
+          src={contact.avatar}
+        />
+        <View style={styles.secondContainer}>
+          <Text style={styles.username}>@{contact.username}</Text>
+        </View>
+      </TouchableOpacity>
+    </Swipeable>
   );
 };
 
@@ -59,6 +122,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 6,
     gap: 15,
+  },
+
+  containerVersion2: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    gap: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.LightGray2,
   },
 
   secondContainer: {
@@ -87,6 +160,15 @@ const styles = StyleSheet.create({
     color: 'black',
     paddingVertical: 6,
     alignSelf: 'flex-start',
+  },
+
+  renderRightActions: {
+    paddingHorizontal: 10,
+    width: 100,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'black',
   },
 });
 

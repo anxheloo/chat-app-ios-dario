@@ -1,69 +1,25 @@
-import React, {useCallback, useEffect} from 'react';
-import {
-  Alert,
-  Platform,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import React, {useCallback} from 'react';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import ScanIcon from '../../assets/icons/messages/ScanIcon';
 import ReusableText from '../ReusableText';
 import {useAppStore} from '../../store';
 import {useNavigation} from '@react-navigation/native';
 import {NavigationProps} from '../../utils/types';
-import {PERMISSIONS, request, RESULTS} from 'react-native-permissions';
 import {useSocket} from '../../utils/useSocket';
-import {apiClient} from '../../api/apiClient';
-import {GET_USER_INFO} from '../../api/apis';
-import {usePermission} from '../../utils/usePermission';
-// import {requestCameraPermission} from '../../utils/helpers';
+import useUserInfo from '../../utils/hooks/useUserInfo';
 
 const Header = () => {
   const username = useAppStore(state => state.username);
-  const setUserPersona = useAppStore(state => state.setUserPersona);
-  const updateKeys = useAppStore(state => state.updateKeys);
-  const token = useAppStore(state => state.token);
   const navigation = useNavigation<NavigationProps>();
   useSocket();
-
-  const {requestCameraPermission} = usePermission();
-
-  // Get user info function
-  const getUserInfo = useCallback(async () => {
-    updateKeys({loading: true});
-
-    try {
-      const res = await apiClient.get(GET_USER_INFO, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (res.status === 200) {
-        setUserPersona(res.data);
-      }
-    } catch (error: any) {
-      Alert.alert(
-        'Error',
-        error.response?.data?.message || 'Failed to fetch user info.',
-      );
-    } finally {
-      updateKeys({loading: false});
-    }
-  }, [token]);
-
-  //Get user info
-  useEffect(() => {
-    getUserInfo();
-  }, [token]);
+  useUserInfo();
 
   //Open Scanner
   const openScanner = useCallback(async () => {
-    const hasPermission = await requestCameraPermission();
-    if (hasPermission) {
-      navigation.navigate('Scanner'); // Navigate to the scanner screen
-    }
-  }, [navigation]);
+    navigation.navigate('Scanner');
+  }, []);
+
+  console.log('This is header step 1');
 
   return (
     <View style={styles.container}>

@@ -1,6 +1,5 @@
 import {
   View,
-  Text,
   StyleSheet,
   TouchableWithoutFeedback,
   Keyboard,
@@ -8,12 +7,11 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import ReusableText from '../ReusableText';
 import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import ReusableInput from '../ReusableInput';
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
-import ReusableButton from '../ReusableButton';
 import {UPDATE_USERNAME} from '../../api/apis';
 import {apiClient} from '../../api/apiClient';
 import {useAppStore} from '../../store';
@@ -28,33 +26,40 @@ const ChangeUsername: React.FC<ChangeUsernameProps> = ({cancel}) => {
   const [username, setUsername] = useState<string>('');
   const [loading, setIsLoading] = useState<boolean>(false);
 
-  const updateUsername = async (): Promise<void> => {
-    setIsLoading(true);
+  const updateUsername = useCallback(
+    async (
+      username: string,
+      token: string | null,
+      cancel: () => void,
+    ): Promise<void> => {
+      setIsLoading(true);
 
-    try {
-      const res = await apiClient.post(
-        UPDATE_USERNAME,
-        {
-          username: username,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
+      try {
+        const res = await apiClient.post(
+          UPDATE_USERNAME,
+          {
+            username: username,
           },
-        },
-      );
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
 
-      if (res.status === 200) {
+        if (res.status === 200) {
+          setIsLoading(false);
+          setUserPersona({username: res.data.username});
+          cancel();
+          Alert.alert('Username Updated', 'Your username has been updated');
+        }
+      } catch (error: any) {
         setIsLoading(false);
-        setUserPersona({username: res.data.username});
-        cancel();
-        Alert.alert('Username Updated', 'Your username has been updated');
+        Alert.alert('Update Error', error.response.data.message);
       }
-    } catch (error: any) {
-      setIsLoading(false);
-      Alert.alert('Update Error', error.response.data.message);
-    }
-  };
+    },
+    [],
+  );
 
   const clearSearch = (): void => {
     setUsername('');
@@ -75,7 +80,7 @@ const ChangeUsername: React.FC<ChangeUsernameProps> = ({cancel}) => {
             <ReusableText
               fontSize={FONTSIZE.md}
               fontWeight={500}
-              onPress={updateUsername}>
+              onPress={() => updateUsername(username, token, cancel)}>
               {!loading ? (
                 'Set'
               ) : (

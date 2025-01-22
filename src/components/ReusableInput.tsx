@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {memo, useState} from 'react';
 import {StyleSheet, TextInput, TouchableOpacity, View} from 'react-native';
 import {BORDERRADIUS, COLORS} from '../theme/theme';
 
@@ -14,44 +14,48 @@ type inputProps = {
   onSubmitEditing?: () => void;
 };
 
-const ReusableInput: React.FC<inputProps> = ({
-  placeholder,
-  value,
-  isPassword,
-  backgroundColor = COLORS.LightGray2,
-  icon1,
-  icon2,
-  onPress,
-  onChange,
-  onSubmitEditing,
-}) => {
-  const [isFocused, setIsFocused] = useState(false);
+const ReusableInput: React.FC<inputProps> = memo(
+  ({
+    placeholder,
+    value,
+    isPassword,
+    backgroundColor = COLORS.LightGray2,
+    icon1,
+    icon2,
+    onPress,
+    onChange,
+    onSubmitEditing,
+  }) => {
+    const [isFocused, setIsFocused] = useState(false);
 
-  return (
-    <View
-      style={[
-        styles.inputContainer,
-        isFocused && styles.focused,
-        {backgroundColor},
-      ]}>
-      {icon1 && icon1}
-      <TextInput
-        value={value}
-        onChangeText={text => onChange(text)}
-        secureTextEntry={isPassword}
-        maxLength={isPassword ? 4 : undefined}
-        placeholder={placeholder}
-        placeholderTextColor={COLORS.LightGray}
-        style={[styles.input, {textAlign: isPassword ? 'center' : 'left'}]}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        onSubmitEditing={onSubmitEditing}
-      />
+    return (
+      <View
+        style={[
+          styles.inputContainer,
+          isFocused && styles.focused,
+          {backgroundColor},
+        ]}>
+        {icon1 && icon1}
+        <TextInput
+          value={value}
+          onChangeText={text => onChange(text)}
+          secureTextEntry={isPassword}
+          maxLength={isPassword ? 4 : undefined}
+          placeholder={placeholder}
+          placeholderTextColor={COLORS.LightGray}
+          style={[styles.input, {textAlign: isPassword ? 'center' : 'left'}]}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          onSubmitEditing={onSubmitEditing}
+        />
 
-      {icon2 && <TouchableOpacity onPress={onPress}>{icon2}</TouchableOpacity>}
-    </View>
-  );
-};
+        {icon2 && (
+          <TouchableOpacity onPress={onPress}>{icon2}</TouchableOpacity>
+        )}
+      </View>
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   inputContainer: {

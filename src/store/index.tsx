@@ -10,6 +10,8 @@ type PersonaSlice = {
   id: string;
   dissappearingMessages: string;
   qr_code: string;
+  isUserInfoFetched: boolean;
+  setUserInfoStatus: (status: boolean) => void;
   setUserPersona: (data: Partial<PersonaSlice>) => void;
 };
 
@@ -27,18 +29,24 @@ type StatusSlice = {
 };
 
 type ChatSlice = {
-  // selectedChatData: Conversation | Contact | null;
-  // directMessagesContacts: Conversation[];
-  // selectedChatMessages: Message[];
-
   selectedChatData: Contact | null;
-  // directMessagesContacts: Contact[];
   directMessagesContacts: Conversation[];
+  friends: Contact[];
   selectedChatMessages: Message[];
   updateFuncChat: (data: Partial<ChatSlice>) => void;
+
+  updateDirectMessagesContacts: (
+    updateFunction: (currentConversations: Conversation[]) => Conversation[],
+  ) => void;
+
   updateSelectedChatMessages: (
     updateFunction: (currentMessages: Message[]) => Message[],
   ) => void;
+
+  updateFriends: (
+    updateFunction: (currentFriends: Contact[]) => Contact[],
+  ) => void;
+
   sortContactsByLastConversation: (message: Message) => void;
 };
 
@@ -61,6 +69,8 @@ const createPersonaSlice: StateCreator<PersonaSlice> = set => ({
   id: '',
   dissappearingMessages: 'None',
   qr_code: '',
+  isUserInfoFetched: false,
+  setUserInfoStatus: (status: boolean) => set({isUserInfoFetched: status}),
   setUserPersona: set,
 });
 
@@ -71,25 +81,29 @@ const createTokenSlice: StateCreator<TokenSlice> = set => ({
 
 const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
   selectedChatData: null,
-  // existing messages
   selectedChatMessages: [],
   directMessagesContacts: [],
-  // uploading state
-  // isUploading: false,
-  // isDownloading: false,
-  // fileUploadProgress: 0,
-  // fileDownloadProgress: 0,
-  // channels
-  // channels: [],
-  // updateFuncChat: typeOrData => set(typeOrData),
+  friends: [],
   updateFuncChat: set,
 
+  updateDirectMessagesContacts: (
+    updateFunction: (currentConversations: Conversation[]) => Conversation[],
+  ) => {
+    const currentConversations = get().directMessagesContacts;
+    const updatedConversations = updateFunction(currentConversations);
+    set({directMessagesContacts: updatedConversations});
+  },
   updateSelectedChatMessages: (
     updateFunction: (currentMessages: Message[]) => Message[],
   ) => {
     const currentMessages = get().selectedChatMessages;
     const updatedMessages = updateFunction(currentMessages);
     set({selectedChatMessages: updatedMessages});
+  },
+  updateFriends: (updateFunction: (currentFriends: Contact[]) => Contact[]) => {
+    const currentFriends = get().friends;
+    const updatedFriends = updateFunction(currentFriends);
+    set({friends: updatedFriends});
   },
 
   sortContactsByLastConversation: message => {

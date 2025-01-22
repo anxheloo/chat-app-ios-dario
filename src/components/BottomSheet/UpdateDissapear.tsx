@@ -8,13 +8,12 @@ import {
   TouchableOpacity,
   Animated,
   Easing,
-  useAnimatedValue,
   ActivityIndicator,
 } from 'react-native';
-import React, {useMemo, useRef, useState} from 'react';
+import React, {memo, useCallback, useRef, useState} from 'react';
 import ReusableText from '../ReusableText';
 import {BORDERRADIUS, COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
-import {UPDATE_DISSAPEARING_MESSAGES, UPDATE_PIN} from '../../api/apis';
+import {UPDATE_DISSAPEARING_MESSAGES} from '../../api/apis';
 import {apiClient} from '../../api/apiClient';
 import {useAppStore} from '../../store';
 import ClockIcon from '../../assets/icons/profile/ClockIcon';
@@ -24,7 +23,7 @@ type UpdateMessagesProps = {
   cancel: () => void;
 };
 
-const UpdateDissapear: React.FC<UpdateMessagesProps> = ({cancel}) => {
+const UpdateDissapear: React.FC<UpdateMessagesProps> = memo(({cancel}) => {
   const setUserPersona = useAppStore(state => state.setUserPersona);
   const token = useAppStore(state => state.token);
   const dissappearingMessages = useAppStore(
@@ -50,7 +49,7 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = ({cancel}) => {
     '1 week',
   ];
 
-  const toggleDropdown = () => {
+  const toggleDropdown = useCallback(() => {
     if (isExpanded) {
       setIsExpanded(false);
       // Animate closing
@@ -86,9 +85,9 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = ({cancel}) => {
         }),
       ]).start();
     }
-  };
+  }, [isExpanded, dropdownHeight, dropdownPadding]);
 
-  const updateMessages = async (): Promise<void> => {
+  const updateMessages = useCallback(async (): Promise<void> => {
     setIsLoading(true);
 
     try {
@@ -116,7 +115,7 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = ({cancel}) => {
       setIsLoading(false);
       Alert.alert('Update Error', error.response.data.message);
     }
-  };
+  }, [selectableOption]);
 
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.contentContainer}>
@@ -205,7 +204,7 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = ({cancel}) => {
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
-};
+});
 
 const styles = StyleSheet.create({
   contentContainer: {

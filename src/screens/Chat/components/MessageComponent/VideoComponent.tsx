@@ -32,27 +32,28 @@ const VideoComponent: React.FC<VideoProps> = ({message, uploading}) => {
 
   return (
     <TouchableOpacity
-      style={styles.container}
+      // style={styles.container}
       onPress={openVideo}
       activeOpacity={1}>
       {uploading ? (
-        // <ActivityIndicator
-        //   size="small"
-        //   color="#fff"
-        //   style={{
-        //     position: 'absolute',
-        //     inset: 0,
-        //   }}
-        // />
-        <Image
-          source={{uri: message.thumbnailUrl}}
-          style={styles.thumbnail}
-          resizeMode="cover"></Image>
+        <ActivityIndicator
+          size="small"
+          color="#fff"
+          style={{
+            position: 'absolute',
+            inset: 0,
+          }}
+        />
       ) : (
+        // <Image
+        //   source={{uri: message.thumbnailUrl}}
+        //   style={styles.thumbnail}
+        //   resizeMode="cover"></Image>
         <Video
           fullscreenOrientation="all"
           source={{uri: message.fileUrl}}
-          style={styles.video}
+          // style={styles.video}
+          style={styles.container}
           // fullscreen={true}
           resizeMode="cover"
           paused={true}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {memo} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {BORDERRADIUS, COLORS} from '../../theme/theme';
 import ScanIcon from '../../assets/icons/messages/ScanIcon';
@@ -6,15 +6,14 @@ import LockIcon from '../../assets/icons/profile/LockIcon';
 import ClockIcon from '../../assets/icons/profile/ClockIcon';
 import RightIcon from '../../assets/icons/profile/RighArrow';
 import {useAppStore} from '../../store';
-
-type SettingType = 'username' | 'qr-code' | 'pin' | 'clock' | 'logout';
+import {SettingType} from '../../utils/types';
 
 type SettingProps = {
   type: SettingType;
   onPress?: () => void;
 };
 
-const SettingElement: React.FC<SettingProps> = ({type, onPress}) => {
+const SettingElement: React.FC<SettingProps> = memo(({type, onPress}) => {
   const username = useAppStore(state => state.username);
 
   const returnBasedOnType = {
@@ -52,7 +51,7 @@ const SettingElement: React.FC<SettingProps> = ({type, onPress}) => {
       <RightIcon width={4} height={8} />
     </TouchableOpacity>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

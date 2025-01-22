@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {memo} from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import ReusableText from '../ReusableText';
 import {BORDERRADIUS, COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
@@ -9,10 +9,10 @@ import ReusableButton from '../ReusableButton';
 
 type SelectAvatarProps = {
   cancel: () => void;
-  setFunc: () => void;
+  setFunc: (avatar: number) => void;
 };
 
-const SelectAvatar: React.FC<SelectAvatarProps> = ({cancel, setFunc}) => {
+const SelectAvatar: React.FC<SelectAvatarProps> = memo(({cancel, setFunc}) => {
   const setUserPersona = useAppStore(state => state.setUserPersona);
   const avatar = useAppStore(state => state.avatar);
 
@@ -68,10 +68,10 @@ const SelectAvatar: React.FC<SelectAvatarProps> = ({cancel, setFunc}) => {
           })}
         </View>
       </View>
-      <ReusableButton text="Set" onPress={setFunc} />
+      <ReusableButton text="Set" onPress={() => setFunc(avatar)} />
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   safeAreaView: {

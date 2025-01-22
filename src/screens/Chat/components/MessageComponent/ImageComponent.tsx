@@ -29,7 +29,7 @@ const ImageComponent: React.FC<ImageProps> = ({message, uploading}) => {
 
   return (
     <TouchableOpacity
-      style={styles.imageContainer}
+      // style={styles.imageContainer}
       onPress={openImage}
       activeOpacity={1}>
       {uploading ? (

@@ -1,6 +1,5 @@
-import {useRoute} from '@react-navigation/native';
-import React, {useRef, useState} from 'react';
-import {Alert, Keyboard, StyleSheet, View} from 'react-native';
+import React, {useMemo, useRef, useState} from 'react';
+import {StyleSheet, View} from 'react-native';
 import ReusableText from '../../components/ReusableText';
 import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import Avatar from '../../components/Persona/Avatar';
@@ -8,79 +7,37 @@ import SettingElement from './SettingElement';
 import BottomSheetWrapper from '../../components/BottomSheet/BottomSheetWrapper';
 import BottomSheet from '@gorhom/bottom-sheet';
 import SelectAvatar from '../../components/BottomSheet/SelectAvatar';
-import {removeToken} from '../../utils/TokenStorage';
-import {useAppStore} from '../../store';
-import {NavigationProps} from '../../utils/types';
-import {apiClient} from '../../api/apiClient';
-import {UPDATE_USER_PROFILE_PIC} from '../../api/apis';
+import {NavigationProps, SettingType} from '../../utils/types';
 import ChangeUsername from '../../components/BottomSheet/ChangeUsername';
 import UpdatePin from '../../components/BottomSheet/UpdatePin';
 import UpdateDissapear from '../../components/BottomSheet/UpdateDissapear';
 import QRCodeModal from '../../components/BottomSheet/QRCodeModal';
 import Layout from '../../components/Layout/Layout';
+import useProfile from '../../utils/hooks/useProfile';
 
 type ProfileProps = {
   navigation: NavigationProps;
 };
 
 const Profile: React.FC<ProfileProps> = ({navigation}) => {
-  const setUserPersona = useAppStore(state => state.setUserPersona);
-  const updateKeys = useAppStore(state => state.updateKeys);
-  const setToken = useAppStore(state => state.setToken);
   const bottomSheetRef = useRef<BottomSheet | null>(null);
   const [clickedSetting, setClickedSetting] = useState<string | null>(null);
-  const avatar = useAppStore(state => state.avatar);
-  const token = useAppStore(state => state.token);
+  const {cancel, handleLogout, handleSettingClick, updateProfilePic} =
+    useProfile(navigation, setClickedSetting, bottomSheetRef);
 
-  const cancel = (): void => {
-    Keyboard.dismiss();
-    bottomSheetRef?.current?.close();
-  };
-
-  const updateProfilePic = async (): Promise<void> => {
-    updateKeys({isUploading: true});
-
-    try {
-      const res = await apiClient.post(
-        UPDATE_USER_PROFILE_PIC,
-        {
-          avatar: avatar,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      if (res.status === 200) {
-        updateKeys({isUploading: false});
-        setUserPersona({avatar: res.data.avatar});
-        bottomSheetRef?.current?.close();
-        Alert.alert('Profile Updated', 'Your avatar has been updated');
-      }
-    } catch (error: any) {
-      updateKeys({isUploading: false});
-      Alert.alert('Update Error', error.response.data.message);
-    }
-  };
-
-  const handleSettingClick = (type: string): void => {
-    setClickedSetting(type);
-    bottomSheetRef.current?.expand(); // Expand BottomSheet or open a modal
-  };
-
-  const handleLogout = async () => {
-    await removeToken();
-    setToken(null);
-
-    setUserPersona({username: '', pin: '', avatar: 0});
-
-    navigation.reset({
-      index: 0, // The index of the current active route
-      routes: [{name: 'Login'}], // Replace the stack with the Login screen
-    });
-  };
+  const settings = useMemo(
+    () =>
+      ['username', 'qr-code', 'pin', 'clock', 'logout'].map(type => (
+        <SettingElement
+          key={type}
+          type={type as SettingType}
+          onPress={() =>
+            type === 'logout' ? handleLogout() : handleSettingClick(type)
+          }
+        />
+      )),
+    [],
+  );
 
   return (
     <Layout>
@@ -113,25 +70,7 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
             />
           </View>
 
-          <View style={styles.contentContainer}>
-            <SettingElement
-              type="username"
-              onPress={() => handleSettingClick('username')}
-            />
-            <SettingElement
-              type="qr-code"
-              onPress={() => handleSettingClick('qr-code')}
-            />
-            <SettingElement
-              type="pin"
-              onPress={() => handleSettingClick('pin')}
-            />
-            <SettingElement
-              type="clock"
-              onPress={() => handleSettingClick('clock')}
-            />
-            <SettingElement type="logout" onPress={handleLogout} />
-          </View>
+          <View style={styles.contentContainer}>{settings}</View>
         </View>
       </View>
 

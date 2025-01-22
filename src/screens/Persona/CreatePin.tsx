@@ -1,11 +1,9 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {
-  Alert,
   Keyboard,
   KeyboardAvoidingView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
@@ -13,12 +11,10 @@ import ReusableText from '../../components/ReusableText';
 import {BORDERRADIUS, COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import ReusableInput from '../../components/ReusableInput';
 import {useAppStore} from '../../store';
-import {apiClient} from '../../api/apiClient';
-import {SIGNUP_ROUTES} from '../../api/apis';
-import {saveToken} from '../../utils/TokenStorage';
 import {NavigationProps} from '../../utils/types';
 import ReusableButton from '../../components/ReusableButton';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import useRegister from '../../utils/hooks/useRegister';
 
 type CreatePinScreenProps = {
   navigation: NavigationProps;
@@ -26,58 +22,30 @@ type CreatePinScreenProps = {
 
 const CreatePin: React.FC<CreatePinScreenProps> = ({navigation}) => {
   const setUserPersona = useAppStore(state => state.setUserPersona);
-  const setToken = useAppStore(state => state.setToken);
-  const updateKeys = useAppStore(state => state.updateKeys);
-  const username = useAppStore(state => state.username);
   const pin = useAppStore(state => state.pin);
-  const avatar = useAppStore(state => state.avatar);
-
   const [pinError, setPinError] = useState<boolean>(false);
+  const handleRegister = useRegister(navigation);
 
   const onChange = (text: string): void => {
     setUserPersona({pin: text});
+    if (pinError) setPinError(false);
+  };
+
+  const isValidPin = () => {
+    return pin.length === 4;
   };
 
   const onPress = (): void => {
-    if (pin.length !== 4) {
+    if (!isValidPin()) {
       setPinError(true);
       return;
     }
-
     handleRegister();
-
-    // navigation.navigate('BottomTabNavigation');
   };
 
-  const cancel = (): void => {
+  const cancel = useCallback((): void => {
     navigation.navigate('CreatePersona');
-  };
-
-  const handleRegister = async () => {
-    updateKeys({loading: true});
-    try {
-      const response = await apiClient.post(SIGNUP_ROUTES, {
-        username,
-        pin,
-        avatar,
-      });
-
-      if (response.status === 201) {
-        updateKeys({loading: false, message: 'Registered Successful'});
-
-        saveToken(response.data.token);
-        setToken(response.data.token);
-
-        navigation.replace('BottomTabNavigation');
-      }
-    } catch (error: any) {
-      updateKeys({loading: false, message: 'Register Failed'});
-      setUserPersona({username: '', pin: '', avatar: 0});
-      Alert.alert('Register Error', error?.response.data.message);
-    } finally {
-      updateKeys({loading: false});
-    }
-  };
+  }, []);
 
   return (
     <KeyboardAvoidingView behavior={'padding'} style={{flex: 1}}>
@@ -90,12 +58,6 @@ const CreatePin: React.FC<CreatePinScreenProps> = ({navigation}) => {
                 fontWeight={300}
                 onPress={cancel}>
                 Cancel
-              </ReusableText>
-              <ReusableText
-                fontSize={FONTSIZE.md}
-                fontWeight={500}
-                onPress={onPress}>
-                Set
               </ReusableText>
             </View>
 

@@ -1,6 +1,5 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
-  Alert,
   Keyboard,
   KeyboardAvoidingView,
   StyleSheet,
@@ -13,11 +12,9 @@ import ReusableText from '../../components/ReusableText';
 import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import ReusableInput from '../../components/ReusableInput';
 import ReusableButton from '../../components/ReusableButton';
-import {useAppStore} from '../../store';
-import {apiClient} from '../../api/apiClient';
-import {LOGIN_ROUTE} from '../../api/apis';
-import {getToken, saveToken} from '../../utils/TokenStorage';
 import {NavigationProps} from '../../utils/types';
+import useLogin from '../../utils/hooks/useLogin';
+import useCheckToken from '../../utils/hooks/useCheckToken';
 
 type LoginScreenProps = {
   navigation: NavigationProps;
@@ -26,66 +23,8 @@ type LoginScreenProps = {
 const Login: React.FC<LoginScreenProps> = ({navigation}) => {
   const [username, setUsername] = useState('');
   const [pin, setPin] = useState('');
-  const setUserPersona = useAppStore(state => state.setUserPersona);
-  const setToken = useAppStore(state => state.setToken);
-  const updateKeys = useAppStore(state => state.updateKeys);
-
-  // Login
-  const onPress = (): void => {
-    if (username === '' || pin === '') {
-      Alert.alert(
-        'Invalid Credentials',
-        'Please enter a valid username and PIN',
-      );
-      return;
-    }
-
-    if (pin.length !== 4) {
-      Alert.alert('Invalid PIN', 'Please enter a 4 digit PIN');
-      return;
-    }
-
-    handleLogin();
-  };
-
-  // Login
-  const handleLogin = async () => {
-    updateKeys({loading: true});
-    try {
-      const response = await apiClient.post(LOGIN_ROUTE, {username, pin});
-
-      if (response.status === 200) {
-        updateKeys({loading: false, message: 'Login Successful'});
-
-        await saveToken(response.data.token);
-        setToken(response.data.token);
-
-        navigation.replace('BottomTabNavigation');
-      }
-    } catch (error: any) {
-      updateKeys({loading: false, message: 'Login Failed'});
-      Alert.alert('Login Error', error?.response.data.message);
-      setUsername('');
-      setPin('');
-    } finally {
-      updateKeys({loading: false});
-    }
-  };
-
-  // Check if token exists
-  useEffect(() => {
-    const checkToken = async () => {
-      const token = await getToken();
-      console.log('This is token:', token);
-
-      if (token) {
-        setToken(token);
-        navigation.replace('BottomTabNavigation');
-      }
-    };
-
-    checkToken();
-  }, []);
+  const onPress = useLogin(username, pin, setUsername, setPin, navigation);
+  useCheckToken(navigation);
 
   return (
     <KeyboardAvoidingView behavior="padding" style={{flex: 1}}>

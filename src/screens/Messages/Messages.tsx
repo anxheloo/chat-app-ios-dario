@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import BottomSheetWrapper from '../../components/BottomSheet/BottomSheetWrapper';
 import PersonasList from '../../components/BottomSheet/PersonasList';
@@ -11,59 +11,55 @@ import {NavigationProps} from '../../utils/types';
 import {useAppStore} from '../../store';
 import Layout from '../../components/Layout/Layout';
 import FullScreenLoader from '../../components/Loading/FullScreenLoader';
+import useConversations from '../../utils/hooks/useConversations';
 
 type MessagesScreenProps = {
   navigation: NavigationProps;
 };
 
 const Messages: React.FC<MessagesScreenProps> = ({navigation}) => {
+  // const {getConversations, loading} = useConversations();
+  const getConversations = useConversations();
   const loading = useAppStore(state => state.loading);
   const [search, setSearch] = useState<string>('');
   const bottomSheetRef = useRef<BottomSheet | null>(null);
 
-  // Open bottom sheet
-  const openBottomSheet = (): void => {
-    bottomSheetRef.current?.expand();
-  };
+  useEffect(() => {
+    console.log('This is Get Conversations step 5');
+    getConversations();
+  }, [getConversations]);
 
-  // Add new
-  const addNew = (): void => {
-    console.log('Add new');
-  };
+  const openBottomSheet = useCallback(
+    () => bottomSheetRef.current?.expand(),
+    [bottomSheetRef],
+  );
+  const closeBottomSheet = useCallback(
+    () => bottomSheetRef.current?.close(),
+    [bottomSheetRef],
+  );
+  const clearSearch = useCallback(() => setSearch(''), []);
 
-  // Close bottom sheet
-  const cancel = (): void => {
-    if (bottomSheetRef && bottomSheetRef?.current) {
-      bottomSheetRef.current.close();
-    }
-  };
+  if (loading) return <FullScreenLoader />;
 
-  // Clear search
-  const clearSearch = (): void => {
-    setSearch('');
-  };
+  console.log('this is Messages step 3');
 
   return (
     <Layout>
-      {loading ? (
-        <FullScreenLoader />
-      ) : (
-        <View style={styles.container}>
-          <ReusableInput
-            placeholder="Search"
-            value={search}
-            onChange={setSearch}
-            onPress={clearSearch}
-            icon1={<SearchIcon width={15} height={15} />}
-            icon2={<CloseIcon width={15} height={15} />}
-          />
+      <View style={styles.container}>
+        <ReusableInput
+          placeholder="Search"
+          value={search}
+          onChange={setSearch}
+          onPress={clearSearch}
+          icon1={<SearchIcon width={15} height={15} />}
+          icon2={<CloseIcon width={15} height={15} />}
+        />
 
-          <Content openBottomSheet={openBottomSheet} navigation={navigation} />
-        </View>
-      )}
+        <Content openBottomSheet={openBottomSheet} navigation={navigation} />
+      </View>
 
       <BottomSheetWrapper ref={bottomSheetRef}>
-        <PersonasList cancel={cancel} addNew={addNew} navigation={navigation} />
+        <PersonasList cancel={closeBottomSheet} navigation={navigation} />
       </BottomSheetWrapper>
     </Layout>
   );

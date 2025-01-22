@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {memo} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import ReusableText from '../../../components/ReusableText';
 import {useNavigation} from '@react-navigation/native';
@@ -8,13 +8,11 @@ import {COLORS} from '../../../theme/theme';
 import CallIcon from '../../../assets/icons/BottomTabIcons/Call-Icon';
 import VideoIcon from '../../../assets/icons/Chat/VideoIcon';
 
-const ChatHeader = () => {
+const ChatHeader = memo(() => {
   const navigation = useNavigation();
   const selectedChatData = useAppStore(state => state.selectedChatData);
 
-  const goBack = () => {
-    navigation.goBack();
-  };
+  const goBack = () => navigation.goBack();
 
   return (
     <View style={styles.container}>
@@ -54,7 +52,7 @@ const ChatHeader = () => {
       </TouchableOpacity>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
