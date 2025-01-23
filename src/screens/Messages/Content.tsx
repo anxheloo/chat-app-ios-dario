@@ -1,10 +1,13 @@
-import React, {memo, useEffect} from 'react';
-import {FlatList, StyleSheet} from 'react-native';
+import React, {memo, useCallback, useState} from 'react';
+import {FlatList, StyleSheet, View} from 'react-native';
 import EmptyChat from './EmptyChat';
 import {useAppStore} from '../../store';
 import {NavigationProps} from '../../utils/types';
 import Conversations from '../../components/Persona/Conversations';
-import useConversations from '../../utils/hooks/useConversations';
+import FullScreenLoader from '../../components/Loading/FullScreenLoader';
+import ReusableInput from '../../components/ReusableInput';
+import SearchIcon from '../../assets/icons/messages/SearchIcon';
+import CloseIcon from '../../assets/icons/messages/CloseIcon';
 
 type ContentProps = {
   openBottomSheet: () => void;
@@ -13,36 +16,45 @@ type ContentProps = {
 
 const Content: React.FC<ContentProps> = memo(
   ({openBottomSheet, navigation}) => {
-    // const getConversations = useConversations();
-    const directMessagesContacts = useAppStore(
-      state => state.directMessagesContacts,
-    );
+    const loading = useAppStore(state => state.loading);
+    const [search, setSearch] = useState<string>('');
+    const conversations = useAppStore(state => state.conversations);
 
     console.log('This is Content step 4');
+    const clearSearch = useCallback(() => setSearch(''), []);
 
-    // useEffect(() => {
-    //   console.log('This is Get Conversations step 5');
-    //   getConversations();
-    // }, [getConversations]);
+    if (loading) {
+      return <FullScreenLoader version={'flex'} />;
+    }
 
-    if (!directMessagesContacts.length) {
+    if (!conversations.length) {
       return <EmptyChat openBottomSheet={openBottomSheet} />;
     }
 
     return (
-      <FlatList
-        contentContainerStyle={styles.content}
-        data={directMessagesContacts}
-        renderItem={({item}) => (
-          <Conversations
-            conversation={item}
-            navigation={navigation}
-            backgroundColor="white"
-          />
-        )}
-        keyExtractor={item => item._id}
-        initialNumToRender={10}
-      />
+      <View style={styles.content}>
+        <ReusableInput
+          placeholder="Search"
+          value={search}
+          onChange={setSearch}
+          onPress={clearSearch}
+          icon1={<SearchIcon width={15} height={15} />}
+          icon2={<CloseIcon width={15} height={15} />}
+        />
+        <FlatList
+          contentContainerStyle={styles.content}
+          data={conversations}
+          renderItem={({item}) => (
+            <Conversations
+              conversation={item}
+              navigation={navigation}
+              backgroundColor="white"
+            />
+          )}
+          keyExtractor={item => item._id}
+          initialNumToRender={10}
+        />
+      </View>
     );
   },
 );
@@ -50,6 +62,7 @@ const Content: React.FC<ContentProps> = memo(
 const styles = StyleSheet.create({
   content: {
     flex: 1,
+    backgroundColor: 'white',
   },
 });
 

@@ -30,12 +30,13 @@ type StatusSlice = {
 
 type ChatSlice = {
   selectedChatData: Contact | null;
-  directMessagesContacts: Conversation[];
+  conversations: Conversation[];
   friends: Contact[];
+  calls: Contact[];
   selectedChatMessages: Message[];
   updateFuncChat: (data: Partial<ChatSlice>) => void;
 
-  updateDirectMessagesContacts: (
+  updateConversations: (
     updateFunction: (currentConversations: Conversation[]) => Conversation[],
   ) => void;
 
@@ -47,7 +48,10 @@ type ChatSlice = {
     updateFunction: (currentFriends: Contact[]) => Contact[],
   ) => void;
 
-  sortContactsByLastConversation: (message: Message) => void;
+  updateCalls: (updateFunction: (currentCalls: Contact[]) => Contact[]) => void;
+
+  // sortConversations: (message: Message) => void;
+  sortConversations: () => void;
 };
 
 type SocketSlice = {
@@ -82,16 +86,17 @@ const createTokenSlice: StateCreator<TokenSlice> = set => ({
 const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
   selectedChatData: null,
   selectedChatMessages: [],
-  directMessagesContacts: [],
+  conversations: [],
   friends: [],
+  calls: [],
   updateFuncChat: set,
 
-  updateDirectMessagesContacts: (
+  updateConversations: (
     updateFunction: (currentConversations: Conversation[]) => Conversation[],
   ) => {
-    const currentConversations = get().directMessagesContacts;
+    const currentConversations = get().conversations;
     const updatedConversations = updateFunction(currentConversations);
-    set({directMessagesContacts: updatedConversations});
+    set({conversations: updatedConversations});
   },
   updateSelectedChatMessages: (
     updateFunction: (currentMessages: Message[]) => Message[],
@@ -106,22 +111,28 @@ const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
     set({friends: updatedFriends});
   },
 
-  sortContactsByLastConversation: message => {
-    const {directMessagesContacts} = get();
-    // const sortedContacts = [...directMessagesContacts].sort((a, b) => {
+  updateCalls: (updateFunction: (currentCalls: Contact[]) => Contact[]) => {
+    const currentCalls = get().calls;
+    const updatedCalls = updateFunction(currentCalls);
+    set({calls: updatedCalls});
+  },
+
+  sortConversations: () => {
+    const {conversations} = get();
+    // const sortedContacts = [...conversations].sort((a, b) => {
     //   if (a._id === message.conversationId) return -1;
     //   if (b._id === message.conversationId) return 1;
     //   return 0;
     // });
 
-    const sortedContacts = directMessagesContacts.sort((a, b) => {
+    const sortedContacts = conversations.sort((a, b) => {
       const dateA = +Date.parse(a?.lastMessage?.createdAt ?? '');
       const dateB = +Date.parse(b?.lastMessage?.createdAt ?? '');
 
       return dateA - dateB;
     });
 
-    set({directMessagesContacts: sortedContacts});
+    set({conversations: sortedContacts});
   },
 
   // sortContactsByLastConversation: (message: any) => {
@@ -130,7 +141,7 @@ const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
   //     message.sender._id === id ? message.recipient._id : message.sender._id;
   //   const fromData =
   //     message.sender._id === id ? message.recipient : message.sender;
-  //   const contacts = [...get().directMessagesContacts];
+  //   const contacts = [...get().conversations];
   //   const data = contacts.find(contact => contact._id === fromId);
   //   const index = contacts.findIndex(contact => contact._id === fromId);
   //   if (index !== -1 && index !== undefined) {
@@ -141,12 +152,12 @@ const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
   //   } else {
   //     contacts.unshift(fromData);
   //   }
-  //   set({directMessagesContacts: contacts});
+  //   set({conversations: contacts});
   // },
 
   // sortContactsByLastConversation: (message: any) => {
   //   const {id} = get() as CreateSlice;
-  //   const contacts = [...get().directMessagesContacts];
+  //   const contacts = [...get().conversations];
 
   //   // Find the conversation involving this message
   //   const conversationIndex = contacts.findIndex(contact =>
@@ -164,7 +175,7 @@ const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
   //     contacts.unshift(updatedConversation);
   //   }
 
-  //   set({directMessagesContacts: contacts});
+  //   set({conversations: contacts});
   // },
 });
 

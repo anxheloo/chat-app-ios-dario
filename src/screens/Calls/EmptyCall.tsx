@@ -10,8 +10,8 @@ type EmptyChatProps = {
 
 const EmptyCall: React.FC<EmptyChatProps> = ({openBottomSheet}) => {
   return (
-    <>
-      <View style={{alignItems: 'center', gap: 10}}>
+    <View style={styles.emptyChat}>
+      <View style={styles.container1}>
         <CallIcon width={47} height={45} />
         <ReusableText fontSize={FONTSIZE.lg} fontWeight={400}>
           No Recent Calls
@@ -34,10 +34,19 @@ const EmptyCall: React.FC<EmptyChatProps> = ({openBottomSheet}) => {
         onPress={openBottomSheet}>
         Start Call
       </ReusableText>
-    </>
+    </View>
   );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  emptyChat: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 50,
+  },
+
+  container1: {alignItems: 'center', gap: 10},
+});
 
 export default EmptyCall;

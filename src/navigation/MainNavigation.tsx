@@ -1,7 +1,6 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
 import CreatePersona from '../screens/Persona/CreatePersona';
 import CreatePin from '../screens/Persona/CreatePin';
 import BottomTabNavigation from './BottomTabNavigation';
@@ -62,7 +61,5 @@ const MainNavigation = () => {
     </NavigationContainer>
   );
 };
-
-const styles = StyleSheet.create({});
 
 export default MainNavigation;

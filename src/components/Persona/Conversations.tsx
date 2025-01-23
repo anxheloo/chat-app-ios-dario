@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -15,9 +15,7 @@ import moment from 'moment';
 import {checkIfImage, checkIfVideo} from '../../utils/helpers';
 import CameraIcon from '../../assets/icons/Chat/CameraIcon';
 import VideoIcon from '../../assets/icons/Chat/VideoIcon';
-import Swipeable, {
-  SwipeableRef,
-} from 'react-native-gesture-handler/ReanimatedSwipeable';
+import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import DeleteIcon from '../../assets/icons/Chat/DeleteIcon';
 import {DELETE_CONVERSATION} from '../../api/apis';
 import {apiClient} from '../../api/apiClient';
@@ -34,14 +32,12 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
     const updateFuncChat = useAppStore(state => state.updateFuncChat);
     const loggedInUserId = useAppStore(state => state.id);
     const token = useAppStore(state => state.token);
-    const directMessagesContacts = useAppStore(
-      state => state.directMessagesContacts,
-    );
+    const conversations = useAppStore(state => state.conversations);
     const [loading, setLoading] = useState(false);
 
     const participant = useMemo(() => {
       return conversation.participants.find(
-        participant => participant._id !== loggedInUserId,
+        user => user._id !== loggedInUserId,
       );
     }, [conversation, loggedInUserId]);
 
@@ -125,7 +121,7 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
 
           // Update the UI
           updateFuncChat({
-            directMessagesContacts: directMessagesContacts.filter(
+            conversations: conversations.filter(
               item => item._id !== conversation._id,
             ),
           });
@@ -134,7 +130,7 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
         setLoading(false);
         Alert.alert('Could not delete the conversation. Please try again.');
       }
-    }, [conversation._id, loading]);
+    }, [conversation._id, conversations, token, updateFuncChat]);
 
     const renderRightActions = useCallback(() => {
       return (
@@ -150,7 +146,9 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
       );
     }, [loading, deleteConversation]);
 
-    if (!participant) return null;
+    if (!participant) {
+      return null;
+    }
 
     return (
       <Swipeable renderRightActions={renderRightActions} overshootRight={false}>

@@ -1,5 +1,11 @@
 import React, {memo, useState} from 'react';
-import {StyleSheet, TextInput, TouchableOpacity, View} from 'react-native';
+import {
+  StyleSheet,
+  TextInput,
+  TextStyle,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {BORDERRADIUS, COLORS} from '../theme/theme';
 
 type inputProps = {
@@ -28,6 +34,10 @@ const ReusableInput: React.FC<inputProps> = memo(
   }) => {
     const [isFocused, setIsFocused] = useState(false);
 
+    const passwordAlign: TextStyle = {
+      textAlign: isPassword ? 'center' : 'left',
+    };
+
     return (
       <View
         style={[
@@ -43,7 +53,7 @@ const ReusableInput: React.FC<inputProps> = memo(
           maxLength={isPassword ? 4 : undefined}
           placeholder={placeholder}
           placeholderTextColor={COLORS.LightGray}
-          style={[styles.input, {textAlign: isPassword ? 'center' : 'left'}]}
+          style={[styles.input, passwordAlign]}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           onSubmitEditing={onSubmitEditing}

@@ -90,6 +90,14 @@ android {
         versionName "1.0"
     }
     signingConfigs {
+
+        release {
+            storeFile file('my-upload-key.keystore')
+            storePassword 'Natali1'
+            keyAlias 'my-key-alias'
+            keyPassword 'Natali1'
+        }
+
         debug {
             storeFile file('debug.keystore')
             storePassword 'android'

@@ -31,7 +31,7 @@ function ScannerScreen({navigation}: ScannerScreenProps): React.ReactElement {
     if (!hasPermission) {
       navigation.goBack();
     }
-  }, []);
+  }, [navigation, requestCameraPermission]);
 
   // 1. Use a simple default back camera
 
@@ -42,12 +42,17 @@ function ScannerScreen({navigation}: ScannerScreenProps): React.ReactElement {
   const isForeground = useIsForeground();
   const isActive = isFocused && isForeground;
 
-  const onCodeScanned = useCallback((codes: Code[]) => {
-    const recipientId = codes[0]?.value; // Extract userId from QR code
-    if (!recipientId) return;
+  const onCodeScanned = useCallback(
+    (codes: Code[]) => {
+      const recipientId = codes[0]?.value; // Extract userId from QR code
+      if (!recipientId) {
+        return;
+      }
 
-    navigation.navigate('ScannedUser', {recipientId}); // Navigate to UserDetailsScreen
-  }, []);
+      navigation.navigate('ScannedUser', {recipientId}); // Navigate to UserDetailsScreen
+    },
+    [navigation],
+  );
 
   // 5. Initialize the Code Scanner to scan QR codes and Barcodes
   const codeScanner = useCodeScanner({

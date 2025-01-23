@@ -22,7 +22,11 @@ const ScannedUser: React.FC<ScannedUserProps> = ({route, navigation}) => {
     navigation,
   );
 
-  if (loading) return <FullScreenLoader />;
+  console.log('This is recipiendId:', recipientId);
+
+  if (loading) {
+    return <FullScreenLoader version={'absolute'} />;
+  }
 
   return (
     <View style={styles.content}>

@@ -12,7 +12,6 @@ import ChangeUsername from '../../components/BottomSheet/ChangeUsername';
 import UpdatePin from '../../components/BottomSheet/UpdatePin';
 import UpdateDissapear from '../../components/BottomSheet/UpdateDissapear';
 import QRCodeModal from '../../components/BottomSheet/QRCodeModal';
-import Layout from '../../components/Layout/Layout';
 import useProfile from '../../utils/hooks/useProfile';
 
 type ProfileProps = {
@@ -36,11 +35,11 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
           }
         />
       )),
-    [],
+    [handleLogout, handleSettingClick],
   );
 
   return (
-    <Layout>
+    <>
       <View style={styles.container}>
         <View style={styles.content}>
           <View style={styles.textContainer}>
@@ -83,7 +82,7 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
         {clickedSetting === 'clock' && <UpdateDissapear cancel={cancel} />}
         {clickedSetting === 'qr-code' && <QRCodeModal cancel={cancel} />}
       </BottomSheetWrapper>
-    </Layout>
+    </>
   );
 };
 

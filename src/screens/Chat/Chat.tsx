@@ -15,30 +15,31 @@ const Chat = () => {
     return () => {
       updateFuncChat({selectedChatMessages: [], selectedChatData: null});
     };
-  }, []);
+  }, [updateFuncChat]);
 
   return (
     <KeyboardAvoidingView
       behavior="padding"
-      style={{flex: 1}}
+      style={styles.container}
       keyboardVerticalOffset={-30}>
-      <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
+      <SafeAreaView style={styles.safeAreaView}>
         <View style={styles.container}>
           <ChatHeader />
           <ChatContainer />
           <ChatFooter />
         </View>
 
-        {loading && <FullScreenLoader />}
+        {loading && <FullScreenLoader version="absolute" />}
       </SafeAreaView>
     </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeAreaView: {flex: 1, backgroundColor: 'white'},
+
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
 });
 

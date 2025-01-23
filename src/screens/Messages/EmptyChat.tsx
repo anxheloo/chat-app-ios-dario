@@ -11,7 +11,7 @@ type EmptyChatProps = {
 const EmptyChat: React.FC<EmptyChatProps> = ({openBottomSheet}) => {
   return (
     <View style={styles.emptyChat}>
-      <View style={{alignItems: 'center', gap: 10}}>
+      <View style={styles.container1}>
         <MessagingIcon width={47} height={45} />
         <ReusableText fontSize={FONTSIZE.lg} fontWeight={400}>
           No Conversations
@@ -45,6 +45,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 50,
   },
+
+  container1: {alignItems: 'center', gap: 10},
 });
 
 export default EmptyChat;

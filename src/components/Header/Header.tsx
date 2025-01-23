@@ -1,29 +1,28 @@
-import React, {useCallback} from 'react';
+import React, {memo, useCallback} from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import ScanIcon from '../../assets/icons/messages/ScanIcon';
 import ReusableText from '../ReusableText';
 import {useAppStore} from '../../store';
 import {useNavigation} from '@react-navigation/native';
 import {NavigationProps} from '../../utils/types';
-import {useSocket} from '../../utils/useSocket';
 import useUserInfo from '../../utils/hooks/useUserInfo';
+// import {useSocket} from '../../utils/useSocket';
 
-const Header = () => {
+const Header = memo(() => {
   const username = useAppStore(state => state.username);
   const navigation = useNavigation<NavigationProps>();
-  useSocket();
   useUserInfo();
 
   //Open Scanner
   const openScanner = useCallback(async () => {
     navigation.navigate('Scanner');
-  }, []);
+  }, [navigation]);
 
   console.log('This is header step 1');
 
   return (
     <View style={styles.container}>
-      <ReusableText fontWeight={500} style={{marginTop: 10}}>
+      <ReusableText fontWeight={500} style={styles.textStyles}>
         @{username}
       </ReusableText>
 
@@ -32,7 +31,7 @@ const Header = () => {
       </TouchableOpacity>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -44,6 +43,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 20,
     paddingTop: 10,
+  },
+
+  textStyles: {
+    marginTop: 10,
   },
 
   icon: {width: 24, height: 24, alignSelf: 'flex-end'},

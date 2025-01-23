@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect} from 'react';
+import {useCallback, useEffect} from 'react';
 import {Alert} from 'react-native';
 import {useAppStore} from '../../store';
 import {apiClient} from '../../api/apiClient';
@@ -13,7 +13,9 @@ const useUserInfo = () => {
 
   // Get user info function
   const getUserInfo = useCallback(async () => {
-    if (isUserInfoFetched) return;
+    if (isUserInfoFetched) {
+      return;
+    }
 
     updateKeys({loading: true});
 
@@ -37,13 +39,13 @@ const useUserInfo = () => {
     } finally {
       updateKeys({loading: false});
     }
-  }, [token, isUserInfoFetched]);
+  }, [isUserInfoFetched, updateKeys, token, setUserInfoStatus, setUserPersona]);
 
   //Get user info
   useEffect(() => {
     console.log('This is getUserInfo step 2');
     getUserInfo();
-  }, [token]);
+  }, [getUserInfo, token]);
 };
 
 export default useUserInfo;

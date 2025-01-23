@@ -11,9 +11,7 @@ import Avatar from './Avatar';
 import {useAppStore} from '../../store';
 import {Contact, NavigationProps} from '../../utils/types';
 import {COLORS, FONTSIZE} from '../../theme/theme';
-import Swipeable, {
-  SwipeableRef,
-} from 'react-native-gesture-handler/ReanimatedSwipeable';
+import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import DeleteIcon from '../../assets/icons/Chat/DeleteIcon';
 import {DELETE_FRIEND} from '../../api/apis';
 import {apiClient} from '../../api/apiClient';
@@ -34,9 +32,14 @@ const Persona: React.FC<PersonaProps> = ({
   version,
 }) => {
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
+  const senderId = useAppStore(state => state.id);
   const token = useAppStore(state => state.token);
+  const socket = useAppStore(state => state.socket);
   const updateFriends = useAppStore(state => state.updateFriends);
   const [loading, setLoading] = useState(false);
+
+  console.log('THis is contact:', contact);
+  console.log('This is contact._id inside Persona', contact._id);
 
   // Select contact to update chat
   const selectContact = () => {
@@ -64,18 +67,26 @@ const Persona: React.FC<PersonaProps> = ({
 
       if (res.status === 200) {
         setLoading(false);
-
         updateFriends(current =>
           current.filter(item => item._id !== contact._id),
         );
+
+        socket?.emit('deleteFriend', {
+          senderId: senderId,
+          friendId: contact._id,
+        });
       }
-    } catch (error) {
+    } catch (error: any) {
       setLoading(false);
-      Alert.alert('Could not delete contact. Please try again.');
+      Alert.alert(error.response.data.message, 'Please try again.');
     }
-  }, [contact._id, loading]);
+  }, [contact._id, senderId, socket, token, updateFriends]);
 
   const renderRightActions = useCallback(() => {
+    if (version && version === 'search') {
+      return null;
+    }
+
     return (
       <TouchableOpacity
         onPress={deleteContact}
@@ -87,7 +98,7 @@ const Persona: React.FC<PersonaProps> = ({
         )}
       </TouchableOpacity>
     );
-  }, [loading, deleteContact]);
+  }, [version, deleteContact, loading]);
 
   return (
     <Swipeable renderRightActions={renderRightActions} overshootRight={false}>

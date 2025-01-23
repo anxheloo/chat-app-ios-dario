@@ -1,75 +1,75 @@
 import {useCallback, useEffect} from 'react';
 import {useAppStore} from '../store';
-import {Message, Conversation} from './types';
+import {Message, Conversation, Contact} from './types';
+import {Alert} from 'react-native';
 
 export const useSocket = () => {
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
   const userId = useAppStore(state => state.id);
   const initializeSocket = useAppStore(state => state.initializeSocket);
   const disconnectSocket = useAppStore(state => state.disconnectSocket);
-
   const updateSelectedChatMessages = useAppStore(
     state => state.updateSelectedChatMessages,
   );
+  const updateFriends = useAppStore(state => state.updateFriends);
 
-  const handleReceiveMessage = useCallback((message: any) => {
-    const {
-      directMessagesContacts,
-      selectedChatData,
-      sortContactsByLastConversation,
-    } = useAppStore.getState();
+  const handleReceiveMessage = useCallback(
+    (message: any) => {
+      const {conversations, selectedChatData, sortConversations} =
+        useAppStore.getState();
 
-    const conversations = [...directMessagesContacts];
+      const tempConversations = [...conversations];
 
-    // Check if the conversation already exists
-    const existingConversationIndex = directMessagesContacts.findIndex(
-      conversation => conversation._id === message.conversationId,
-    );
+      // Check if the conversation already exists
+      const existingConversationIndex = conversations.findIndex(
+        conversation => conversation._id === message.conversationId,
+      );
 
-    // Update the existing conversation
-    if (existingConversationIndex !== -1) {
-      conversations[existingConversationIndex] = {
-        ...directMessagesContacts[existingConversationIndex],
-        lastMessage: message,
-        lastMessageTime: message.createdAt,
-      };
-    } else {
-      // Add a new conversation if it doesn't exist
-      conversations.unshift({
-        _id: message.conversationId,
-        participants: [message.sender, message.recipient],
-        lastMessage: message,
-        lastMessageTime: message.createdAt,
+      // Update the existing conversation
+      if (existingConversationIndex !== -1) {
+        tempConversations[existingConversationIndex] = {
+          ...conversations[existingConversationIndex],
+          lastMessage: message,
+          lastMessageTime: message.createdAt,
+        };
+      } else {
+        // Add a new conversation if it doesn't exist
+        tempConversations.unshift({
+          _id: message.conversationId,
+          participants: [message.sender, message.recipient],
+          lastMessage: message,
+          lastMessageTime: message.createdAt,
+        });
+      }
+
+      // Update the conversations in the state
+      updateFuncChat({
+        conversations: tempConversations,
       });
-    }
 
-    // Update the conversations in the state
-    updateFuncChat({
-      directMessagesContacts: conversations,
-    });
+      if (
+        selectedChatData?._id === message.recipient._id ||
+        selectedChatData?._id === message.sender._id
+      ) {
+        updateSelectedChatMessages(current => [
+          ...current.filter(msg => msg._id !== message._id),
+          {
+            ...message,
+            recipient: message.recipient._id,
+            sender: message.sender._id,
+          },
+        ]);
 
-    if (
-      selectedChatData?._id === message.recipient._id ||
-      selectedChatData?._id === message.sender._id
-    ) {
-      updateSelectedChatMessages(current => [
-        ...current.filter(msg => msg._id !== message._id),
-        {
-          ...message,
-          recipient: message.recipient._id,
-          sender: message.sender._id,
-        },
-      ]);
+        // updateKeys({loading: false});
+      }
 
-      // updateKeys({loading: false});
-    }
-
-    sortContactsByLastConversation(message);
-  }, []);
-
+      sortConversations();
+    },
+    [updateFuncChat, updateSelectedChatMessages],
+  );
   // const handleConversationUpdated = useCallback(
   //   ({conversationId, lastMessage, lastMessageTime}:{conversationId: string, lastMessage: any, lastMessageTime: string}) => {
-  //     const {directMessagesContacts} = useAppStore.getState();
+  //     const {conversations} = useAppStore.getState();
 
   //     const updatedContacts = directMessagesContacts.map(conversation => {
   //       if (conversation._id === conversationId) {
@@ -82,12 +82,13 @@ export const useSocket = () => {
   //       return conversation;
   //     });
 
-  //     updateFuncChat({directMessagesContacts: updatedContacts});
+  //     updateFuncChat({conversations: updatedContacts});
   //   },
   //   [],
   // );
 
   // Handle message deletion
+
   const handleMessageDeleted = useCallback(
     ({messageId}: {messageId: string}) => {
       const {selectedChatMessages, selectedChatData} = useAppStore.getState();
@@ -116,37 +117,82 @@ export const useSocket = () => {
         });
       }
     },
-    [],
+    [updateFuncChat],
   );
 
-  const handleConverationUpdated = useCallback((conversation: Conversation) => {
-    console.log('Conversation emited from backend:', conversation);
+  const handleConverationUpdated = useCallback(
+    (conversation: Conversation) => {
+      console.log('Conversation emited from backend:', conversation);
 
-    const {directMessagesContacts} = useAppStore.getState();
-    const existingConversations = directMessagesContacts.map(item => {
-      if (item._id === conversation._id) {
-        return {
-          ...item,
-          lastMessage: conversation.lastMessage,
-          lastMessageTime: conversation.lastMessageTime,
-        };
-      }
+      const {conversations} = useAppStore.getState();
+      const existingConversations = conversations.map(item => {
+        if (item._id === conversation._id) {
+          return {
+            ...item,
+            lastMessage: conversation.lastMessage,
+            lastMessageTime: conversation.lastMessageTime,
+          };
+        }
 
-      return item;
-    });
+        return item;
+      });
 
-    updateFuncChat({directMessagesContacts: existingConversations});
-  }, []);
+      updateFuncChat({conversations: existingConversations});
+    },
+    [updateFuncChat],
+  );
+
+  const notifyReceiver = useCallback(
+    (friend: Contact) => {
+      console.log('THis is friend inside notify receiver:', friend);
+
+      Alert.alert(
+        'Incoming Friend',
+        `@${friend.username} was added as a friend.`,
+      );
+
+      updateFriends(current => [friend, ...current]);
+    },
+    [updateFriends],
+  );
+
+  const friendDeleted = useCallback(
+    ({senderId}: {senderId: string}) => {
+      console.log('THis is friendId inside friendDeleted:', senderId);
+
+      Alert.alert('Incoming Friend', `${senderId} removed you.`);
+      updateFriends(current =>
+        current.filter(friend => friend._id !== senderId),
+      );
+    },
+    [updateFriends],
+  );
 
   useEffect(() => {
     const socket = initializeSocket();
+
+    console.log('THis is userId:', userId);
 
     if (socket) {
       socket.on('receiveMessage', handleReceiveMessage);
       socket.on('messageDeleted', handleMessageDeleted);
       socket.on('conversationUpdated', handleConverationUpdated);
+      socket.on('friendCreated', notifyReceiver);
+      socket.on('friendDeleted', friendDeleted);
     }
 
-    return () => disconnectSocket();
-  }, [userId]);
+    return () => {
+      console.log('socket disconected from useSocket');
+      disconnectSocket();
+    };
+  }, [
+    disconnectSocket,
+    friendDeleted,
+    handleConverationUpdated,
+    handleMessageDeleted,
+    handleReceiveMessage,
+    initializeSocket,
+    notifyReceiver,
+    userId,
+  ]);
 };

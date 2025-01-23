@@ -1,5 +1,5 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {Alert, StyleSheet, View} from 'react-native';
+import {useCallback, useEffect, useState} from 'react';
+import {Alert} from 'react-native';
 import {apiClient} from '../../api/apiClient';
 import {ADD_FRIEND, GET_SCANNED_USER} from '../../api/apis';
 import {useAppStore} from '../../store';
@@ -9,39 +9,43 @@ const useScannedUser = (scannedUserId: string, navigation: NavigationProps) => {
   const token = useAppStore(state => state.token);
   const socket = useAppStore(state => state.socket);
   const senderId = useAppStore(state => state.id);
+  const updateFriends = useAppStore(state => state.updateFriends);
   const [loading, setLoading] = useState(false);
 
   const [scannedUser, setScannedUser] = useState({
     username: '',
-    avatar: '',
-    id: '',
+    avatar: 0,
+    _id: '',
   });
 
-  const getScannedUserDetails = async () => {
-    setLoading(true);
+  const getScannedUserDetails = useCallback(
+    async (recipientId: string) => {
+      setLoading(true);
 
-    // Fetch user details from server
-    try {
-      const response = await apiClient.get(
-        `${GET_SCANNED_USER}/${scannedUserId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
+      // Fetch user details from server
+      try {
+        const response = await apiClient.get(
+          `${GET_SCANNED_USER}/${recipientId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
-        },
-      );
+        );
 
-      if (response.status === 200) {
-        const {username, avatar, id} = response.data;
-        setScannedUser({username, avatar, id});
+        if (response.status === 200) {
+          const {username, avatar, _id} = response.data;
+          setScannedUser({username, avatar, _id});
+        }
+      } catch (error) {
+        Alert.alert('Error', 'Failed to get user details');
+        console.log(error);
+      } finally {
         setLoading(false);
       }
-    } catch (error) {
-      Alert.alert('Error', 'Failed to get user details');
-      console.log(error);
-      setLoading(false);
-    }
-  };
+    },
+    [token],
+  );
 
   const addFriend = useCallback(async () => {
     try {
@@ -58,19 +62,27 @@ const useScannedUser = (scannedUserId: string, navigation: NavigationProps) => {
       );
 
       if (res.status === 200) {
+        updateFriends(current => [scannedUser, ...current]);
         socket?.emit('addFriend', {recipientId: scannedUserId, senderId});
         Alert.alert('Success', 'Friend successfully added!');
         navigation?.navigate('BottomTabNavigation', {screen: 'Contacts'});
       }
     } catch (error: any) {
-      console.log('This is error in send friend:', error);
-      Alert.alert('Error', 'Failed to send request');
+      Alert.alert('Error', error.response.data.message);
     }
-  }, [token, socket, senderId, scannedUserId, navigation]);
+  }, [
+    scannedUserId,
+    token,
+    updateFriends,
+    socket,
+    senderId,
+    navigation,
+    scannedUser,
+  ]);
 
   useEffect(() => {
-    getScannedUserDetails();
-  }, []);
+    getScannedUserDetails(scannedUserId);
+  }, [getScannedUserDetails, scannedUserId]);
 
   return {loading, scannedUser, addFriend};
 };

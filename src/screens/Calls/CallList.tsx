@@ -1,37 +1,31 @@
 import React, {useCallback, useState} from 'react';
 import {FlatList, StyleSheet, View} from 'react-native';
-import {useAppStore} from '../../store';
 import {NavigationProps} from '../../utils/types';
-import EmptyContacts from './EmptyContacts';
-import Persona from '../../components/Persona/Persona';
+import {useAppStore} from '../../store';
 import FullScreenLoader from '../../components/Loading/FullScreenLoader';
+import EmptyCall from './EmptyCall';
 import ReusableInput from '../../components/ReusableInput';
 import SearchIcon from '../../assets/icons/messages/SearchIcon';
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
+import Persona from '../../components/Persona/Persona';
 
-type ContentProps = {
+type Props = {
+  openBottomSheet: () => void;
   navigation: NavigationProps;
 };
 
-const ContactsList: React.FC<ContentProps> = ({navigation}) => {
-  const friends = useAppStore(state => state.friends);
+const CallList: React.FC<Props> = ({openBottomSheet, navigation}) => {
   const loading = useAppStore(state => state.loading);
+  const calls = useAppStore(state => state.calls);
   const [search, setSearch] = useState<string>('');
-  const action = useCallback(
-    () => navigation.navigate('Scanner'),
-    [navigation],
-  );
-
-  const clearSearch = useCallback((): void => {
-    setSearch('');
-  }, []);
+  const clearSearch = useCallback(() => setSearch(''), []);
 
   if (loading) {
     return <FullScreenLoader version={'flex'} />;
   }
 
-  if (!friends.length) {
-    return <EmptyContacts action={action} />;
+  if (!calls.length) {
+    return <EmptyCall openBottomSheet={openBottomSheet} />;
   }
 
   return (
@@ -46,13 +40,9 @@ const ContactsList: React.FC<ContentProps> = ({navigation}) => {
       />
       <FlatList
         contentContainerStyle={styles.content}
-        data={friends}
+        data={calls}
         renderItem={({item}) => (
-          <Persona
-            contact={item}
-            navigation={navigation}
-            backgroundColor="white"
-          />
+          <Persona contact={item} navigation={navigation} />
         )}
         keyExtractor={item => item._id}
         initialNumToRender={10}
@@ -68,4 +58,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ContactsList;
+export default CallList;

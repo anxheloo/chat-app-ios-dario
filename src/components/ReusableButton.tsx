@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  ActivityIndicator,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {ActivityIndicator, StyleSheet, TouchableOpacity} from 'react-native';
 import ReusableText from './ReusableText';
 import {BORDERRADIUS, COLORS, FONTWEIGHT} from '../theme/theme';
 import {useAppStore} from '../store';

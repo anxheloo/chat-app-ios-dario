@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import {useCallback} from 'react';
 import {useAppStore} from '../../store';
 import {Alert} from 'react-native';
 import {ObjectId} from 'bson';
@@ -24,8 +24,18 @@ const useSend = (
     state => state.updateSelectedChatMessages,
   );
 
+  // console.log('outside:', {
+  //   selectedChatData,
+  //   dissapearingTimeFrame,
+  //   id,
+  //   token,
+  //   socket,
+  // });
+
   const sendMessage = useCallback(async () => {
-    if (message.trim() === '') return;
+    if (message.trim() === '') {
+      return;
+    }
 
     // Emit the single text message wrapped in an array
     socket?.emit('sendMessage', {
@@ -42,10 +52,25 @@ const useSend = (
     });
 
     setMessage('');
-  }, [message, socket, id, selectedChatData, dissapearingTimeFrame]);
+  }, [
+    message,
+    socket,
+    id,
+    selectedChatData?._id,
+    dissapearingTimeFrame,
+    setMessage,
+  ]);
 
   const handleCameraUpload = useCallback(
     async (res: any) => {
+      // console.log('inside', {
+      //   selectedChatData,
+      //   dissapearingTimeFrame,
+      //   id,
+      //   token,
+      //   socket,
+      // });
+
       if (res.assets?.length) {
         // 1.Check the total size of the selected images or videos
         let totalSize = res.assets.reduce(
@@ -104,9 +129,6 @@ const useSend = (
         );
 
         updateSelectedChatMessages(current => [...current, ...tempMsgs]);
-        // //5. Hide camera options
-        // setCameraOptions(false);
-        // updateKeys({loading: false});
 
         //6. Create a FormData object to send the compressed file
         const formData = new FormData();
@@ -130,6 +152,8 @@ const useSend = (
 
           //8. Emit the event when upload is successful
           if (uploadResponse.status === 200) {
+            console.log('This is response.status:', uploadResponse.status);
+
             const uploadedFilePaths = uploadResponse.data.filePaths;
 
             //9. Construct the final message objects
@@ -150,18 +174,12 @@ const useSend = (
                   ) || msg,
               ),
             );
-
-            // 11. Set Loading to False
-            updateKeys({loading: false});
-
-            //11. Emit the message
             socket?.emit('sendMessage', {messages: uploadedMessages});
           } else {
             Alert.alert(
               uploadResponse.data?.message || 'Upload failed',
               'Error uploading media, try again!',
             );
-            updateKeys({loading: false});
           }
         } catch (error: any) {
           updateSelectedChatMessages(currentMessages =>
@@ -170,14 +188,24 @@ const useSend = (
                 !tempMsgs.some((tempMsg: Message) => tempMsg._id === msg._id),
             ),
           );
+          Alert.alert('Error', 'Failed to upload media');
+        } finally {
           setCameraOptions(false);
           updateKeys({loading: false});
-          console.log('Error', 'Failed to upload media');
-          Alert.alert('Error', 'Failed to upload media');
         }
       }
     },
-    [selectedChatData, dissapearingTimeFrame, id, token, socket],
+    [
+      updateSelectedChatMessages,
+      setCameraOptions,
+      updateKeys,
+      selectedChatData?.conversationId,
+      selectedChatData?._id,
+      id,
+      dissapearingTimeFrame,
+      token,
+      socket,
+    ],
   );
 
   return {sendMessage, handleCameraUpload};

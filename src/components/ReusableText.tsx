@@ -1,6 +1,5 @@
-import React from 'react';
+import React, {memo} from 'react';
 import {Text, TextStyle} from 'react-native';
-import {FONTSIZE} from '../theme/theme';
 
 type TextProps = {
   children: string | React.ReactNode;
@@ -13,32 +12,34 @@ type TextProps = {
   onPress?: () => void;
 };
 
-const ReusableText: React.FC<TextProps> = ({
-  children,
-  fontSize = 14,
-  fontWeight = 'normal',
-  color = '#000',
-  textAlign = 'left',
-  style,
-  textDecorationLine,
-  onPress,
-}) => {
-  return (
-    <Text
-      onPress={onPress}
-      style={[
-        {
-          fontSize,
-          fontWeight,
-          color,
-          textAlign,
-          textDecorationLine,
-        } as TextStyle,
-        style,
-      ]}>
-      {children}
-    </Text>
-  );
-};
+const ReusableText: React.FC<TextProps> = memo(
+  ({
+    children,
+    fontSize = 14,
+    fontWeight = 'normal',
+    color = '#000',
+    textAlign = 'left',
+    style,
+    textDecorationLine,
+    onPress,
+  }) => {
+    return (
+      <Text
+        onPress={onPress}
+        style={[
+          {
+            fontSize,
+            fontWeight,
+            color,
+            textAlign,
+            textDecorationLine,
+          } as TextStyle,
+          style,
+        ]}>
+        {children}
+      </Text>
+    );
+  },
+);
 
 export default ReusableText;

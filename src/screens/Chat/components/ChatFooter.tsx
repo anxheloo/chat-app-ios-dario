@@ -30,11 +30,12 @@ const ChatFooter = memo(() => {
         const hasPermission = await requestCameraPermission();
         if (hasPermission) {
           updateKeys({loading: true});
-          ImagePicker.launchCamera(options, (res: any) => {
+          ImagePicker.launchCamera(options, async (res: any) => {
             if (!res.didCancel && !res.error) {
-              handleCameraUpload(res);
+              await handleCameraUpload(res);
             } else {
               setCameraOptions(false);
+              updateKeys({loading: false});
               console.error(
                 'Camera error or cancelled:',
                 res.error || 'Cancelled',
@@ -48,12 +49,13 @@ const ChatFooter = memo(() => {
         const hasPermission = await requestPhotoLibraryPermission();
         if (hasPermission) {
           updateKeys({loading: true});
-          ImagePicker.launchImageLibrary(options, (res: any) => {
+          ImagePicker.launchImageLibrary(options, async (res: any) => {
             console.log('res', res);
             if (!res.didCancel && !res.error) {
-              handleCameraUpload(res);
+              await handleCameraUpload(res);
             } else {
               setCameraOptions(false);
+              updateKeys({loading: false});
               console.error(
                 'Image library error or cancelled:',
                 res.error || 'Cancelled',
@@ -65,7 +67,12 @@ const ChatFooter = memo(() => {
         }
       }
     },
-    [requestCameraPermission, requestPhotoLibraryPermission],
+    [
+      handleCameraUpload,
+      requestCameraPermission,
+      requestPhotoLibraryPermission,
+      updateKeys,
+    ],
   );
 
   return (

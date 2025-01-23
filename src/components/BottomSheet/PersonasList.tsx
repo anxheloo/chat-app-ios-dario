@@ -48,7 +48,9 @@ const PersonasList: React.FC<PersonasListProps> = ({cancel, navigation}) => {
         );
 
         if (res.status === 200) {
-          setSearchFriends(res.data.contacts);
+          console.log('This is response status 200');
+          console.log('This is response.data.friends:');
+          setSearchFriends(res.data.friends);
         } else {
           console.log('error searching contacts');
         }

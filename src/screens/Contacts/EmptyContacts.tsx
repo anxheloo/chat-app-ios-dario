@@ -11,7 +11,7 @@ type EmptyChatProps = {
 const EmptyContacts: React.FC<EmptyChatProps> = ({action}) => {
   return (
     <View style={styles.emptyContacts}>
-      <View style={{alignItems: 'center', gap: 10}}>
+      <View style={styles.container1}>
         <ContactsIcon width={47} height={45} fill={COLORS.Black} />
         <ReusableText fontSize={FONTSIZE.lg} fontWeight={400}>
           No Recent Contacts
@@ -45,6 +45,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 50,
   },
+
+  container1: {alignItems: 'center', gap: 10},
 });
 
 export default EmptyContacts;
