@@ -11,6 +11,8 @@ import useUserInfo from '../../utils/hooks/useUserInfo';
 const Header = memo(() => {
   const username = useAppStore(state => state.username);
   const navigation = useNavigation<NavigationProps>();
+
+  // Get user info, user conversations, calls and friends
   useUserInfo();
 
   //Open Scanner

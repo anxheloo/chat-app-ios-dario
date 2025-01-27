@@ -1,5 +1,4 @@
-import React from 'react';
-import {Alert, StyleSheet, View} from 'react-native';
+import {Alert} from 'react-native';
 import {useAppStore} from '../../store';
 import {apiClient} from '../../api/apiClient';
 import {LOGIN_ROUTE} from '../../api/apis';
@@ -44,7 +43,7 @@ const useLogin = (
         await saveToken(response.data.token);
         setToken(response.data.token);
 
-        navigation.replace('BottomTabNavigation');
+        navigation?.replace('BottomTabNavigation');
       }
     } catch (error: any) {
       updateKeys({loading: false});

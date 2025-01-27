@@ -1,119 +1,119 @@
 import React from 'react';
-import {
-  Modal,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  Dimensions,
-  Alert,
-} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View, Alert} from 'react-native';
 import {BORDERRADIUS, COLORS, FONTSIZE} from '../../theme/theme';
 import {apiClient} from '../../api/apiClient';
 import {DELETE_MESSAGE} from '../../api/apis';
 import {useAppStore} from '../../store';
 
-type DeleteMsgProps = {
-  msgId: string;
-  showModal: boolean;
-  setShowModal: (value: boolean) => void;
-};
+const DeleteMsg = React.memo(() => {
+  const token = useAppStore(state => state.token);
+  const updateFuncChat = useAppStore(state => state.updateFuncChat);
+  const updateSelectedChatMessages = useAppStore(
+    state => state.updateSelectedChatMessages,
+  );
+  const selectedMsgToDelete = useAppStore(
+    state => state.selectedMessageToDelete,
+  );
+  const socket = useAppStore(state => state.socket);
+  const id = useAppStore(state => state.id);
 
-const DeleteMsg: React.FC<DeleteMsgProps> = React.memo(
-  ({msgId, setShowModal, showModal}) => {
-    const token = useAppStore(state => state.token);
-    const updateFuncChat = useAppStore(state => state.updateFuncChat);
-    const {selectedChatMessages} = useAppStore.getState();
-    const socket = useAppStore(state => state.socket);
-    const id = useAppStore(state => state.id);
+  const isShown = selectedMsgToDelete !== null;
+  const msgId = selectedMsgToDelete?._id;
 
-    // Delete Specific message
-    const handleDelete = async () => {
-      try {
-        const res = await apiClient.post(
-          DELETE_MESSAGE,
-          {msgId: msgId},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+  // Delete Specific message
+  const handleDelete = async () => {
+    try {
+      const res = await apiClient.post(
+        DELETE_MESSAGE,
+        {msgId: msgId},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
+        },
+      );
+
+      if (res.status === 200) {
+        console.log('This is the new conversation:', res.data.conversation);
+
+        updateSelectedChatMessages(current =>
+          current.map(msg => {
+            if (msg._id === msgId) {
+              return {
+                ...msg,
+                messageType: 'deleted',
+                content: 'Message deleted',
+              };
+            }
+            return msg;
+          }),
         );
 
-        if (res.status === 200) {
-          console.log('This is the new conversation:', res.data.conversation);
-          updateFuncChat({
-            selectedChatMessages: selectedChatMessages.map(msg => {
-              if (msg._id === msgId) {
-                return {
-                  ...msg,
-                  messageType: 'deleted',
-                  content: 'Message deleted',
-                };
-              }
-              return msg;
-            }),
-          });
+        // updateFuncChat({
+        //   selectedChatMessages: selectedChatMessages.map(msg => {
+        //     if (msg._id === msgId) {
+        //       return {
+        //         ...msg,
+        //         messageType: 'deleted',
+        //         content: 'Message deleted',
+        //       };
+        //     }
+        //     return msg;
+        //   }),
+        // });
 
-          socket?.emit('deleteSpecificMessage', {
-            messageId: msgId,
-            senderId: id,
-            recipientId: res.data.recipientId,
-            conversation: res.data.conversation,
-          });
-
-          setShowModal(false);
-        }
-      } catch (error) {
-        setShowModal(false);
-        Alert.alert('Error', 'Unable to delete the message. Please try again.');
+        socket?.emit('deleteSpecificMessage', {
+          messageId: msgId,
+          senderId: id,
+          recipientId: res.data.recipientId,
+          conversation: res.data.conversation,
+        });
       }
-    };
+    } catch (error) {
+      Alert.alert('Error', 'Unable to delete the message. Please try again.');
+    } finally {
+      updateFuncChat({selectedMessageToDelete: null});
+    }
+  };
 
-    return (
-      <Modal
-        visible={showModal}
-        animationType="fade"
-        onRequestClose={() => setShowModal(false)}
-        transparent={true}>
-        <View style={styles.overlay}>
-          <View style={styles.content}>
-            <Text style={styles.title}>Are you sure?</Text>
+  const closeModal = () => {
+    // setShowModal(false);
+    updateFuncChat({selectedMessageToDelete: null});
+  };
 
-            <View style={styles.btnContainer}>
-              <TouchableOpacity
-                style={[styles.btn]}
-                onPress={() => {
-                  setShowModal(false);
-                }}>
-                <Text style={{fontWeight: '300', fontSize: FONTSIZE.md}}>
-                  Cancel
-                </Text>
-              </TouchableOpacity>
+  if (!isShown) {
+    return null;
+  }
 
-              <TouchableOpacity
-                onPress={handleDelete}
-                style={[styles.btn, {backgroundColor: 'white'}]}>
-                <Text style={{fontWeight: '500', fontSize: FONTSIZE.md}}>
-                  Delete
-                </Text>
-              </TouchableOpacity>
-            </View>
+  return (
+    <View style={StyleSheet.absoluteFill}>
+      <View style={styles.overlay}>
+        <View style={styles.content}>
+          <Text style={styles.title}>Are you sure?</Text>
+
+          <View style={styles.btnContainer}>
+            <TouchableOpacity style={[styles.btn]} onPress={closeModal}>
+              <Text style={styles.cancelBtn}>Cancel</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={handleDelete}
+              style={[styles.btn, {backgroundColor: 'white'}]}>
+              <Text style={styles.deleteBtn}>Delete</Text>
+            </TouchableOpacity>
           </View>
         </View>
-      </Modal>
-    );
-  },
-);
+      </View>
+    </View>
+  );
+});
 
 const styles = StyleSheet.create({
   overlay: {
-    height: Dimensions.get('window').height,
-    width: Dimensions.get('window').width,
     backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent black background
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1,
   },
 
   content: {
@@ -125,7 +125,6 @@ const styles = StyleSheet.create({
     borderRadius: BORDERRADIUS.radius_14,
     justifyContent: 'space-around',
     alignItems: 'center',
-    zIndex: 2,
   },
 
   title: {
@@ -147,6 +146,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  deleteBtn: {fontWeight: '500', fontSize: FONTSIZE.md},
+  cancelBtn: {fontWeight: '300', fontSize: FONTSIZE.md},
 });
 
 export default DeleteMsg;

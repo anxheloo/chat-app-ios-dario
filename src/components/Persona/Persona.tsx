@@ -33,6 +33,7 @@ const Persona: React.FC<PersonaProps> = ({
 }) => {
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
   const senderId = useAppStore(state => state.id);
+  const senderUsername = useAppStore(state => state.username);
   const token = useAppStore(state => state.token);
   const socket = useAppStore(state => state.socket);
   const updateFriends = useAppStore(state => state.updateFriends);
@@ -74,13 +75,14 @@ const Persona: React.FC<PersonaProps> = ({
         socket?.emit('deleteFriend', {
           senderId: senderId,
           friendId: contact._id,
+          senderUsername,
         });
       }
     } catch (error: any) {
       setLoading(false);
       Alert.alert(error.response.data.message, 'Please try again.');
     }
-  }, [contact._id, senderId, socket, token, updateFriends]);
+  }, [contact._id, senderId, senderUsername, socket, token, updateFriends]);
 
   const renderRightActions = useCallback(() => {
     if (version && version === 'search') {

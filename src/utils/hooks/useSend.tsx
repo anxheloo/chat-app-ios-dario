@@ -2,7 +2,7 @@ import {useCallback} from 'react';
 import {useAppStore} from '../../store';
 import {Alert} from 'react-native';
 import {ObjectId} from 'bson';
-import {createThumbnail} from 'react-native-create-thumbnail';
+// import {createThumbnail} from 'react-native-create-thumbnail';
 import {apiClient} from '../../api/apiClient';
 import {HOST, UPLOAD_FILE} from '../../api/apis';
 import {Message} from '../types';
@@ -23,14 +23,6 @@ const useSend = (
   const updateSelectedChatMessages = useAppStore(
     state => state.updateSelectedChatMessages,
   );
-
-  // console.log('outside:', {
-  //   selectedChatData,
-  //   dissapearingTimeFrame,
-  //   id,
-  //   token,
-  //   socket,
-  // });
 
   const sendMessage = useCallback(async () => {
     if (message.trim() === '') {
@@ -63,38 +55,23 @@ const useSend = (
 
   const handleCameraUpload = useCallback(
     async (res: any) => {
-      // console.log('inside', {
-      //   selectedChatData,
-      //   dissapearingTimeFrame,
-      //   id,
-      //   token,
-      //   socket,
-      // });
-
       if (res.assets?.length) {
+        console.log('this is res from camera upload', res);
+        console.log('this is base64 from camera upload', res.assets[0].base64);
+
         // 1.Check the total size of the selected images or videos
         let totalSize = res.assets.reduce(
           (acc: any, file: any) => acc + file.fileSize,
           0,
         );
 
-        // 2.If total size is bigger than 100mb return
-        if (totalSize > 100 * 1024 * 1024) {
+        // 2.If total size is bigger than 500mb return
+        if (totalSize > 500 * 1024 * 1024) {
           setCameraOptions(false);
           updateKeys({loading: false});
           return Alert.alert(
             'Total size excedeed',
             'Maximum upload capacity is 100mb',
-          );
-        }
-
-        // 3.If more than 10 files are selected, return
-        if (res.assets?.length > 6) {
-          setCameraOptions(false);
-          updateKeys({loading: false});
-          return Alert.alert(
-            'Total size excedeed',
-            'Maximum upload items is 6',
           );
         }
 
@@ -104,13 +81,13 @@ const useSend = (
             const tempId = new ObjectId().toString();
             const isVideo = media.type.startsWith('video');
 
-            let thumbnail = '';
-            if (isVideo) {
-              const thumbnailResponse = await createThumbnail({
-                url: media.uri,
-              });
-              thumbnail = thumbnailResponse.path; // Thumbnail path
-            }
+            // let thumbnail = '';
+            // if (isVideo) {
+            //   const thumbnailResponse = await createThumbnail({
+            //     url: media.uri,
+            //   });
+            //   thumbnail = thumbnailResponse.path; // Thumbnail path
+            // }
 
             return {
               _id: tempId,
@@ -121,9 +98,12 @@ const useSend = (
               createdAt: new Date().toISOString(),
               messageType: 'file',
               fileUrl: media.uri,
-              thumbnailUrl: thumbnail, // Save thumbnail
+              // fileUrl: media.base64,
+              // thumbnailUrl: thumbnail, // Save thumbnail
+              thumbnailUrl: null, // Save thumbnail
               expiresAt: dissapearingTimeFrame,
               uploading: true,
+              duration: isVideo ? media.duration : null,
             };
           }),
         );
@@ -152,8 +132,6 @@ const useSend = (
 
           //8. Emit the event when upload is successful
           if (uploadResponse.status === 200) {
-            console.log('This is response.status:', uploadResponse.status);
-
             const uploadedFilePaths = uploadResponse.data.filePaths;
 
             //9. Construct the final message objects

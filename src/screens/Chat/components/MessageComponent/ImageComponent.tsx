@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback} from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -12,10 +12,14 @@ import {useNavigation} from '@react-navigation/native';
 type ImageProps = {
   message: Message;
   uploading: boolean;
+  isSender: boolean;
 };
 
-const ImageComponent: React.FC<ImageProps> = ({message, uploading}) => {
-  // const [loading, setIsLoading] = useState(false);
+const ImageComponent: React.FC<ImageProps> = ({
+  message,
+  uploading,
+  isSender,
+}) => {
   const navigation = useNavigation<NavigationProps>();
 
   const openImage = useCallback(() => {
@@ -25,33 +29,24 @@ const ImageComponent: React.FC<ImageProps> = ({message, uploading}) => {
         type: 'image',
       });
     }
-  }, [uploading, message.fileUrl]);
+  }, [uploading, navigation, message.fileUrl]);
 
   return (
     <TouchableOpacity
-      // style={styles.imageContainer}
       onPress={openImage}
-      activeOpacity={1}>
+      activeOpacity={0.9}
+      style={styles.image}>
       {uploading ? (
         <ActivityIndicator
           size="small"
-          color="#fff"
-          style={{
-            position: 'absolute',
-            inset: 0,
-          }}
+          color={isSender ? '#fff' : '#000'}
+          style={styles.activityIndicator}
         />
       ) : (
         <Image
           source={{uri: message.fileUrl}}
           style={styles.image}
           resizeMode="cover"
-          // onLoadStart={() => setIsLoading(true)}
-          // onLoad={() => setIsLoading(false)}
-          // onError={() => {
-          //   setIsLoading(false);
-          //   console.log('Error loading image');
-          // }}
         />
       )}
     </TouchableOpacity>
@@ -59,16 +54,16 @@ const ImageComponent: React.FC<ImageProps> = ({message, uploading}) => {
 };
 
 const styles = StyleSheet.create({
-  imageContainer: {
-    width: 220,
-    height: 150,
-  },
-
   image: {
     width: 220,
     height: 150,
     borderTopLeftRadius: BORDERRADIUS.radius_13,
     borderTopRightRadius: BORDERRADIUS.radius_13,
+  },
+
+  activityIndicator: {
+    position: 'absolute',
+    inset: 0,
   },
 });
 

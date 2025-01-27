@@ -34,6 +34,7 @@ type ChatSlice = {
   friends: Contact[];
   calls: Contact[];
   selectedChatMessages: Message[];
+  selectedMessageToDelete: Message | null;
   updateFuncChat: (data: Partial<ChatSlice>) => void;
 
   updateConversations: (
@@ -89,6 +90,7 @@ const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
   conversations: [],
   friends: [],
   calls: [],
+  selectedMessageToDelete: null,
   updateFuncChat: set,
 
   updateConversations: (
@@ -129,7 +131,8 @@ const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
       const dateA = +Date.parse(a?.lastMessage?.createdAt ?? '');
       const dateB = +Date.parse(b?.lastMessage?.createdAt ?? '');
 
-      return dateA - dateB;
+      // return dateA - dateB;
+      return dateB - dateA;
     });
 
     set({conversations: sortedContacts});

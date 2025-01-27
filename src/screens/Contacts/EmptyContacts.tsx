@@ -1,14 +1,20 @@
-import React from 'react';
+import React, {useCallback} from 'react';
 import {StyleSheet, View} from 'react-native';
 import ReusableText from '../../components/ReusableText';
 import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import ContactsIcon from '../../assets/icons/BottomTabIcons/ContactsIcon';
+import {NavigationProps} from '../../utils/types';
 
 type EmptyChatProps = {
-  action: () => void;
+  navigation: NavigationProps;
 };
 
-const EmptyContacts: React.FC<EmptyChatProps> = ({action}) => {
+const EmptyContacts: React.FC<EmptyChatProps> = ({navigation}) => {
+  const action = useCallback(
+    () => navigation.navigate('Scanner'),
+    [navigation],
+  );
+
   return (
     <View style={styles.emptyContacts}>
       <View style={styles.container1}>

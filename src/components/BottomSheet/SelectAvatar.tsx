@@ -45,11 +45,7 @@ const SelectAvatar: React.FC<SelectAvatarProps> = memo(({cancel, setFunc}) => {
         <Avatar width={100} height={100} avatarWidth={70} avatarHeight={70} />
       </View>
 
-      <View
-        style={{
-          flex: 1,
-          alignItems: 'center',
-        }}>
+      <View style={styles.avatarContainer2}>
         <View style={styles.avatarContainer}>
           {avatarUrls.map((icon, index) => {
             const SelectedAvatar = icon;
@@ -111,6 +107,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flex: 1,
     maxWidth: 250,
+  },
+
+  avatarContainer2: {
+    flex: 1,
+    alignItems: 'center',
   },
 
   avatarItem: {

@@ -11,6 +11,7 @@ export type RootStackParamList = {
   // BottomTabNavigation: undefined;
   BottomTabNavigation: {
     screen?: 'Messages' | 'Calls' | 'Contacts' | 'Profile';
+    params?: undefined;
   };
   CreatePersona: undefined;
   CreatePin: undefined;
@@ -42,8 +43,9 @@ export type Message = {
   expiresAt: string;
   messageType: string;
   fileUrl: string;
-  thumbnailUrl: string;
+  thumbnailUrl: string | null;
   uploading: boolean;
+  duration?: number | null;
   showDate?: boolean;
 };
 

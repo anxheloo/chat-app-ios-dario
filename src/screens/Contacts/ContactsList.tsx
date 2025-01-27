@@ -17,10 +17,6 @@ const ContactsList: React.FC<ContentProps> = ({navigation}) => {
   const friends = useAppStore(state => state.friends);
   const loading = useAppStore(state => state.loading);
   const [search, setSearch] = useState<string>('');
-  const action = useCallback(
-    () => navigation.navigate('Scanner'),
-    [navigation],
-  );
 
   const clearSearch = useCallback((): void => {
     setSearch('');
@@ -31,7 +27,7 @@ const ContactsList: React.FC<ContentProps> = ({navigation}) => {
   }
 
   if (!friends.length) {
-    return <EmptyContacts action={action} />;
+    return <EmptyContacts navigation={navigation} />;
   }
 
   return (

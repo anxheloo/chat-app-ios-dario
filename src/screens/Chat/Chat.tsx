@@ -6,6 +6,7 @@ import ChatFooter from './components/ChatFooter';
 import {useAppStore} from '../../store';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import FullScreenLoader from '../../components/Loading/FullScreenLoader';
+import DeleteMsg from '../../components/modals/DeleteMsg';
 
 const Chat = () => {
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
@@ -31,6 +32,7 @@ const Chat = () => {
 
         {loading && <FullScreenLoader version="absolute" />}
       </SafeAreaView>
+      <DeleteMsg />
     </KeyboardAvoidingView>
   );
 };

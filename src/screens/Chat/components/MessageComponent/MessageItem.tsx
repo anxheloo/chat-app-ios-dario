@@ -1,12 +1,11 @@
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import {StyleSheet, Text, TouchableOpacity} from 'react-native';
 import {Message} from '../../../../utils/types';
 import {useAppStore} from '../../../../store';
 import {BORDERRADIUS, FONTSIZE} from '../../../../theme/theme';
 import {checkIfImage, checkIfVideo} from '../../../../utils/helpers';
-import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
+import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import DeleteIcon from '../../../../assets/icons/Chat/DeleteIcon';
-import DeleteMsg from '../../../../components/modals/DeleteMsg';
 import ImageComponent from './ImageComponent';
 import VideoComponent from './VideoComponent';
 import moment from 'moment';
@@ -19,13 +18,13 @@ type MessageItemProps = {
 
 const MessageItem: React.FC<MessageItemProps> = React.memo(({message}) => {
   const loggedInUserId = useAppStore(state => state.id);
+  const updateFuncChat = useAppStore(state => state.updateFuncChat);
   const isSender = message?.sender === loggedInUserId;
-  const [showModal, setShowModal] = useState<boolean>(false);
 
   // Show modal on delete icon click
   const handleShowModal = useCallback(() => {
-    setShowModal(true);
-  }, []);
+    updateFuncChat({selectedMessageToDelete: message});
+  }, [message, updateFuncChat]);
 
   // Render messages based on message type
   const renderMessageContent = useMemo(() => {
@@ -35,12 +34,20 @@ const MessageItem: React.FC<MessageItemProps> = React.memo(({message}) => {
       case 'file':
         if (checkIfImage(message.fileUrl)) {
           return (
-            <ImageComponent message={message} uploading={message?.uploading} />
+            <ImageComponent
+              message={message}
+              uploading={message?.uploading}
+              isSender={isSender}
+            />
           );
         }
         if (checkIfVideo(message.fileUrl)) {
           return (
-            <VideoComponent message={message} uploading={message?.uploading} />
+            <VideoComponent
+              message={message}
+              uploading={message?.uploading}
+              isSender={isSender}
+            />
           );
         }
         return (
@@ -87,24 +94,18 @@ const MessageItem: React.FC<MessageItemProps> = React.memo(({message}) => {
       )}
 
       {isSender && message.messageType !== 'deleted' ? (
-        <ReanimatedSwipeable
+        <Swipeable
           renderRightActions={renderRightActions}
           overshootRight={false}>
           <MessageContent isSender={isSender} createdAt={message.createdAt}>
             {renderMessageContent}
           </MessageContent>
-        </ReanimatedSwipeable>
+        </Swipeable>
       ) : (
         <MessageContent isSender={isSender} createdAt={message.createdAt}>
           {renderMessageContent}
         </MessageContent>
       )}
-
-      <DeleteMsg
-        msgId={message._id}
-        setShowModal={setShowModal}
-        showModal={showModal}
-      />
     </>
   );
 });

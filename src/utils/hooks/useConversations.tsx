@@ -1,4 +1,3 @@
-import {useCallback} from 'react';
 import {GET_CONVERSATIONS} from '../../api/apis';
 import {apiClient} from '../../api/apiClient';
 import {useAppStore} from '../../store';
@@ -9,7 +8,7 @@ const useConversations = () => {
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
   const updateKeys = useAppStore(state => state.updateKeys);
 
-  const getConversations = useCallback(async () => {
+  const getConversations = async () => {
     updateKeys({loading: true});
     try {
       const res = await apiClient.get(GET_CONVERSATIONS, {
@@ -27,7 +26,7 @@ const useConversations = () => {
     } finally {
       updateKeys({loading: false});
     }
-  }, [token, updateFuncChat, updateKeys]);
+  };
 
   // return {getConversations, loading};
   return getConversations;

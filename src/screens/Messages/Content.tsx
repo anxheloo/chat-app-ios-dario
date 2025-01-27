@@ -1,4 +1,4 @@
-import React, {memo, useCallback, useState} from 'react';
+import React, {memo, useCallback, useMemo, useState} from 'react';
 import {FlatList, StyleSheet, View} from 'react-native';
 import EmptyChat from './EmptyChat';
 import {useAppStore} from '../../store';
@@ -17,11 +17,38 @@ type ContentProps = {
 const Content: React.FC<ContentProps> = memo(
   ({openBottomSheet, navigation}) => {
     const loading = useAppStore(state => state.loading);
+    const userId = useAppStore(state => state.id);
     const [search, setSearch] = useState<string>('');
+    const [debouncedSearch, setDebounceSearch] = useState<string>('');
     const conversations = useAppStore(state => state.conversations);
+
+    const searchedConversations = useMemo(
+      () =>
+        conversations.filter(
+          conversation =>
+            conversation.participants
+              .filter(participant => participant._id !== userId)
+              .filter(contact =>
+                contact.username
+                  .toLowerCase()
+                  .includes(debouncedSearch.toLowerCase()),
+              ).length > 0,
+        ),
+      [conversations, debouncedSearch, userId],
+    );
 
     console.log('This is Content step 4');
     const clearSearch = useCallback(() => setSearch(''), []);
+
+    const updateSearch = (searchTerm: string) => {
+      setSearch(searchTerm);
+
+      const t = setTimeout(() => {
+        setDebounceSearch(searchTerm);
+      }, 300);
+
+      return () => clearTimeout(t);
+    };
 
     if (loading) {
       return <FullScreenLoader version={'flex'} />;
@@ -36,14 +63,14 @@ const Content: React.FC<ContentProps> = memo(
         <ReusableInput
           placeholder="Search"
           value={search}
-          onChange={setSearch}
+          onChange={updateSearch}
           onPress={clearSearch}
           icon1={<SearchIcon width={15} height={15} />}
           icon2={<CloseIcon width={15} height={15} />}
         />
         <FlatList
           contentContainerStyle={styles.content}
-          data={conversations}
+          data={searchedConversations}
           renderItem={({item}) => (
             <Conversations
               conversation={item}
@@ -52,7 +79,8 @@ const Content: React.FC<ContentProps> = memo(
             />
           )}
           keyExtractor={item => item._id}
-          initialNumToRender={10}
+          initialNumToRender={20}
+          maxToRenderPerBatch={20}
         />
       </View>
     );

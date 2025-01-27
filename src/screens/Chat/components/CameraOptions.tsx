@@ -2,9 +2,6 @@ import React, {memo} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import * as ImagePicker from 'react-native-image-picker';
 
-/* toggle includeExtra */
-const includeExtra = true;
-
 interface Action {
   title: string;
   type: 'capture' | 'library';
@@ -20,9 +17,10 @@ const actions: Action[] = [
       mediaType: 'mixed',
       formatAsMp4: true,
       // includeExtra,
-      quality: 0.3,
-      videoQuality: 'low',
+      quality: 0.1,
+      videoQuality: 'high',
       assetRepresentationMode: 'current',
+      includeBase64: true,
     },
   },
   {
@@ -34,8 +32,9 @@ const actions: Action[] = [
       formatAsMp4: true,
       // includeExtra,
       assetRepresentationMode: 'current',
-      quality: 0.3,
-      videoQuality: 'low',
+      quality: 0.1,
+      videoQuality: 'high',
+      includeBase64: true,
     },
   },
 ];
@@ -55,7 +54,7 @@ const CameraOptions: React.FC<Props> = memo(({onButtonPress}) => {
           <Text
             key={title}
             onPress={() => onButtonPress(type, options)}
-            style={{fontSize: 14, fontWeight: '400', paddingRight: 10}}>
+            style={styles.text}>
             {title}
           </Text>
         );
@@ -83,8 +82,10 @@ const styles = StyleSheet.create({
     },
     gap: 10,
   },
-  text: {
-    textAlign: 'center',
-    color: 'white',
-  },
+  // text: {
+  //   textAlign: 'center',
+  //   color: 'white',
+  // },
+
+  text: {fontSize: 14, fontWeight: '400', paddingRight: 10},
 });

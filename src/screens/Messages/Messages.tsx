@@ -1,10 +1,10 @@
-import React, {useCallback, useEffect, useRef} from 'react';
+import React, {useCallback, useRef} from 'react';
 import BottomSheetWrapper from '../../components/BottomSheet/BottomSheetWrapper';
 import PersonasList from '../../components/BottomSheet/PersonasList';
 import BottomSheet from '@gorhom/bottom-sheet';
 import Content from './Content';
 import {NavigationProps} from '../../utils/types';
-import useConversations from '../../utils/hooks/useConversations';
+// import useConversations from '../../utils/hooks/useConversations';
 import {useSocket} from '../../utils/useSocket';
 
 type MessagesScreenProps = {
@@ -12,13 +12,8 @@ type MessagesScreenProps = {
 };
 
 const Messages: React.FC<MessagesScreenProps> = ({navigation}) => {
-  const getConversations = useConversations();
   useSocket();
   const bottomSheetRef = useRef<BottomSheet | null>(null);
-
-  useEffect(() => {
-    getConversations();
-  }, [getConversations]);
 
   const openBottomSheet = useCallback(
     () => bottomSheetRef.current?.expand(),

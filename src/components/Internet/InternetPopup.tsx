@@ -1,114 +1,74 @@
-import React, {useState, useEffect} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Modal} from 'react-native';
-import NetInfo from '@react-native-community/netinfo';
-import {Dimensions} from 'react-native';
-
-const windowWidth = Dimensions.get('window').width;
-const windowHeight = Dimensions.get('window').height;
+import React from 'react';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import CheckInternet from '../../utils/hooks/CheckInternet';
+import {BORDERRADIUS, COLORS, FONTSIZE} from '../../theme/theme';
 
 const InternetPopup = () => {
-  const [isInternetConnected, setIsInternetConnected] = useState(true);
-  const [showPopup, setShowPopup] = useState(false);
+  const {hasInternet, handleTryAgain} = CheckInternet();
 
-  useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener((state: any) => {
-      setIsInternetConnected(state.isConnected);
-      setShowPopup(!state.isConnected);
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, []);
-
-  const handleTryAgain = async () => {};
-
-  const handlePopupClose = () => {
-    setShowPopup(false); // Call the callback function from LoginPage to update showInternetPopup state
-  };
+  if (hasInternet) {
+    return null;
+  }
 
   return (
-    <>
-      {showPopup && (
-        <Modal visible={showPopup} transparent animationType="fade">
-          <View style={styles.centeredContainer}>
-            <View style={styles.popUpContainer}>
-              <Text
-                style={{
-                  fontSize: 22,
-                  marginTop: 30,
-                  paddingHorizontal: 20,
-                  textAlign: 'center',
-                }}>
-                MUNGON LIDHJA ME INTERNETIN. SIGUROHUNI QE TE KENI AKSES NE
-                INTERNET.
-              </Text>
-              {/* <AntDesign name="wifi" size={30} color="black" /> */}
-              <TouchableOpacity
-                style={styles.provoPerseriButton}
-                onPress={handleTryAgain}>
-                <Text style={styles.buttonText}>PROVO PERSERI</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => {
-                  handlePopupClose();
-                }}>
-                {/* <MaterialIcons name="close" size={40} color="black" /> */}
-              </TouchableOpacity>
-            </View>
+    <View style={StyleSheet.absoluteFill}>
+      <View style={styles.overlay}>
+        <View style={styles.content}>
+          <Text style={styles.title}>Check Internet Connection!</Text>
+
+          <View style={styles.btnContainer}>
+            <TouchableOpacity
+              onPress={handleTryAgain}
+              style={[styles.btn, {backgroundColor: 'white'}]}>
+              <Text style={styles.deleteBtn}>Try again</Text>
+            </TouchableOpacity>
           </View>
-        </Modal>
-      )}
-    </>
+        </View>
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  centeredContainer: {
+  overlay: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent black background
     flex: 1,
-    // width: windowWidth,
-    // height: windowHeight,
     justifyContent: 'center',
     alignItems: 'center',
-    // backgroundColor: "blue",
   },
 
-  popUpContainer: {
-    backgroundColor: 'white',
-    borderRadius: 40,
-    paddingVertical: 25,
-    paddingHorizontal: 20,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    // height: "72%",
-    // width: "90%",
-    width: '85%',
-    height: windowHeight / 2,
-    position: 'relative',
-  },
-
-  provoPerseriButton: {
-    backgroundColor: '#25a8dd', // Set your desired button background color
-    paddingVertical: 10,
-    alignItems: 'center',
-    borderRadius: 16,
-    width: '90%',
-    // marginTop: windowHeight * 0.15,
-  },
-
-  closeButton: {
-    position: 'absolute',
-    top: 5,
-    right: 10,
+  content: {
+    backgroundColor: COLORS.LightGray2,
+    width: '100%',
+    maxWidth: 320,
+    height: 120,
     padding: 10,
+    borderRadius: BORDERRADIUS.radius_14,
+    justifyContent: 'space-around',
+    alignItems: 'center',
   },
 
-  buttonText: {
-    color: '#FFF',
-    fontSize: 25,
-    fontWeight: 'bold',
+  title: {
+    color: COLORS.Black,
+    fontSize: FONTSIZE.lg,
+    fontWeight: '700',
   },
+
+  btnContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 20,
+    width: '100%',
+  },
+  btn: {
+    width: 130,
+    borderRadius: BORDERRADIUS.radius_14,
+    height: 34,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteBtn: {fontWeight: '500', fontSize: FONTSIZE.md},
+  cancelBtn: {fontWeight: '300', fontSize: FONTSIZE.md},
 });
 
 export default InternetPopup;

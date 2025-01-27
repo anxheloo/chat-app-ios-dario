@@ -55,6 +55,7 @@ export const useSocket = () => {
           ...current.filter(msg => msg._id !== message._id),
           {
             ...message,
+            uploading: false,
             recipient: message.recipient._id,
             sender: message.sender._id,
           },
@@ -157,10 +158,16 @@ export const useSocket = () => {
   );
 
   const friendDeleted = useCallback(
-    ({senderId}: {senderId: string}) => {
+    ({
+      senderId,
+      senderUsername,
+    }: {
+      senderId: string;
+      senderUsername: string;
+    }) => {
       console.log('THis is friendId inside friendDeleted:', senderId);
 
-      Alert.alert('Incoming Friend', `${senderId} removed you.`);
+      Alert.alert('Friend removal', `${senderUsername} removed you.`);
       updateFriends(current =>
         current.filter(friend => friend._id !== senderId),
       );

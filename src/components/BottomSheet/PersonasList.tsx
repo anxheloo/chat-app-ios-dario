@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {
   FlatList,
   Keyboard,
@@ -12,11 +12,9 @@ import ReusableInput from '../ReusableInput';
 import SearchIcon from '../../assets/icons/messages/SearchIcon';
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
 import Persona from '../Persona/Persona';
-import {apiClient} from '../../api/apiClient';
-import {SEARCH} from '../../api/apis';
-import {Contact, NavigationProps} from '../../utils/types';
-import {useAppStore} from '../../store';
 import AddIcon from '../../assets/icons/AddIcon';
+import {useAppStore} from '../../store';
+import {NavigationProps} from '../../utils/types';
 
 type PersonasListProps = {
   cancel: () => void;
@@ -25,55 +23,36 @@ type PersonasListProps = {
 
 const PersonasList: React.FC<PersonasListProps> = ({cancel, navigation}) => {
   const [search, setSearch] = useState<string>('');
-  const [searchedFriends, setSearchFriends] = useState<Contact[]>([]);
-  const token = useAppStore(state => state.token);
+  const [debouncedSearch, setDebounceSearch] = useState<string>('');
+  const friends = useAppStore(state => state.friends);
+
+  const searchedFriends = useMemo(
+    () =>
+      friends.filter(friend =>
+        friend.username.toLowerCase().includes(debouncedSearch.toLowerCase()),
+      ),
+    [debouncedSearch, friends],
+  );
+
+  const updateSearch = (searchTerm: string) => {
+    setSearch(searchTerm);
+
+    const t = setTimeout(() => {
+      setDebounceSearch(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(t);
+  };
 
   const clearSearch = useCallback((): void => {
     setSearch('');
-    setSearchFriends([]);
     Keyboard.dismiss();
   }, []);
-
-  const searchFriends = async (search: string) => {
-    if (search.length > 0) {
-      try {
-        const res = await apiClient.post(
-          SEARCH,
-          {searchTerm: search},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-
-        if (res.status === 200) {
-          console.log('This is response status 200');
-          console.log('This is response.data.friends:');
-          setSearchFriends(res.data.friends);
-        } else {
-          console.log('error searching contacts');
-        }
-      } catch (error) {
-        console.error('API call error:', error);
-      }
-    } else {
-      setSearchFriends([]);
-    }
-  };
 
   const addNew = useCallback(async () => {
     cancel();
     navigation?.navigate('Scanner');
-  }, [cancel]);
-
-  useEffect(() => {
-    const delay = setTimeout(() => {
-      searchFriends(search);
-    }, 300);
-
-    return () => clearTimeout(delay);
-  }, [search]);
+  }, [cancel, navigation]);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -105,7 +84,7 @@ const PersonasList: React.FC<PersonasListProps> = ({cancel, navigation}) => {
         <ReusableInput
           placeholder="Search"
           value={search}
-          onChange={setSearch}
+          onChange={updateSearch}
           onPress={clearSearch}
           backgroundColor="white"
           icon1={<SearchIcon width={15} height={15} />}
@@ -124,7 +103,6 @@ const PersonasList: React.FC<PersonasListProps> = ({cancel, navigation}) => {
             />
           )}
           keyExtractor={item => item._id}
-          // extraData={searchedFriends}
           // ListEmptyComponent={<Text>ska kontakte</Text>}
           initialNumToRender={10}
         />

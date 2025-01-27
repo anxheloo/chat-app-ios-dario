@@ -27,7 +27,7 @@ const Login: React.FC<LoginScreenProps> = ({navigation}) => {
   useCheckToken(navigation);
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={{flex: 1}}>
+    <KeyboardAvoidingView behavior="padding" style={styles.safeAreaView}>
       <SafeAreaView style={styles.safeAreaView}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.container}>

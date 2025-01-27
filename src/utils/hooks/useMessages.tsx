@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {Alert} from 'react-native';
 import {apiClient} from '../../api/apiClient';
 import {GET_ALL_MESSAGES} from '../../api/apis';
@@ -6,6 +6,7 @@ import {useAppStore} from '../../store';
 
 const useMessages = (flatListRef: any) => {
   const token = useAppStore(state => state.token);
+  // const updateKeys = useAppStore(state => state.updateKeys);
   const updateSelectedChatMessages = useAppStore(
     state => state.updateSelectedChatMessages,
   );
@@ -17,10 +18,18 @@ const useMessages = (flatListRef: any) => {
     page: 0,
   });
 
+  const refetch = useCallback(() => {
+    setPagination(prev => ({...prev, page: 0, isLoading: false}));
+    updateSelectedChatMessages(() => []);
+    getAllMessages();
+  }, []);
+
   const getAllMessages = useCallback(async () => {
     const {isLoading, hasMore, page} = pagination;
 
-    if (isLoading || !hasMore) return;
+    if (isLoading || !hasMore) {
+      return;
+    }
 
     setPagination(prev => ({...prev, isLoading: true}));
 
@@ -61,13 +70,7 @@ const useMessages = (flatListRef: any) => {
     } finally {
       setPagination(prev => ({...prev, isLoading: false}));
     }
-  }, [pagination, selectedChatData, token]);
-
-  const refetch = useCallback(() => {
-    setPagination(prev => ({...prev, page: 0, isLoading: false}));
-    updateSelectedChatMessages(() => []);
-    getAllMessages();
-  }, []);
+  }, [pagination, selectedChatData?._id, token, updateSelectedChatMessages]);
 
   const loadMoreItem = useCallback(() => {
     if (!pagination.isLoading && pagination.hasMore) {

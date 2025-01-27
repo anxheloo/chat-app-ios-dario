@@ -57,6 +57,7 @@ const ChatContainer = () => {
           maxToRenderPerBatch={20}
         />
       </TouchableWithoutFeedback>
+
       {!isNearBottom && (
         <ScrollToBottom
           onPress={() => scrollToBottom(0, flatListRef?.current)}

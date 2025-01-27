@@ -7,6 +7,7 @@ import {
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import MainNavigation from './src/navigation/MainNavigation';
 import {PortalProvider} from '@gorhom/portal';
+import InternetPopup from './src/components/Internet/InternetPopup';
 // import InternetPopup from './src/components/Internet/InternetPopup';
 
 const App = () => {
@@ -59,7 +60,7 @@ const App = () => {
         <PortalProvider>
           <MainNavigation />
         </PortalProvider>
-        {/* <InternetPopup /> */}
+        <InternetPopup />
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

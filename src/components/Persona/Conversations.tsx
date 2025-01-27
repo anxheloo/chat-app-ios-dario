@@ -117,8 +117,6 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
         );
 
         if (res.status === 200) {
-          setLoading(false);
-
           // Update the UI
           updateFuncChat({
             conversations: conversations.filter(
@@ -127,8 +125,9 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
           });
         }
       } catch (error) {
-        setLoading(false);
         Alert.alert('Could not delete the conversation. Please try again.');
+      } finally {
+        setLoading(false);
       }
     }, [conversation._id, conversations, token, updateFuncChat]);
 
