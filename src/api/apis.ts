@@ -1,6 +1,6 @@
-// export const HOST = 'http://172.20.10.3:8000';
+export const HOST = 'http://172.20.10.3:8000';
 
-export const HOST = 'http://172.16.0.29:8000';
+// export const HOST = 'http://172.16.0.29:8000';
 
 export const AUTH_ROUTES = 'api/auth';
 export const SIGNUP_ROUTES = `${AUTH_ROUTES}/signup`;
@@ -25,3 +25,4 @@ export const MESSAGES_ROUTES = 'api/messages';
 export const GET_ALL_MESSAGES = `${MESSAGES_ROUTES}/get-messages`;
 export const DELETE_MESSAGE = `${MESSAGES_ROUTES}/delete-message`;
 export const UPLOAD_FILE = `${MESSAGES_ROUTES}/upload-files`;
+export const SEND_MESSAGE = `${MESSAGES_ROUTES}/send-message`;

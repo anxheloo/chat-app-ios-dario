@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {memo} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import * as ImagePicker from 'react-native-image-picker';
@@ -18,9 +19,8 @@ const actions: Action[] = [
       formatAsMp4: true,
       // includeExtra,
       quality: 0.1,
-      videoQuality: 'high',
+      videoQuality: 'medium',
       assetRepresentationMode: 'current',
-      includeBase64: true,
     },
   },
   {
@@ -33,8 +33,7 @@ const actions: Action[] = [
       // includeExtra,
       assetRepresentationMode: 'current',
       quality: 0.1,
-      videoQuality: 'high',
-      includeBase64: true,
+      videoQuality: 'medium',
     },
   },
 ];
@@ -46,7 +45,7 @@ type Props = {
   ) => void;
 };
 
-const CameraOptions: React.FC<Props> = memo(({onButtonPress}) => {
+const CameraOptions: React.FC<Props> = ({onButtonPress}) => {
   return (
     <View style={styles.container}>
       {actions.map(({title, type, options}) => {
@@ -61,7 +60,7 @@ const CameraOptions: React.FC<Props> = memo(({onButtonPress}) => {
       })}
     </View>
   );
-});
+};
 
 export default CameraOptions;
 

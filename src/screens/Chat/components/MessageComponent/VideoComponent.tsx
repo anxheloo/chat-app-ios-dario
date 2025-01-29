@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   StyleSheet,
   ActivityIndicator,
@@ -21,6 +22,7 @@ type VideoProps = {
 const VideoComponent: React.FC<VideoProps> = memo(
   ({message, uploading, isSender}) => {
     const navigation = useNavigation<NavigationProps>();
+    // const [upload, setUpload] = useState(true);
 
     const openVideo = useCallback(() => {
       if (!uploading) {
@@ -55,6 +57,9 @@ const VideoComponent: React.FC<VideoProps> = memo(
             style={styles.video}
             resizeMode="cover"
             paused={true}
+            useTextureView={false}
+            // onLoad={() => setUpload(false)}
+            onError={error => console.log('This is error:', error)}
           />
         )}
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {memo, useCallback, useState} from 'react';
 import {Alert, StyleSheet, TouchableOpacity, View} from 'react-native';
 import ReusableInput from '../../../components/ReusableInput';
@@ -11,7 +12,7 @@ import useSend from '../../../utils/hooks/useSend';
 
 type ImagePickerType = 'capture' | 'library';
 
-const ChatFooter = memo(() => {
+const ChatFooter = () => {
   const updateKeys = useAppStore(state => state.updateKeys);
   const [message, setMessage] = useState('');
   const [cameraOptions, setCameraOptions] = useState(false);
@@ -97,7 +98,7 @@ const ChatFooter = memo(() => {
       </TouchableOpacity>
     </View>
   );
-});
+};
 
 const styles = StyleSheet.create({
   footerContainer: {
