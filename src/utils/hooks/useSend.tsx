@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {useCallback} from 'react';
 import {useAppStore} from '../../store';
 import {Alert} from 'react-native';
 import {ObjectId} from 'bson';
 // import {createThumbnail} from 'react-native-create-thumbnail';
 import {apiClient} from '../../api/apiClient';
-import {HOST, UPLOAD_FILE} from '../../api/apis';
+import {HOST, SEND_MESSAGE, UPLOAD_FILE} from '../../api/apis';
 import {Message} from '../types';
+import {Image, Video} from 'react-native-compressor';
 
 const useSend = (
   message: string,
@@ -23,6 +25,36 @@ const useSend = (
   const updateSelectedChatMessages = useAppStore(
     state => state.updateSelectedChatMessages,
   );
+
+  const compressImage = async (uri: string) => {
+    try {
+      const compressedUri = await Image.compress(uri, {
+        compressionMethod: 'auto',
+        maxWidth: 1000,
+        quality: 0.5,
+        returnableOutputType: 'uri',
+      });
+      return compressedUri;
+    } catch (error) {
+      console.error('Image compression failed:', error);
+      return uri;
+    }
+  };
+
+  const compressVideo = async (uri: string) => {
+    try {
+      const compressedUri = await Video.compress(uri, {
+        compressionMethod: 'auto',
+        maxSize: 720,
+      });
+
+      console.log('Compressed Video Path:', compressedUri);
+      return compressedUri;
+    } catch (error) {
+      console.error('Video compression failed:', error);
+      return uri; // Return original URI if compression fails
+    }
+  };
 
   const sendMessage = useCallback(async () => {
     if (message.trim() === '') {
@@ -57,7 +89,7 @@ const useSend = (
     async (res: any) => {
       if (res.assets?.length) {
         console.log('this is res from camera upload', res);
-        console.log('this is base64 from camera upload', res.assets[0].base64);
+        // console.log('this is base64 from camera upload', res.assets[0].base64);
 
         // 1.Check the total size of the selected images or videos
         let totalSize = res.assets.reduce(
@@ -80,7 +112,6 @@ const useSend = (
           res.assets.map(async (media: any) => {
             const tempId = new ObjectId().toString();
             const isVideo = media.type.startsWith('video');
-
             // let thumbnail = '';
             // if (isVideo) {
             //   const thumbnailResponse = await createThumbnail({
@@ -98,7 +129,7 @@ const useSend = (
               createdAt: new Date().toISOString(),
               messageType: 'file',
               fileUrl: media.uri,
-              // fileUrl: media.base64,
+              // fileUrl: compressedUri,
               // thumbnailUrl: thumbnail, // Save thumbnail
               thumbnailUrl: null, // Save thumbnail
               expiresAt: dissapearingTimeFrame,
@@ -108,18 +139,28 @@ const useSend = (
           }),
         );
 
+        // console.log('These are tempMsgs:', tempMsgs)
+
         updateSelectedChatMessages(current => [...current, ...tempMsgs]);
 
         //6. Create a FormData object to send the compressed file
         const formData = new FormData();
 
-        res.assets.forEach((file: any) => {
-          formData.append('files', {
-            uri: file.uri,
-            name: file.fileName,
-            type: file.type,
-          });
-        });
+        await Promise.all(
+          res.assets.map(async (file: any) => {
+            const isVideo = file.type.startsWith('video');
+
+            const compressedUri = isVideo
+              ? await compressVideo(file.uri)
+              : await compressImage(file.uri);
+
+            formData.append('files', {
+              uri: compressedUri,
+              name: file.fileName,
+              type: file.type,
+            });
+          }),
+        );
 
         try {
           //7. Post the compressed file to store on the server
@@ -132,9 +173,11 @@ const useSend = (
 
           //8. Emit the event when upload is successful
           if (uploadResponse.status === 200) {
+            console.log('reposnse success');
+
             const uploadedFilePaths = uploadResponse.data.filePaths;
 
-            //9. Construct the final message objects
+            // 9. Construct the final message objects
             const uploadedMessages = tempMsgs.map(
               (tempMsg: Message, index: number) => ({
                 ...tempMsg,
@@ -143,7 +186,7 @@ const useSend = (
               }),
             );
 
-            //10. Update UI with final URLs
+            // 10. Update UI with final URLs
             updateSelectedChatMessages(current =>
               current.map(
                 msg =>

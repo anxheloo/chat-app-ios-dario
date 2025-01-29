@@ -47,6 +47,7 @@ const ChatContainer = () => {
           onRefresh={loadMoreItem}
           ref={flatListRef}
           contentContainerStyle={styles.chatContainer}
+          removeClippedSubviews
           data={messagesData}
           renderItem={({item}) => <MessageItem message={item} />}
           keyExtractor={item => item._id}

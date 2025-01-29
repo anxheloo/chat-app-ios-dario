@@ -1,4 +1,5 @@
-import React, {useCallback} from 'react';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, {useCallback, useState} from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -21,6 +22,7 @@ const ImageComponent: React.FC<ImageProps> = ({
   isSender,
 }) => {
   const navigation = useNavigation<NavigationProps>();
+  // const [upload, setUpload] = useState(true);
 
   const openImage = useCallback(() => {
     if (!uploading) {
@@ -30,6 +32,8 @@ const ImageComponent: React.FC<ImageProps> = ({
       });
     }
   }, [uploading, navigation, message.fileUrl]);
+
+  console.log('This is fileIrl inside image:', message.fileUrl);
 
   return (
     <TouchableOpacity
@@ -44,9 +48,16 @@ const ImageComponent: React.FC<ImageProps> = ({
         />
       ) : (
         <Image
-          source={{uri: message.fileUrl}}
+          width={220}
+          height={150}
+          // source={{uri: `data:image/png;base64,${message.fileUrl}`}}
+          source={{
+            uri: message.fileUrl,
+          }}
           style={styles.image}
           resizeMode="cover"
+          // onLoad={() => setUpload(false)}
+          onError={error => console.log('This is error:', error)}
         />
       )}
     </TouchableOpacity>
