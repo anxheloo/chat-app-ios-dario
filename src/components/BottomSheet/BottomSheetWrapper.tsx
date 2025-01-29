@@ -1,9 +1,8 @@
 import BottomSheet, {BottomSheetView} from '@gorhom/bottom-sheet';
-import React, {forwardRef, memo, useCallback, useEffect, useMemo} from 'react';
-import {Keyboard, KeyboardAvoidingView, StyleSheet} from 'react-native';
+import React, {forwardRef, memo, useEffect} from 'react';
+import {Keyboard, StyleSheet} from 'react-native';
 import {COLORS} from '../../theme/theme';
 import {Portal, PortalHost} from '@gorhom/portal';
-import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 
 type BottomSheetProps = {
   children: React.ReactNode;
@@ -11,8 +10,8 @@ type BottomSheetProps = {
 
 const BottomSheetWrapper = memo(
   forwardRef<BottomSheet, BottomSheetProps>(({children}, ref) => {
-    const snapPoints = useMemo(() => ['25%', '50%', '75%'], []);
-    const handleSheetChanges = useCallback((index: number) => {}, []);
+    // const snapPoints = ['1%', '25%', '50%', '75%'];
+    const snapPoints = ['75%'];
 
     useEffect(() => {
       return () => {
@@ -25,13 +24,12 @@ const BottomSheetWrapper = memo(
         <Portal>
           <BottomSheet
             ref={ref}
-            onChange={handleSheetChanges}
             snapPoints={snapPoints}
             enablePanDownToClose
-            keyboardBehavior="extend"
-            index={-1}
+            keyboardBehavior="extend" // Prevent BottomSheet from being pushed
+            // index={-1}
+            index={0}
             handleIndicatorStyle={styles.handleIndicator}
-            // handleComponent={null}
             handleStyle={styles.indicatorContainer}
             style={styles.bottomSheet}>
             <BottomSheetView style={styles.contentContainer}>
@@ -80,7 +78,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.LightGray2,
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
-    paddingBottom: 40,
+    // paddingBottom: 40,
   },
 });
 

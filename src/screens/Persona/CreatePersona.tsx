@@ -6,7 +6,6 @@ import {
   KeyboardAvoidingView,
   Keyboard,
   TouchableWithoutFeedback,
-  Platform,
 } from 'react-native';
 import ReusableText from '../../components/ReusableText';
 import {BORDERRADIUS, COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
@@ -47,10 +46,10 @@ const CreatePersona: React.FC<CreatePersonaScreenProps> = ({navigation}) => {
     return () => {
       setUserPersona({username: ''});
     };
-  }, []);
+  }, [setUserPersona]);
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={{flex: 1}}>
+    <KeyboardAvoidingView behavior="padding" style={styles.safeAreaView}>
       <SafeAreaView style={styles.safeAreaView}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.container}>

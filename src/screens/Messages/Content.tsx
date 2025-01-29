@@ -37,7 +37,6 @@ const Content: React.FC<ContentProps> = memo(
       [conversations, debouncedSearch, userId],
     );
 
-    console.log('This is Content step 4');
     const clearSearch = useCallback(() => setSearch(''), []);
 
     const updateSearch = (searchTerm: string) => {
@@ -55,7 +54,9 @@ const Content: React.FC<ContentProps> = memo(
     }
 
     if (!conversations.length) {
-      return <EmptyChat openBottomSheet={openBottomSheet} />;
+      return (
+        <EmptyChat openBottomSheet={openBottomSheet} navigation={navigation} />
+      );
     }
 
     return (

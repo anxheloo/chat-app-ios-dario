@@ -6,7 +6,6 @@ import {useAppStore} from '../../store';
 
 const useMessages = (flatListRef: any) => {
   const token = useAppStore(state => state.token);
-  // const updateKeys = useAppStore(state => state.updateKeys);
   const updateSelectedChatMessages = useAppStore(
     state => state.updateSelectedChatMessages,
   );
@@ -64,7 +63,15 @@ const useMessages = (flatListRef: any) => {
         // setHasMore(updatedHasMore);
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to get messages', [
+      // Alert.alert('Error', 'Failed to get messages', [
+      //   {text: 'Try again', onPress: refetch},
+      // ]);
+      Alert.alert('Alert Title', 'My Alert Msg', [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
         {text: 'Try again', onPress: refetch},
       ]);
     } finally {

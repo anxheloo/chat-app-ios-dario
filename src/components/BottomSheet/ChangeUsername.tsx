@@ -1,9 +1,9 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 import {
   View,
   StyleSheet,
   TouchableWithoutFeedback,
   Keyboard,
-  KeyboardAvoidingView,
   Alert,
   ActivityIndicator,
 } from 'react-native';
@@ -58,7 +58,7 @@ const ChangeUsername: React.FC<ChangeUsernameProps> = ({cancel}) => {
         Alert.alert('Update Error', error.response.data.message);
       }
     },
-    [],
+    [setUserPersona],
   );
 
   const clearSearch = (): void => {
@@ -66,59 +66,55 @@ const ChangeUsername: React.FC<ChangeUsernameProps> = ({cancel}) => {
   };
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={styles.contentContainer}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.contentContainer}>
-          <View style={styles.header}>
-            <ReusableText
-              fontSize={FONTSIZE.md}
-              fontWeight={300}
-              onPress={cancel}>
-              Cancel
-            </ReusableText>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.contentContainer}>
+        <View style={styles.header}>
+          <ReusableText
+            fontSize={FONTSIZE.md}
+            fontWeight={300}
+            onPress={cancel}>
+            Cancel
+          </ReusableText>
 
-            <ReusableText
-              fontSize={FONTSIZE.md}
-              fontWeight={500}
-              onPress={() => updateUsername(username, token, cancel)}>
-              {!loading ? (
-                'Set'
-              ) : (
-                <ActivityIndicator size="small" color="black" />
-              )}
-            </ReusableText>
-          </View>
-
-          <View style={styles.textContainer}>
-            <ReusableText fontSize={FONTSIZE.title} fontWeight={700}>
-              Username
-            </ReusableText>
-            <ReusableText
-              fontSize={14}
-              fontWeight={FONTWEIGHT[300]}
-              color={COLORS.LightGray}
-              textAlign="center">
-              The username you enter will be visible only to your Solitar
-              contact list
-            </ReusableText>
-          </View>
-
-          <View style={styles.mainContent}>
-            <ReusableInput
-              placeholder="Enter username"
-              value={username}
-              onChange={setUsername}
-              onPress={clearSearch}
-              backgroundColor="white"
-              icon1={<ReusableText fontSize={FONTSIZE.md}>@</ReusableText>}
-              icon2={<CloseIcon width={15} height={15} />}
-            />
-
-            {/* <ReusableButton text="Set" onPress={updateUsername} /> */}
-          </View>
+          <ReusableText
+            fontSize={FONTSIZE.md}
+            fontWeight={500}
+            onPress={() => updateUsername(username, token, cancel)}>
+            {!loading ? (
+              'Set'
+            ) : (
+              <ActivityIndicator size="small" color="black" />
+            )}
+          </ReusableText>
         </View>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+
+        <View style={styles.textContainer}>
+          <ReusableText fontSize={FONTSIZE.title} fontWeight={700}>
+            Username
+          </ReusableText>
+          <ReusableText
+            fontSize={14}
+            fontWeight={FONTWEIGHT[300]}
+            color={COLORS.LightGray}
+            textAlign="center">
+            The username you enter will be visible only to your Solitar contact
+            list
+          </ReusableText>
+        </View>
+
+        <View style={styles.mainContent}>
+          <ReusableInput
+            placeholder="Enter username"
+            value={username}
+            onChange={setUsername}
+            onPress={clearSearch}
+            backgroundColor="white"
+            icon1={<ReusableText fontSize={FONTSIZE.md}>@</ReusableText>}
+            icon2={<CloseIcon width={15} height={15} />}
+          />
+        </View>
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 

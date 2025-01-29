@@ -1,17 +1,10 @@
-import React, {useMemo, useRef, useState} from 'react';
+import React, {useMemo} from 'react';
 import {StyleSheet, View} from 'react-native';
 import ReusableText from '../../components/ReusableText';
 import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import Avatar from '../../components/Persona/Avatar';
 import SettingElement from './SettingElement';
-import BottomSheetWrapper from '../../components/BottomSheet/BottomSheetWrapper';
-import BottomSheet from '@gorhom/bottom-sheet';
-import SelectAvatar from '../../components/BottomSheet/SelectAvatar';
 import {NavigationProps, SettingType} from '../../utils/types';
-import ChangeUsername from '../../components/BottomSheet/ChangeUsername';
-import UpdatePin from '../../components/BottomSheet/UpdatePin';
-import UpdateDissapear from '../../components/BottomSheet/UpdateDissapear';
-import QRCodeModal from '../../components/BottomSheet/QRCodeModal';
 import useProfile from '../../utils/hooks/useProfile';
 
 type ProfileProps = {
@@ -19,10 +12,7 @@ type ProfileProps = {
 };
 
 const Profile: React.FC<ProfileProps> = ({navigation}) => {
-  const bottomSheetRef = useRef<BottomSheet | null>(null);
-  const [clickedSetting, setClickedSetting] = useState<string | null>(null);
-  const {cancel, handleLogout, handleSettingClick, updateProfilePic} =
-    useProfile(navigation, setClickedSetting, bottomSheetRef);
+  const {handleLogout, handleSettingClick} = useProfile(navigation);
 
   const settings = useMemo(
     () =>
@@ -73,15 +63,21 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
         </View>
       </View>
 
-      <BottomSheetWrapper ref={bottomSheetRef}>
-        {clickedSetting === 'username' && <ChangeUsername cancel={cancel} />}
-        {clickedSetting === 'avatar' && (
-          <SelectAvatar cancel={cancel} setFunc={updateProfilePic} />
-        )}
-        {clickedSetting === 'pin' && <UpdatePin cancel={cancel} />}
-        {clickedSetting === 'clock' && <UpdateDissapear cancel={cancel} />}
-        {clickedSetting === 'qr-code' && <QRCodeModal cancel={cancel} />}
-      </BottomSheetWrapper>
+      {/* {bottomSheetType !== null &&
+        bottomSheetType?.length > 0 &&
+        bottomSheetType !== 'PersonasList' && (
+          <BottomSheetWrapper ref={bottomSheetRef}>
+            {bottomSheetType === 'username' && (
+              <ChangeUsername cancel={cancel} />
+            )}
+            {bottomSheetType === 'avatar' && (
+              <SelectAvatar cancel={cancel} setFunc={updateProfilePic} />
+            )}
+            {bottomSheetType === 'pin' && <UpdatePin cancel={cancel} />}
+            {bottomSheetType === 'clock' && <UpdateDissapear cancel={cancel} />}
+            {bottomSheetType === 'qr-code' && <QRCodeModal cancel={cancel} />}
+          </BottomSheetWrapper>
+        )} */}
     </>
   );
 };

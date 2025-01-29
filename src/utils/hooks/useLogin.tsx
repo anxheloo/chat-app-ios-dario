@@ -38,14 +38,17 @@ const useLogin = (
       const response = await apiClient.post(LOGIN_ROUTE, {username, pin});
 
       if (response.status === 200) {
+        console.log('This is response.status:', response.status);
         updateKeys({loading: false});
 
         await saveToken(response.data.token);
         setToken(response.data.token);
 
-        navigation?.replace('BottomTabNavigation');
+        navigation?.replace('BottomTabNavigation', {screen: 'Messages'});
       }
     } catch (error: any) {
+      console.log('This is error:', error);
+
       updateKeys({loading: false});
       Alert.alert('Login Error', error?.response.data.message);
       setUsername('');

@@ -2,6 +2,8 @@ import {io} from 'socket.io-client';
 import {create, StateCreator} from 'zustand';
 import {HOST} from '../api/apis';
 import {Contact, Conversation, Message} from '../utils/types';
+import BottomSheet from '@gorhom/bottom-sheet';
+import {BottomSheetMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 
 type PersonaSlice = {
   username: string;
@@ -25,6 +27,8 @@ type StatusSlice = {
   message: string | null;
   isUploading: boolean;
   fileUploadProgress: number;
+  bottomSheetType: string | null;
+  bottomSheetRef: BottomSheet | null | BottomSheetMethods;
   updateKeys: (data: Partial<StatusSlice>) => void;
 };
 
@@ -188,6 +192,8 @@ const createStatusSlice: StateCreator<StatusSlice> = set => ({
   message: null,
   isUploading: false,
   fileUploadProgress: 0,
+  bottomSheetType: null,
+  bottomSheetRef: null,
   updateKeys: set,
 });
 

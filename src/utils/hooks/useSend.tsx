@@ -71,7 +71,7 @@ const useSend = (
           updateKeys({loading: false});
           return Alert.alert(
             'Total size excedeed',
-            'Maximum upload capacity is 100mb',
+            'Maximum upload capacity is 500mb',
           );
         }
 
@@ -152,6 +152,7 @@ const useSend = (
                   ) || msg,
               ),
             );
+
             socket?.emit('sendMessage', {messages: uploadedMessages});
           } else {
             Alert.alert(

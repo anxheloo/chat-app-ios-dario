@@ -4,11 +4,11 @@ import ReusableText from '../../components/ReusableText';
 import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import CallIcon from '../../assets/icons/Calls/Call';
 
-type EmptyChatProps = {
-  openBottomSheet: () => void;
-};
+// type EmptyChatProps = {
+//   openBottomSheet: () => void;
+// };
 
-const EmptyCall: React.FC<EmptyChatProps> = ({openBottomSheet}) => {
+const EmptyCall = () => {
   return (
     <View style={styles.emptyChat}>
       <View style={styles.container1}>
@@ -31,7 +31,7 @@ const EmptyCall: React.FC<EmptyChatProps> = ({openBottomSheet}) => {
         fontWeight={FONTWEIGHT[400]}
         textAlign="center"
         textDecorationLine="underline"
-        onPress={openBottomSheet}>
+        onPress={() => {}}>
         Start Call
       </ReusableText>
     </View>

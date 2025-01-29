@@ -1,5 +1,4 @@
-import BottomSheet from '@gorhom/bottom-sheet';
-import React, {useCallback} from 'react';
+import {useCallback} from 'react';
 import {Alert, Keyboard} from 'react-native';
 import {UPDATE_USER_PROFILE_PIC} from '../../api/apis';
 import {apiClient} from '../../api/apiClient';
@@ -9,20 +8,22 @@ import {NavigationProps} from '../types';
 
 const useProfile = (
   navigation: NavigationProps,
-  setClickedSetting: (type: string) => void,
-  bottomSheetRef: React.RefObject<BottomSheet>,
+  // bottomSheetRef?: React.RefObject<BottomSheet>,
 ) => {
   const setUserPersona = useAppStore(state => state.setUserPersona);
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
   const setUserInfoStatus = useAppStore(state => state.setUserInfoStatus);
   const setToken = useAppStore(state => state.setToken);
   const updateKeys = useAppStore(state => state.updateKeys);
+  const bottomSheetRef = useAppStore(state => state.bottomSheetRef);
   const avatar = useAppStore(state => state.avatar);
   const token = useAppStore(state => state.token);
 
   const cancel = (): void => {
     Keyboard.dismiss();
-    bottomSheetRef?.current?.close();
+    updateKeys({bottomSheetType: null});
+    // bottomSheetRef?.current?.close();
+    bottomSheetRef?.close();
   };
 
   const handleLogout = async () => {
@@ -45,10 +46,11 @@ const useProfile = (
 
   const handleSettingClick = useCallback(
     (type: string): void => {
-      setClickedSetting(type);
-      bottomSheetRef.current?.expand(); // Expand BottomSheet or open a modal
+      updateKeys({bottomSheetType: type});
+      // bottomSheetRef?.current?.expand(); // Expand BottomSheet or open a modal
+      bottomSheetRef?.expand(); // Expand BottomSheet or open a modal
     },
-    [bottomSheetRef, setClickedSetting],
+    [bottomSheetRef, updateKeys],
   );
 
   const updateProfilePic = async (): Promise<void> => {
@@ -69,7 +71,8 @@ const useProfile = (
 
       if (res.status === 200) {
         setUserPersona({avatar: res.data.avatar});
-        bottomSheetRef?.current?.close();
+        // bottomSheetRef?.current?.close();
+        bottomSheetRef?.close();
         Alert.alert('Profile Updated', 'Your avatar has been updated');
       }
     } catch (error: any) {

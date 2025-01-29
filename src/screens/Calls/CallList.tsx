@@ -10,11 +10,11 @@ import CloseIcon from '../../assets/icons/messages/CloseIcon';
 import Persona from '../../components/Persona/Persona';
 
 type Props = {
-  openBottomSheet: () => void;
+  // openBottomSheet: () => void;
   navigation: NavigationProps;
 };
 
-const CallList: React.FC<Props> = ({openBottomSheet, navigation}) => {
+const CallList: React.FC<Props> = ({navigation}) => {
   const loading = useAppStore(state => state.loading);
   const calls = useAppStore(state => state.calls);
   const [search, setSearch] = useState<string>('');
@@ -25,7 +25,7 @@ const CallList: React.FC<Props> = ({openBottomSheet, navigation}) => {
   }
 
   if (!calls.length) {
-    return <EmptyCall openBottomSheet={openBottomSheet} />;
+    return <EmptyCall />;
   }
 
   return (

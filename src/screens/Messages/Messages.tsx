@@ -1,11 +1,8 @@
-import React, {useCallback, useRef} from 'react';
-import BottomSheetWrapper from '../../components/BottomSheet/BottomSheetWrapper';
-import PersonasList from '../../components/BottomSheet/PersonasList';
-import BottomSheet from '@gorhom/bottom-sheet';
+import React from 'react';
 import Content from './Content';
 import {NavigationProps} from '../../utils/types';
-// import useConversations from '../../utils/hooks/useConversations';
 import {useSocket} from '../../utils/useSocket';
+import useProfile from '../../utils/hooks/useProfile';
 
 type MessagesScreenProps = {
   navigation: NavigationProps;
@@ -13,23 +10,23 @@ type MessagesScreenProps = {
 
 const Messages: React.FC<MessagesScreenProps> = ({navigation}) => {
   useSocket();
-  const bottomSheetRef = useRef<BottomSheet | null>(null);
+  const {handleSettingClick} = useProfile(navigation);
 
-  const openBottomSheet = useCallback(
-    () => bottomSheetRef.current?.expand(),
-    [bottomSheetRef],
-  );
-  const closeBottomSheet = useCallback(
-    () => bottomSheetRef.current?.close(),
-    [bottomSheetRef],
-  );
+  const openBottomSheet = () => {
+    handleSettingClick('PersonasList');
+  };
 
   return (
     <>
       <Content openBottomSheet={openBottomSheet} navigation={navigation} />
-      <BottomSheetWrapper ref={bottomSheetRef}>
-        <PersonasList cancel={closeBottomSheet} navigation={navigation} />
-      </BottomSheetWrapper>
+
+      {/* {bottomSheetType !== null && bottomSheetType?.length > 0 && (
+        <BottomSheetWrapper ref={bottomSheetRef}>
+          {bottomSheetType === 'PersonasList' && (
+            <PersonasList cancel={cancel} navigation={navigation} />
+          )}
+        </BottomSheetWrapper>
+      )} */}
     </>
   );
 };
