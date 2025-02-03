@@ -175,6 +175,10 @@ export const useSocket = () => {
     [updateFriends],
   );
 
+  const loginalert = () => {
+    Alert.alert('Login', 'You have been logged in.');
+  };
+
   useEffect(() => {
     const socket = initializeSocket();
 
@@ -186,6 +190,7 @@ export const useSocket = () => {
       socket.on('conversationUpdated', handleConverationUpdated);
       socket.on('friendCreated', notifyReceiver);
       socket.on('friendDeleted', friendDeleted);
+      socket.on('login', loginalert);
     }
 
     return () => {

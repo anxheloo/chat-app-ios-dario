@@ -6,13 +6,13 @@ import {useCameraDevice, useCodeScanner} from 'react-native-vision-camera';
 import {Camera} from 'react-native-vision-camera';
 import {SAFE_AREA_PADDING} from './Constants';
 import {useIsForeground} from '../../utils/useIsForeground';
-import {useIsFocused} from '@react-navigation/core';
 import {NavigationProps} from '../../utils/types';
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
 import {BlurView} from '@react-native-community/blur';
 import {BORDERRADIUS} from '../../theme/theme';
 import ReusableText from '../../components/ReusableText';
 import {usePermission} from '../../utils/usePermission';
+import {useIsFocused} from '@react-navigation/native';
 
 type ScannerScreenProps = {
   navigation: NavigationProps;

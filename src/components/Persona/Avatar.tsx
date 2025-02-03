@@ -1,5 +1,5 @@
 import React, {memo} from 'react';
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {useAppStore} from '../../store';
 import {avatarUrls} from '../../utils/constants';
 import {BORDERRADIUS} from '../../theme/theme';
@@ -12,7 +12,6 @@ type AvatarProps = {
   avatarHeight: number;
   backgroundColor?: string;
   routeName?: string;
-  onPress?: () => void;
   src?: number;
 };
 
@@ -24,18 +23,18 @@ const Avatar: React.FC<AvatarProps> = memo(
     avatarHeight,
     backgroundColor = 'white',
     routeName,
-    onPress,
     src,
   }) => {
     const avatar = useAppStore(state => state.avatar);
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     const Avatar = avatarUrls[src !== undefined ? src : avatar];
 
     return (
       <View style={[styles.container, {backgroundColor, width, height}]}>
         {routeName === 'Profile' && (
-          <TouchableOpacity style={styles.editContainer} onPress={onPress}>
+          <View style={styles.editContainer}>
             <EditIcon width={10} height={12} />
-          </TouchableOpacity>
+          </View>
         )}
         <Avatar width={avatarWidth} height={avatarHeight} />
       </View>

@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {FlatList, StyleSheet, View} from 'react-native';
 import {useAppStore} from '../../store';
 import {NavigationProps} from '../../utils/types';
@@ -17,6 +17,25 @@ const ContactsList: React.FC<ContentProps> = ({navigation}) => {
   const friends = useAppStore(state => state.friends);
   const loading = useAppStore(state => state.loading);
   const [search, setSearch] = useState<string>('');
+  const [debouncedSearch, setDebounceSearch] = useState<string>('');
+
+  const searchedFriends = useMemo(
+    () =>
+      friends.filter(friend =>
+        friend.username.toLowerCase().includes(debouncedSearch.toLowerCase()),
+      ),
+    [debouncedSearch, friends],
+  );
+
+  const updateSearch = (searchTerm: string) => {
+    setSearch(searchTerm);
+
+    const t = setTimeout(() => {
+      setDebounceSearch(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(t);
+  };
 
   const clearSearch = useCallback((): void => {
     setSearch('');
@@ -35,14 +54,14 @@ const ContactsList: React.FC<ContentProps> = ({navigation}) => {
       <ReusableInput
         placeholder="Search"
         value={search}
-        onChange={setSearch}
+        onChange={updateSearch}
         onPress={clearSearch}
         icon1={<SearchIcon width={15} height={15} />}
         icon2={<CloseIcon width={15} height={15} />}
       />
       <FlatList
         contentContainerStyle={styles.content}
-        data={friends}
+        data={searchedFriends}
         renderItem={({item}) => (
           <Persona
             contact={item}

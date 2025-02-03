@@ -1,8 +1,12 @@
-import BottomSheet, {BottomSheetView} from '@gorhom/bottom-sheet';
-import React, {forwardRef, memo, useEffect} from 'react';
-import {Keyboard, StyleSheet} from 'react-native';
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetView,
+} from '@gorhom/bottom-sheet';
+import React, {forwardRef, memo, useCallback, useEffect, useMemo} from 'react';
+import {Keyboard, StyleSheet, View} from 'react-native';
 import {COLORS} from '../../theme/theme';
-import {Portal, PortalHost} from '@gorhom/portal';
+import {Portal} from '@gorhom/portal';
+import {useAppStore} from '../../store';
 
 type BottomSheetProps = {
   children: React.ReactNode;
@@ -10,8 +14,9 @@ type BottomSheetProps = {
 
 const BottomSheetWrapper = memo(
   forwardRef<BottomSheet, BottomSheetProps>(({children}, ref) => {
-    // const snapPoints = ['1%', '25%', '50%', '75%'];
-    const snapPoints = ['75%'];
+    const snapPoints = useMemo(() => ['25%', '50%', '75%'], []);
+    // const snapPoints = ['75%'];
+    const updateKeys = useAppStore(state => state.updateKeys);
 
     useEffect(() => {
       return () => {
@@ -19,34 +24,54 @@ const BottomSheetWrapper = memo(
       };
     }, []);
 
-    return (
-      <>
-        <Portal>
-          <BottomSheet
-            ref={ref}
-            snapPoints={snapPoints}
-            enablePanDownToClose
-            keyboardBehavior="extend" // Prevent BottomSheet from being pushed
-            // index={-1}
-            index={0}
-            handleIndicatorStyle={styles.handleIndicator}
-            handleStyle={styles.indicatorContainer}
-            style={styles.bottomSheet}>
-            <BottomSheetView style={styles.contentContainer}>
-              {children}
-            </BottomSheetView>
-          </BottomSheet>
-        </Portal>
+    const onClose = useCallback(() => {
+      updateKeys({bottomSheetType: null});
+    }, [updateKeys]);
 
-        <PortalHost name="BottomSheetWrapper" />
-      </>
+    const renderBackdrop = useCallback(
+      (props: any) => (
+        <BottomSheetBackdrop
+          appearsOnIndex={2}
+          disappearsOnIndex={0}
+          {...props}
+        />
+      ),
+      [],
+    );
+
+    return (
+      <Portal name="BottomSheetWrapper">
+        {/* <View style={styles.container}> */}
+        <BottomSheet
+          ref={ref}
+          snapPoints={snapPoints}
+          enablePanDownToClose={true}
+          backdropComponent={renderBackdrop}
+          onClose={onClose}
+          keyboardBehavior="extend"
+          // index={-1}
+          index={0}
+          handleIndicatorStyle={styles.handleIndicator}
+          handleStyle={styles.indicatorContainer}
+          style={styles.bottomSheet}>
+          <BottomSheetView style={styles.contentContainer}>
+            {children}
+          </BottomSheetView>
+        </BottomSheet>
+        {/* </View> */}
+      </Portal>
     );
   }),
 );
 
 const styles = StyleSheet.create({
-  bottomSheet: {
+  container: {
     flex: 1,
+  },
+
+  bottomSheet: {
+    // flex: 1,
+    // height: '100%',
     shadowOffset: {
       width: 0,
       height: 5,
@@ -78,7 +103,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.LightGray2,
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
-    // paddingBottom: 40,
+    paddingBottom: 20,
   },
 });
 

@@ -41,20 +41,15 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
       );
     }, [conversation, loggedInUserId]);
 
-    const username = participant?.username;
-    const avatar = participant?.avatar;
-
-    const lastMessageTime = conversation.lastMessageTime;
-
     const content = conversation?.lastMessage?.content;
-
     const messageType = conversation.lastMessage?.messageType;
-
     const fileUrl = conversation.lastMessage?.fileUrl;
 
     // Select contact to update chat
     const selectContact = useCallback(() => {
-      if (!participant) return;
+      if (!participant) {
+        return;
+      }
 
       updateFuncChat({
         selectedChatData: {
@@ -143,7 +138,7 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
           )}
         </TouchableOpacity>
       );
-    }, [loading, deleteConversation]);
+    }, [deleteConversation, loading]);
 
     if (!participant) {
       return null;
@@ -164,15 +159,15 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
             avatarWidth={34}
             avatarHeight={34}
             backgroundColor={COLORS.LightGray2}
-            src={avatar}
+            src={participant?.avatar}
           />
           <View style={styles.secondContainer}>
-            <Text style={styles.username}>@{username}</Text>
+            <Text style={styles.username}>@{participant?.username}</Text>
             <View>{renderLastMessage}</View>
           </View>
 
           <Text style={[styles.messageDate]}>
-            {moment(lastMessageTime).format('H:mm')}
+            {moment(conversation?.lastMessageTime).format('H:mm')}
           </Text>
         </TouchableOpacity>
       </Swipeable>

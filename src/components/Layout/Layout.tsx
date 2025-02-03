@@ -1,5 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {useEffect, useRef} from 'react';
-import {Keyboard, StyleSheet, TouchableWithoutFeedback} from 'react-native';
+import {
+  Keyboard,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Header from '../Header/Header';
 import BottomSheetWrapper from '../BottomSheet/BottomSheetWrapper';
@@ -12,49 +18,24 @@ import SelectAvatar from '../BottomSheet/SelectAvatar';
 import UpdatePin from '../BottomSheet/UpdatePin';
 import UpdateDissapear from '../BottomSheet/UpdateDissapear';
 import QRCodeModal from '../BottomSheet/QRCodeModal';
+import CustomBottomSheetModal from '../BottomSheet/CustomBottomSheetModal';
+import {useNavigation} from '@react-navigation/native';
 // import { NavigationProps } from '../../utils/types';
 
 type Props = {
   children: React.ReactNode;
-  navigation: any;
 };
 
-const Layout: React.FC<Props> = ({children, navigation}) => {
-  const bottomSheetRef = useRef<BottomSheet | null>(null);
-  const bottomSheetType = useAppStore(state => state.bottomSheetType);
-  const updateKeys = useAppStore(state => state.updateKeys);
-  const {cancel, updateProfilePic} = useProfile(navigation);
-
-  useEffect(() => {
-    if (bottomSheetRef.current) {
-      updateKeys({bottomSheetRef: bottomSheetRef.current});
-    }
-  }, [updateKeys]);
-
+const Layout: React.FC<Props> = ({children}) => {
+  const navigation = useNavigation();
   return (
-    <>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <SafeAreaView style={styles.safeAreaStyles}>
-          <Header />
-          {children}
-        </SafeAreaView>
-      </TouchableWithoutFeedback>
-
-      {bottomSheetType !== null && bottomSheetType?.length > 0 && (
-        <BottomSheetWrapper ref={bottomSheetRef}>
-          {bottomSheetType === 'PersonasList' && (
-            <PersonasList cancel={cancel} navigation={navigation} />
-          )}
-          {bottomSheetType === 'username' && <ChangeUsername cancel={cancel} />}
-          {bottomSheetType === 'avatar' && (
-            <SelectAvatar cancel={cancel} setFunc={updateProfilePic} />
-          )}
-          {bottomSheetType === 'pin' && <UpdatePin cancel={cancel} />}
-          {bottomSheetType === 'clock' && <UpdateDissapear cancel={cancel} />}
-          {bottomSheetType === 'qr-code' && <QRCodeModal cancel={cancel} />}
-        </BottomSheetWrapper>
-      )}
-    </>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <SafeAreaView style={styles.safeAreaStyles}>
+        <Header />
+        {children}
+        <CustomBottomSheetModal navigation={navigation} />
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 };
 

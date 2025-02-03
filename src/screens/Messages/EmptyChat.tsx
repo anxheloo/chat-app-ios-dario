@@ -5,13 +5,14 @@ import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import MessagingIcon from '../../assets/icons/messages/MessagingIcon';
 import ReusableText from '../../components/ReusableText';
 import {NavigationProps} from '../../utils/types';
+import {useAppStore} from '../../store';
 
 type EmptyChatProps = {
-  openBottomSheet: () => void;
   navigation: NavigationProps;
 };
 
-const EmptyChat: React.FC<EmptyChatProps> = ({openBottomSheet, navigation}) => {
+const EmptyChat: React.FC<EmptyChatProps> = ({navigation}) => {
+  const updateKeys = useAppStore(state => state.updateKeys);
   return (
     <>
       <View style={styles.emptyChat}>
@@ -35,7 +36,7 @@ const EmptyChat: React.FC<EmptyChatProps> = ({openBottomSheet, navigation}) => {
           fontWeight={FONTWEIGHT[400]}
           textAlign="center"
           textDecorationLine="underline"
-          onPress={openBottomSheet}>
+          onPress={() => updateKeys({bottomSheetType: 'start-conversation'})}>
           Start Conversation
         </ReusableText>
       </View>

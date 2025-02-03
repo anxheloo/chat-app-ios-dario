@@ -1,5 +1,5 @@
 import React, {memo} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import ReusableText from '../../../components/ReusableText';
 import {useNavigation} from '@react-navigation/native';
 import {useAppStore} from '../../../store';

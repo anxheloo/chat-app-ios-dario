@@ -10,8 +10,8 @@ type UpdatePinProps = {
 
 const QRCodeModal: React.FC<UpdatePinProps> = ({cancel}) => {
   const qr_code = useAppStore(state => state.qr_code);
-  const [loading, setLoading] = useState(true); // Track loading state
-  const [error, setError] = useState(false); // Track error state
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   return (
     <View style={styles.contentContainer}>
@@ -44,7 +44,7 @@ const QRCodeModal: React.FC<UpdatePinProps> = ({cancel}) => {
           )}
           <Image
             source={{uri: qr_code}}
-            style={{width: 220, height: 220}}
+            style={styles.qrCode}
             resizeMode="contain"
             onLoad={() => setLoading(false)} // Image loaded
             onError={() => {
@@ -85,11 +85,12 @@ const styles = StyleSheet.create({
     width: 220,
     height: 220,
     borderRadius: 14,
-    overflow: 'hidden',
+    // overflow: 'hidden',
     backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',
   },
+  qrCode: {width: 220, height: 220},
   errorText: {
     color: 'red',
     fontSize: 16,

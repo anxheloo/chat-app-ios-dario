@@ -20,11 +20,18 @@ const Header = memo(() => {
     navigation.navigate('Scanner');
   }, [navigation]);
 
+  const navigateToHomePage = useCallback(() => {
+    navigation?.replace('BottomTabNavigation', {screen: 'Messages'});
+  }, [navigation]);
+
   console.log('This is header step 1');
 
   return (
     <View style={styles.container}>
-      <ReusableText fontWeight={500} style={styles.textStyles}>
+      <ReusableText
+        fontWeight={500}
+        style={styles.textStyles}
+        onPress={navigateToHomePage}>
         @{username}
       </ReusableText>
 

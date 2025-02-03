@@ -1,18 +1,21 @@
 import React, {useMemo} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import ReusableText from '../../components/ReusableText';
 import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import Avatar from '../../components/Persona/Avatar';
 import SettingElement from './SettingElement';
 import {NavigationProps, SettingType} from '../../utils/types';
 import useProfile from '../../utils/hooks/useProfile';
+import {useAppStore} from '../../store';
+// import {useAppStore} from '../../store';
 
 type ProfileProps = {
   navigation: NavigationProps;
 };
 
 const Profile: React.FC<ProfileProps> = ({navigation}) => {
-  const {handleLogout, handleSettingClick} = useProfile(navigation);
+  const {handleLogout} = useProfile(navigation);
+  const updateKeys = useAppStore(state => state.updateKeys);
 
   const settings = useMemo(
     () =>
@@ -21,64 +24,49 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
           key={type}
           type={type as SettingType}
           onPress={() =>
-            type === 'logout' ? handleLogout() : handleSettingClick(type)
+            type === 'logout'
+              ? handleLogout()
+              : updateKeys({bottomSheetType: type})
           }
         />
       )),
-    [handleLogout, handleSettingClick],
+    [handleLogout, updateKeys],
   );
 
   return (
-    <>
-      <View style={styles.container}>
-        <View style={styles.content}>
-          <View style={styles.textContainer}>
-            <ReusableText fontSize={FONTSIZE.title} fontWeight={700}>
-              Profile
-            </ReusableText>
+    <View style={styles.container}>
+      <View style={styles.content}>
+        <View style={styles.textContainer}>
+          <ReusableText fontSize={FONTSIZE.title} fontWeight={700}>
+            Profile
+          </ReusableText>
 
-            <ReusableText
-              fontSize={14}
-              fontWeight={FONTWEIGHT[300]}
-              color={COLORS.LightGray}
-              textAlign="center">
-              The username you enter will be visible only to your Solitar
-              contact list
-            </ReusableText>
-          </View>
-
-          <View style={styles.avatarView}>
-            <Avatar
-              width={80}
-              height={80}
-              avatarWidth={60}
-              avatarHeight={60}
-              backgroundColor={COLORS.LightGray2}
-              routeName="Profile"
-              onPress={() => handleSettingClick('avatar')}
-            />
-          </View>
-
-          <View style={styles.contentContainer}>{settings}</View>
+          <ReusableText
+            fontSize={14}
+            fontWeight={FONTWEIGHT[300]}
+            color={COLORS.LightGray}
+            textAlign="center">
+            The username you enter will be visible only to your Solitar contact
+            list
+          </ReusableText>
         </View>
-      </View>
 
-      {/* {bottomSheetType !== null &&
-        bottomSheetType?.length > 0 &&
-        bottomSheetType !== 'PersonasList' && (
-          <BottomSheetWrapper ref={bottomSheetRef}>
-            {bottomSheetType === 'username' && (
-              <ChangeUsername cancel={cancel} />
-            )}
-            {bottomSheetType === 'avatar' && (
-              <SelectAvatar cancel={cancel} setFunc={updateProfilePic} />
-            )}
-            {bottomSheetType === 'pin' && <UpdatePin cancel={cancel} />}
-            {bottomSheetType === 'clock' && <UpdateDissapear cancel={cancel} />}
-            {bottomSheetType === 'qr-code' && <QRCodeModal cancel={cancel} />}
-          </BottomSheetWrapper>
-        )} */}
-    </>
+        <TouchableOpacity
+          style={styles.avatarView}
+          onPress={() => updateKeys({bottomSheetType: 'avatar'})}>
+          <Avatar
+            width={80}
+            height={80}
+            avatarWidth={60}
+            avatarHeight={60}
+            backgroundColor={COLORS.LightGray2}
+            routeName="Profile"
+          />
+        </TouchableOpacity>
+
+        <View style={styles.contentContainer}>{settings}</View>
+      </View>
+    </View>
   );
 };
 
