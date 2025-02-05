@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -15,16 +15,23 @@ import ReusableButton from '../../components/ReusableButton';
 import {NavigationProps} from '../../utils/types';
 import useLogin from '../../utils/hooks/useLogin';
 import useCheckToken from '../../utils/hooks/useCheckToken';
+import {useAppStore} from '../../store';
 
 type LoginScreenProps = {
   navigation: NavigationProps;
 };
 
 const Login: React.FC<LoginScreenProps> = ({navigation}) => {
+  const {setNavigation} = useAppStore();
   const [username, setUsername] = useState('');
   const [pin, setPin] = useState('');
   const onPress = useLogin(username, pin, setUsername, setPin, navigation);
   useCheckToken(navigation);
+
+  // Store navigation in store
+  useEffect(() => {
+    setNavigation(navigation);
+  }, [navigation, setNavigation]);
 
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.safeAreaView}>

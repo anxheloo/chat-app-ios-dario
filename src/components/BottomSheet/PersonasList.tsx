@@ -14,14 +14,13 @@ import CloseIcon from '../../assets/icons/messages/CloseIcon';
 import Persona from '../Persona/Persona';
 import AddIcon from '../../assets/icons/AddIcon';
 import {useAppStore} from '../../store';
-import {NavigationProps} from '../../utils/types';
 
 type PersonasListProps = {
   cancel: () => void;
-  navigation?: NavigationProps;
 };
 
-const PersonasList: React.FC<PersonasListProps> = ({cancel, navigation}) => {
+const PersonasList: React.FC<PersonasListProps> = ({cancel}) => {
+  const {navigation} = useAppStore();
   const [search, setSearch] = useState<string>('');
   const [debouncedSearch, setDebounceSearch] = useState<string>('');
   const friends = useAppStore(state => state.friends);

@@ -2,36 +2,11 @@ import {Alert} from 'react-native';
 import {UPDATE_USER_PROFILE_PIC} from '../../api/apis';
 import {apiClient} from '../../api/apiClient';
 import {useAppStore} from '../../store';
-import {removeToken} from '../TokenStorage';
-import {NavigationProps} from '../types';
 
-const useProfile = (navigation: NavigationProps) => {
-  const setUserPersona = useAppStore(state => state.setUserPersona);
-  const updateFuncChat = useAppStore(state => state.updateFuncChat);
-  const setUserInfoStatus = useAppStore(state => state.setUserInfoStatus);
-  const setToken = useAppStore(state => state.setToken);
-  const updateKeys = useAppStore(state => state.updateKeys);
-  const avatar = useAppStore(state => state.avatar);
-  const token = useAppStore(state => state.token);
+const useProfile = () => {
+  const {setUserPersona, updateKeys, token, navigation} = useAppStore();
 
-  const handleLogout = async () => {
-    await removeToken();
-    setToken(null);
-
-    setUserPersona({
-      username: '',
-      pin: '',
-      avatar: 0,
-    });
-    setUserInfoStatus(false);
-    updateFuncChat({conversations: [], friends: [], calls: []});
-
-    navigation.reset({
-      index: 0, // The index of the current active route
-      routes: [{name: 'Login'}], // Replace the stack with the Login screen
-    });
-  };
-  const updateProfilePic = async (): Promise<void> => {
+  const updateProfilePic = async (avatar: number): Promise<void> => {
     updateKeys({isUploading: true});
 
     try {
@@ -58,7 +33,13 @@ const useProfile = (navigation: NavigationProps) => {
     }
   };
 
-  return {handleLogout, updateProfilePic};
+  const selectAvatar = (avatar: number): void => {
+    setUserPersona({avatar: avatar});
+    updateKeys({bottomSheetType: null});
+    navigation?.navigate('CreatePin');
+  };
+
+  return {updateProfilePic, selectAvatar};
 };
 
 export default useProfile;

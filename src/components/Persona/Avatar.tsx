@@ -27,7 +27,7 @@ const Avatar: React.FC<AvatarProps> = memo(
   }) => {
     const avatar = useAppStore(state => state.avatar);
     // eslint-disable-next-line @typescript-eslint/no-shadow
-    const Avatar = avatarUrls[src !== undefined ? src : avatar];
+    const Avatar = avatarUrls[src ?? avatar];
 
     return (
       <View style={[styles.container, {backgroundColor, width, height}]}>

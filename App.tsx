@@ -5,6 +5,7 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import MainNavigation from './src/navigation/MainNavigation';
 import InternetPopup from './src/components/Internet/InternetPopup';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import CustomBottomSheetModal from './src/components/BottomSheet/CustomBottomSheetModal';
 
 const App = () => {
   // const CustomStatusBar = ({
@@ -31,12 +32,7 @@ const App = () => {
   //   );
   // };
 
-  return (
-    <GestureHandlerRootView style={styles.gestureHandlerContainer}>
-      {/* <PortalProvider> */}
-      <BottomSheetModalProvider>
-        <SafeAreaProvider>
-          {/* {Platform.OS === 'ios' ? (
+  /* {Platform.OS === 'ios' ? (
           <CustomStatusBar
           backgroundColor="transparent"
           barStyle="dark-content"
@@ -47,8 +43,12 @@ const App = () => {
             backgroundColor="transparent"
             barStyle={'dark-content'}
             />
-            )} */}
+            )} */
 
+  return (
+    <GestureHandlerRootView style={styles.gestureHandlerContainer}>
+      <BottomSheetModalProvider>
+        <SafeAreaProvider>
           <StatusBar
             translucent={true}
             backgroundColor="transparent"
@@ -57,9 +57,9 @@ const App = () => {
 
           <MainNavigation />
           <InternetPopup />
+          <CustomBottomSheetModal />
         </SafeAreaProvider>
       </BottomSheetModalProvider>
-      {/* </PortalProvider> */}
     </GestureHandlerRootView>
   );
 };

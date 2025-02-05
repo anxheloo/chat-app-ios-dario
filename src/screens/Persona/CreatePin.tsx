@@ -45,11 +45,11 @@ const CreatePin: React.FC<CreatePinScreenProps> = ({navigation}) => {
 
   const cancel = useCallback((): void => {
     navigation.navigate('CreatePersona');
-  }, []);
+  }, [navigation]);
 
   return (
-    <KeyboardAvoidingView behavior={'padding'} style={{flex: 1}}>
-      <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
+    <KeyboardAvoidingView behavior={'padding'} style={styles.safeAreaView}>
+      <SafeAreaView style={styles.safeAreaView}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.container}>
             <View style={styles.header}>
@@ -101,6 +101,7 @@ const CreatePin: React.FC<CreatePinScreenProps> = ({navigation}) => {
 };
 
 const styles = StyleSheet.create({
+  safeAreaView: {flex: 1, backgroundColor: 'white'},
   container: {
     flex: 1,
     padding: 20,

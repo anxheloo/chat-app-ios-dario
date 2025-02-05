@@ -5,17 +5,43 @@ import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import Avatar from '../../components/Persona/Avatar';
 import SettingElement from './SettingElement';
 import {NavigationProps, SettingType} from '../../utils/types';
-import useProfile from '../../utils/hooks/useProfile';
 import {useAppStore} from '../../store';
-// import {useAppStore} from '../../store';
+import {removeToken} from '../../utils/TokenStorage';
 
 type ProfileProps = {
   navigation: NavigationProps;
 };
 
 const Profile: React.FC<ProfileProps> = ({navigation}) => {
-  const {handleLogout} = useProfile(navigation);
-  const updateKeys = useAppStore(state => state.updateKeys);
+  const {
+    updateKeys,
+    updateFuncChat,
+    setUserInfoStatus,
+    setToken,
+    setUserPersona,
+  } = useAppStore();
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleLogout = async () => {
+    await removeToken();
+
+    setToken(null);
+
+    setUserPersona({
+      username: '',
+      pin: '',
+      avatar: 0,
+    });
+
+    setUserInfoStatus(false);
+
+    updateFuncChat({conversations: [], friends: [], calls: []});
+
+    navigation.reset({
+      index: 0, // The index of the current active route
+      routes: [{name: 'Login'}], // Replace the stack with the Login screen
+    });
+  };
 
   const settings = useMemo(
     () =>

@@ -1,4 +1,4 @@
-import React, {memo} from 'react';
+import React, {memo, useState} from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import ReusableText from '../ReusableText';
 import {BORDERRADIUS, COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
@@ -13,8 +13,7 @@ type SelectAvatarProps = {
 };
 
 const SelectAvatar: React.FC<SelectAvatarProps> = memo(({cancel, setFunc}) => {
-  const setUserPersona = useAppStore(state => state.setUserPersona);
-  const avatar = useAppStore(state => state.avatar);
+  const [avatar, setAvatar] = useState(useAppStore(state => state.avatar));
 
   return (
     <View style={styles.contentContainer}>
@@ -40,22 +39,26 @@ const SelectAvatar: React.FC<SelectAvatarProps> = memo(({cancel, setFunc}) => {
         </View>
 
         <View style={styles.selectableIconParent}>
-          <Avatar width={100} height={100} avatarWidth={70} avatarHeight={70} />
+          <Avatar
+            width={100}
+            height={100}
+            avatarWidth={70}
+            avatarHeight={70}
+            src={avatar}
+          />
         </View>
 
         <View style={styles.avatarContainer2}>
           <View style={styles.avatarContainer}>
             {avatarUrls.map((icon, index) => {
               const SelectedAvatar = icon;
+              const borderColor = avatar === index ? 'black' : 'transparent';
 
               return (
                 <TouchableOpacity
                   key={index}
-                  onPress={() => setUserPersona({avatar: index})}
-                  style={[
-                    styles.avatarItem,
-                    {borderColor: avatar === index ? 'black' : 'transparent'},
-                  ]}>
+                  onPress={() => setAvatar(index)}
+                  style={[styles.avatarItem, {borderColor: borderColor}]}>
                   <SelectedAvatar width={37.5} height={37.5} />
                 </TouchableOpacity>
               );

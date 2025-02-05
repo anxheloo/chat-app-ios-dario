@@ -18,7 +18,7 @@ import {apiClient} from '../../api/apiClient';
 
 type PersonaProps = {
   contact: Contact;
-  navigation?: NavigationProps;
+  navigation?: NavigationProps | null;
   backgroundColor?: string;
   cancel?: () => void;
   version?: string;
@@ -31,25 +31,25 @@ const Persona: React.FC<PersonaProps> = ({
   cancel,
   version,
 }) => {
-  const updateFuncChat = useAppStore(state => state.updateFuncChat);
-  const senderId = useAppStore(state => state.id);
-  const senderUsername = useAppStore(state => state.username);
-  const token = useAppStore(state => state.token);
-  const socket = useAppStore(state => state.socket);
-  const updateFriends = useAppStore(state => state.updateFriends);
+  const {
+    updateFuncChat,
+    updateKeys,
+    id: senderId,
+    username: senderUsername,
+    token,
+    socket,
+    updateFriends,
+  } = useAppStore();
   const [loading, setLoading] = useState(false);
-
-  console.log('THis is contact:', contact);
-  console.log('This is contact._id inside Persona', contact._id);
 
   // Select contact to update chat
   const selectContact = () => {
-    updateFuncChat({selectedChatData: contact});
-    navigation?.navigate('Chat');
-
+    updateKeys({bottomSheetType: null});
     if (cancel) {
       cancel();
     }
+    updateFuncChat({selectedChatData: contact});
+    navigation?.navigate('Chat');
   };
 
   const deleteContact = useCallback(async () => {

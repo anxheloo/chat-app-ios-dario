@@ -17,9 +17,7 @@ const InternetPopup = () => {
           <Text style={styles.title}>Check Internet Connection!</Text>
 
           <View style={styles.btnContainer}>
-            <TouchableOpacity
-              onPress={handleTryAgain}
-              style={[styles.btn, {backgroundColor: 'white'}]}>
+            <TouchableOpacity onPress={handleTryAgain} style={styles.btn}>
               <Text style={styles.deleteBtn}>Try again</Text>
             </TouchableOpacity>
           </View>
@@ -66,6 +64,7 @@ const styles = StyleSheet.create({
     height: 34,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'white',
   },
   deleteBtn: {fontWeight: '500', fontSize: FONTSIZE.md},
   cancelBtn: {fontWeight: '300', fontSize: FONTSIZE.md},

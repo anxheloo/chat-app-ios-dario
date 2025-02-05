@@ -14,17 +14,11 @@ import UpdateDissapear from './UpdateDissapear';
 import ChangeUsername from './ChangeUsername';
 import SelectAvatar from './SelectAvatar';
 import useProfile from '../../utils/hooks/useProfile';
-import {NavigationProps} from '../../utils/types';
 
-const CustomBottomSheetModal = ({
-  navigation,
-}: {
-  navigation: NavigationProps;
-}) => {
+const CustomBottomSheetModal = () => {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
-  const {updateProfilePic} = useProfile(navigation);
-  const bottomSheetType = useAppStore(state => state.bottomSheetType);
-  const updateKeys = useAppStore(state => state.updateKeys);
+  const {bottomSheetType, updateKeys} = useAppStore();
+  const {updateProfilePic, selectAvatar} = useProfile();
   const snapPoints = useMemo(() => ['25%', '50%', '75%'], []);
 
   useEffect(() => {
@@ -33,7 +27,7 @@ const CustomBottomSheetModal = ({
     } else if (bottomSheetRef?.current) {
       bottomSheetRef.current?.dismiss();
     }
-  }, [bottomSheetType]);
+  }, [bottomSheetRef, bottomSheetType]);
 
   const closeBottomSheet = useCallback(() => {
     updateKeys({bottomSheetType: null});
@@ -65,10 +59,12 @@ const CustomBottomSheetModal = ({
         return (
           <SelectAvatar cancel={closeBottomSheet} setFunc={updateProfilePic} />
         );
-      case 'start-conversation':
+      case 'create-avatar':
         return (
-          <PersonasList cancel={closeBottomSheet} navigation={navigation} />
+          <SelectAvatar cancel={closeBottomSheet} setFunc={selectAvatar} />
         );
+      case 'start-conversation':
+        return <PersonasList cancel={closeBottomSheet} />;
       default:
         return null;
     }

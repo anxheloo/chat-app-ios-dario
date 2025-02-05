@@ -1,7 +1,7 @@
 import {io} from 'socket.io-client';
 import {create, StateCreator} from 'zustand';
 import {HOST} from '../api/apis';
-import {Contact, Conversation, Message} from '../utils/types';
+import {Contact, Conversation, Message, NavigationProps} from '../utils/types';
 
 type PersonaSlice = {
   username: string;
@@ -25,8 +25,11 @@ type StatusSlice = {
   message: string | null;
   isUploading: boolean;
   fileUploadProgress: number;
-  bottomSheetType: string | null;
   updateKeys: (data: Partial<StatusSlice>) => void;
+
+  bottomSheetType: string | null;
+  navigation: NavigationProps | null;
+  setNavigation: (navigation: NavigationProps) => void;
 };
 
 type ChatSlice = {
@@ -190,8 +193,9 @@ const createStatusSlice: StateCreator<StatusSlice> = set => ({
   isUploading: false,
   fileUploadProgress: 0,
   bottomSheetType: null,
-  bottomSheetRef: null,
 
+  navigation: null,
+  setNavigation: navigation => set(() => ({navigation})),
   updateKeys: set,
 });
 

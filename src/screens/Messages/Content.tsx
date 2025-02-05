@@ -14,11 +14,10 @@ type ContentProps = {
 };
 
 const Content: React.FC<ContentProps> = memo(({navigation}) => {
-  const loading = useAppStore(state => state.loading);
-  const userId = useAppStore(state => state.id);
+  const {loading, id: userId, conversations} = useAppStore();
+  // const userId = useAppStore(state => state.id);
   const [search, setSearch] = useState<string>('');
   const [debouncedSearch, setDebounceSearch] = useState<string>('');
-  const conversations = useAppStore(state => state.conversations);
 
   const searchedConversations = useMemo(
     () =>

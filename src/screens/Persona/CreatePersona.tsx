@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect} from 'react';
 import {
   StyleSheet,
   View,
@@ -10,10 +10,7 @@ import {
 import ReusableText from '../../components/ReusableText';
 import {BORDERRADIUS, COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import {useAppStore} from '../../store';
-import BottomSheet from '@gorhom/bottom-sheet';
 import AvatarIcon from '../../assets/icons/avatar/Avatar0';
-import BottomSheetWrapper from '../../components/BottomSheet/BottomSheetWrapper';
-import SelectAvatar from '../../components/BottomSheet/SelectAvatar';
 import ReusableInput from '../../components/ReusableInput';
 import ReusableButton from '../../components/ReusableButton';
 import {NavigationProps} from '../../utils/types';
@@ -24,22 +21,10 @@ type CreatePersonaScreenProps = {
 };
 
 const CreatePersona: React.FC<CreatePersonaScreenProps> = ({navigation}) => {
-  const setUserPersona = useAppStore(state => state.setUserPersona);
-  const username = useAppStore(state => state.username);
-  const bottomSheetRef = useRef<BottomSheet | null>(null);
+  const {username, setUserPersona, updateKeys} = useAppStore();
 
-  const openBottomSheet = (): void => {
-    Keyboard.dismiss();
-    bottomSheetRef.current?.expand();
-  };
   const onChange = (text: string): void => {
     setUserPersona({username: text.trim()});
-  };
-  const cancel = () => bottomSheetRef?.current?.close();
-  // Close bottom sheet and go to CreatePin screen
-  const setFunc = (): void => {
-    bottomSheetRef?.current?.close();
-    navigation.navigate('CreatePin');
   };
 
   useEffect(() => {
@@ -94,15 +79,13 @@ const CreatePersona: React.FC<CreatePersonaScreenProps> = ({navigation}) => {
                   Already have an account? Sign In
                 </ReusableText>
               </View>
-
-              <ReusableButton text="Continue" onPress={openBottomSheet} />
+              <ReusableButton
+                text="Continue"
+                onPress={() => updateKeys({bottomSheetType: 'create-avatar'})}
+              />
             </View>
           </View>
         </TouchableWithoutFeedback>
-
-        <BottomSheetWrapper ref={bottomSheetRef}>
-          <SelectAvatar cancel={cancel} setFunc={setFunc} />
-        </BottomSheetWrapper>
       </SafeAreaView>
     </KeyboardAvoidingView>
   );

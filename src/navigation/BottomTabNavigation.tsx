@@ -11,7 +11,6 @@ import ContactsIcon from '../assets/icons/BottomTabIcons/ContactsIcon';
 import ProfileIcon from '../assets/icons/BottomTabIcons/ProfileIcon';
 import TabBarIcon from './TabBarIcon';
 import Layout from '../components/Layout/Layout';
-import {useNavigation} from '@react-navigation/native';
 
 const MessageTabBarIcon = ({focused}: {focused: boolean}) => (
   <TabBarIcon Icon={MessageIcon} focused={focused} label={'Messages'} />
@@ -31,10 +30,9 @@ const ProfileTabBarIcon = ({focused}: {focused: boolean}) => (
 
 const BottomTabNavigation = () => {
   const Tab = createBottomTabNavigator();
-  const navigation = useNavigation();
 
   return (
-    <Layout navigation={navigation}>
+    <Layout>
       <Tab.Navigator
         initialRouteName="Messages"
         screenOptions={{
@@ -125,12 +123,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#F9FAFC',
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 5,
-    // },
-    // shadowOpacity: 0.2,
-    // shadowRadius: 10,
+    borderColor: '#E5E5E5',
   },
 });
