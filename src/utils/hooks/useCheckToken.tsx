@@ -4,7 +4,7 @@ import {useAppStore} from '../../store';
 import {NavigationProps} from '../types';
 
 const useCheckToken = (navigation: NavigationProps) => {
-  const setToken = useAppStore(state => state.setToken);
+  const {setToken} = useAppStore();
 
   const checkToken = async () => {
     const token = await getToken();
@@ -12,7 +12,7 @@ const useCheckToken = (navigation: NavigationProps) => {
 
     if (token) {
       setToken(token);
-      navigation.replace('BottomTabNavigation');
+      navigation.replace('BottomTabNavigation', {screen: 'Messages'});
     }
   };
 

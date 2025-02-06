@@ -3,6 +3,7 @@ import {
   FlatList,
   Keyboard,
   StyleSheet,
+  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
@@ -20,10 +21,9 @@ type PersonasListProps = {
 };
 
 const PersonasList: React.FC<PersonasListProps> = ({cancel}) => {
-  const {navigation} = useAppStore();
+  const {friends, navigation} = useAppStore();
   const [search, setSearch] = useState<string>('');
   const [debouncedSearch, setDebounceSearch] = useState<string>('');
-  const friends = useAppStore(state => state.friends);
 
   const searchedFriends = useMemo(
     () =>
@@ -48,22 +48,26 @@ const PersonasList: React.FC<PersonasListProps> = ({cancel}) => {
     Keyboard.dismiss();
   }, []);
 
-  const addNew = useCallback(async () => {
+  const addNew = useCallback(() => {
     cancel();
-    navigation?.navigate('Scanner');
+
+    setTimeout(() => {
+      navigation?.navigate('Scanner');
+    }, 300);
   }, [cancel, navigation]);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.contentContainer}>
         <View style={styles.header}>
-          <ReusableText
-            fontSize={FONTSIZE.md}
-            fontWeight={300}
-            onPress={cancel}>
-            Cancel
-          </ReusableText>
-          <AddIcon width={17.5} height={17.5} onPress={addNew} />
+          <TouchableOpacity onPress={cancel} style={styles.cancelBtn}>
+            <ReusableText fontSize={FONTSIZE.md} fontWeight={300}>
+              Cancel
+            </ReusableText>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={addNew} style={styles.addIcon}>
+            <AddIcon width={17.5} height={17.5} />
+          </TouchableOpacity>
         </View>
 
         <View style={styles.textContainer}>
@@ -131,6 +135,16 @@ const styles = StyleSheet.create({
   list: {
     flex: 1,
     paddingTop: 10,
+  },
+
+  addIcon: {
+    padding: 5,
+    borderRadius: 100,
+  },
+
+  cancelBtn: {
+    padding: 5,
+    borderRadius: 50,
   },
 });
 

@@ -12,8 +12,7 @@ const useLogin = (
   setPin: (text: string) => void,
   navigation: NavigationProps,
 ) => {
-  const updateKeys = useAppStore(state => state.updateKeys);
-  const setToken = useAppStore(state => state.setToken);
+  const {updateKeys, setToken} = useAppStore();
 
   const validateInput = (): boolean => {
     if (!username || !pin) {

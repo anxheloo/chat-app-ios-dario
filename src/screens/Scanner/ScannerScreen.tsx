@@ -13,14 +13,18 @@ import {BORDERRADIUS} from '../../theme/theme';
 import ReusableText from '../../components/ReusableText';
 import {usePermission} from '../../utils/usePermission';
 import {useIsFocused} from '@react-navigation/native';
+import {useAppStore} from '../../store';
 
 type ScannerScreenProps = {
   navigation: NavigationProps;
 };
 function ScannerScreen({navigation}: ScannerScreenProps): React.ReactElement {
   const {requestCameraPermission} = usePermission();
+  const {updateKeys} = useAppStore();
 
   useEffect(() => {
+    // updateKeys({bottomSheetType: null});
+
     const request = async () => {
       const hasPermission = await requestCameraPermission();
       return hasPermission;
@@ -31,7 +35,7 @@ function ScannerScreen({navigation}: ScannerScreenProps): React.ReactElement {
     if (!hasPermission) {
       navigation.goBack();
     }
-  }, [navigation, requestCameraPermission]);
+  }, [navigation, requestCameraPermission, updateKeys]);
 
   // 1. Use a simple default back camera
 
@@ -49,7 +53,7 @@ function ScannerScreen({navigation}: ScannerScreenProps): React.ReactElement {
         return;
       }
 
-      navigation.navigate('ScannedUser', {recipientId}); // Navigate to UserDetailsScreen
+      navigation?.navigate('ScannedUser', {recipientId}); // Navigate to UserDetailsScreen
     },
     [navigation],
   );
@@ -104,7 +108,9 @@ function ScannerScreen({navigation}: ScannerScreenProps): React.ReactElement {
         )}
       </View>
 
-      <TouchableOpacity style={styles.backButton} onPress={navigation.goBack}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}>
         <CloseIcon width={35} height={35} />
       </TouchableOpacity>
     </View>

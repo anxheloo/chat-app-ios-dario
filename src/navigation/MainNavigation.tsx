@@ -16,7 +16,10 @@ const MainNavigation = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions={{
+          animation: 'fade',
+        }}>
         <Stack.Screen
           name="Login"
           component={Login}

@@ -9,12 +9,14 @@ import {
 } from '../../api/apis';
 
 const useUserInfo = () => {
-  const setUserPersona = useAppStore(state => state.setUserPersona);
-  const updateFuncChat = useAppStore(state => state.updateFuncChat);
-  const isUserInfoFetched = useAppStore(state => state.isUserInfoFetched);
-  const setUserInfoStatus = useAppStore(state => state.setUserInfoStatus);
-  const updateKeys = useAppStore(state => state.updateKeys);
-  const token = useAppStore(state => state.token);
+  const {
+    setUserPersona,
+    updateFuncChat,
+    isUserInfoFetched,
+    setUserInfoStatus,
+    updateKeys,
+    token,
+  } = useAppStore();
 
   // Get user info function
   const getUserInfo = useCallback(async () => {

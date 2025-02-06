@@ -6,7 +6,7 @@ type Props = {
 };
 
 const FullScreenLoader: React.FC<Props> = ({version}) => {
-  const color = version === 'absolute' ? 'white' : 'black';
+  const color = version === 'absolute' ? 'black' : 'white';
 
   return (
     <View
@@ -27,15 +27,15 @@ const styles = StyleSheet.create({
     inset: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
-    // backgroundColor: 'transparent',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 
   loadingContainer2: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    // backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });
 

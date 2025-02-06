@@ -1,16 +1,16 @@
-import {View, StyleSheet, Image, ActivityIndicator, Text} from 'react-native';
+import {View, StyleSheet, ActivityIndicator} from 'react-native';
 import React, {useState} from 'react';
 import ReusableText from '../ReusableText';
 import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import {useAppStore} from '../../store';
+import QRCode from 'react-native-qrcode-svg';
 
 type UpdatePinProps = {
   cancel: () => void;
 };
 
 const QRCodeModal: React.FC<UpdatePinProps> = ({cancel}) => {
-  const qr_code = useAppStore(state => state.qr_code);
-  const [loading, setLoading] = useState(true);
+  const {id: userId} = useAppStore();
   const [error, setError] = useState(false);
 
   return (
@@ -36,22 +36,11 @@ const QRCodeModal: React.FC<UpdatePinProps> = ({cancel}) => {
 
       <View style={styles.mainContent}>
         <View style={styles.qrCodeContainer}>
-          {loading && !error && (
-            <ActivityIndicator size="large" color={COLORS.LightGray} />
+          {error ? (
+            <ActivityIndicator size="large" color="#000" />
+          ) : (
+            <QRCode value={userId} size={180} onError={() => setError(true)} />
           )}
-          {error && (
-            <Text style={styles.errorText}>Failed to load QR Code</Text>
-          )}
-          <Image
-            source={{uri: qr_code}}
-            style={styles.qrCode}
-            resizeMode="contain"
-            onLoad={() => setLoading(false)} // Image loaded
-            onError={() => {
-              setLoading(false);
-              setError(true); // Handle image loading error
-            }}
-          />
         </View>
       </View>
     </View>

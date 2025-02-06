@@ -10,15 +10,15 @@ import VideoIcon from '../../../assets/icons/Chat/VideoIcon';
 
 const ChatHeader = memo(() => {
   const navigation = useNavigation();
-  const selectedChatData = useAppStore(state => state.selectedChatData);
+  const {selectedChatData} = useAppStore();
 
   const goBack = () => navigation.goBack();
 
   return (
     <View style={styles.container}>
-      <ReusableText fontWeight={500} onPress={goBack}>
-        Back
-      </ReusableText>
+      <TouchableOpacity style={styles.backBtn} onPress={goBack}>
+        <ReusableText fontWeight={500}>Back</ReusableText>
+      </TouchableOpacity>
 
       <View style={styles.middleContent}>
         <Avatar
@@ -61,9 +61,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5E5',
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: 10,
     alignItems: 'center',
     paddingTop: 10,
+    maxHeight: 60,
   },
 
   middleContent: {
@@ -75,6 +76,11 @@ const styles = StyleSheet.create({
   },
 
   icon: {width: 24, height: 24, marginHorizontal: 10},
+
+  backBtn: {
+    padding: 10,
+    borderRadius: 8,
+  },
 });
 
 export default ChatHeader;

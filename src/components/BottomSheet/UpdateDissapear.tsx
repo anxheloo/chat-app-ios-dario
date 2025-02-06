@@ -24,11 +24,7 @@ type UpdateMessagesProps = {
 };
 
 const UpdateDissapear: React.FC<UpdateMessagesProps> = memo(({cancel}) => {
-  const setUserPersona = useAppStore(state => state.setUserPersona);
-  const token = useAppStore(state => state.token);
-  const dissappearingMessages = useAppStore(
-    state => state.dissappearingMessages,
-  );
+  const {setUserPersona, token, dissappearingMessages} = useAppStore();
   const [selectableOption, setSelectableOption] = useState<string>(
     dissappearingMessages,
   );
@@ -115,7 +111,7 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = memo(({cancel}) => {
       setIsLoading(false);
       Alert.alert('Update Error', error.response.data.message);
     }
-  }, [selectableOption]);
+  }, [cancel, selectableOption, setUserPersona, toggleDropdown, token]);
 
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.contentContainer}>

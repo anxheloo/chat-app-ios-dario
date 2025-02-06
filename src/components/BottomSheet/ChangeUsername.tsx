@@ -21,9 +21,8 @@ type ChangeUsernameProps = {
 };
 
 const ChangeUsername: React.FC<ChangeUsernameProps> = ({cancel}) => {
-  const setUserPersona = useAppStore(state => state.setUserPersona);
-  const token = useAppStore(state => state.token);
-  const [username, setUsername] = useState<string>('');
+  const {setUserPersona, token, username: globalUsername} = useAppStore();
+  const [username, setUsername] = useState<string>(globalUsername);
   const [loading, setIsLoading] = useState<boolean>(false);
 
   const updateUsername = useCallback(

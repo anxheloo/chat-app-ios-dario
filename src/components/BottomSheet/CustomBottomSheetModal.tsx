@@ -24,14 +24,14 @@ const CustomBottomSheetModal = () => {
   useEffect(() => {
     if (bottomSheetType && bottomSheetRef?.current) {
       bottomSheetRef.current?.present();
-    } else if (bottomSheetRef?.current) {
+    } else {
       bottomSheetRef.current?.dismiss();
     }
   }, [bottomSheetRef, bottomSheetType]);
 
   const closeBottomSheet = useCallback(() => {
-    updateKeys({bottomSheetType: null});
     bottomSheetRef.current?.dismiss();
+    updateKeys({bottomSheetType: null});
   }, [updateKeys]);
 
   const renderBackdrop = useCallback(

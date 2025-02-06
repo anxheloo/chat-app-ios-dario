@@ -12,35 +12,34 @@ type EmptyChatProps = {
 };
 
 const EmptyChat: React.FC<EmptyChatProps> = ({navigation}) => {
-  const updateKeys = useAppStore(state => state.updateKeys);
-  return (
-    <>
-      <View style={styles.emptyChat}>
-        <View style={styles.container1}>
-          <MessagingIcon width={47} height={45} />
-          <ReusableText fontSize={FONTSIZE.lg} fontWeight={400}>
-            No Conversations
-          </ReusableText>
+  const {updateKeys} = useAppStore();
 
-          <ReusableText
-            fontSize={14}
-            fontWeight={FONTWEIGHT[300]}
-            color={COLORS.LightGray}
-            textAlign="center">
-            Select persona and start messaging
-          </ReusableText>
-        </View>
+  return (
+    <View style={styles.emptyChat}>
+      <View style={styles.container1}>
+        <MessagingIcon width={47} height={45} />
+        <ReusableText fontSize={FONTSIZE.lg} fontWeight={400}>
+          No Conversations
+        </ReusableText>
 
         <ReusableText
-          fontSize={16}
-          fontWeight={FONTWEIGHT[400]}
-          textAlign="center"
-          textDecorationLine="underline"
-          onPress={() => updateKeys({bottomSheetType: 'start-conversation'})}>
-          Start Conversation
+          fontSize={14}
+          fontWeight={FONTWEIGHT[300]}
+          color={COLORS.LightGray}
+          textAlign="center">
+          Select persona and start messaging
         </ReusableText>
       </View>
-    </>
+
+      <ReusableText
+        fontSize={16}
+        fontWeight={FONTWEIGHT[400]}
+        textAlign="center"
+        textDecorationLine="underline"
+        onPress={() => updateKeys({bottomSheetType: 'start-conversation'})}>
+        Start Conversation
+      </ReusableText>
+    </View>
   );
 };
 

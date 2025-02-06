@@ -9,8 +9,7 @@ import FullScreenLoader from '../../components/Loading/FullScreenLoader';
 import DeleteMsg from '../../components/modals/DeleteMsg';
 
 const Chat = () => {
-  const updateFuncChat = useAppStore(state => state.updateFuncChat);
-  const loading = useAppStore(state => state.loading);
+  const {updateFuncChat, loading} = useAppStore();
 
   useEffect(() => {
     return () => {
@@ -30,7 +29,7 @@ const Chat = () => {
           <ChatFooter />
         </View>
 
-        {loading && <FullScreenLoader version="absolute" />}
+        {loading && <FullScreenLoader version={'absolute'} />}
       </SafeAreaView>
       <DeleteMsg />
     </KeyboardAvoidingView>

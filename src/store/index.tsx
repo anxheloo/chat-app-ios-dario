@@ -9,7 +9,7 @@ type PersonaSlice = {
   pin: string;
   id: string;
   dissappearingMessages: string;
-  qr_code: string;
+  // qr_code: string;
   isUserInfoFetched: boolean;
   setUserInfoStatus: (status: boolean) => void;
   setUserPersona: (data: Partial<PersonaSlice>) => void;
@@ -29,7 +29,6 @@ type StatusSlice = {
 
   bottomSheetType: string | null;
   navigation: NavigationProps | null;
-  setNavigation: (navigation: NavigationProps) => void;
 };
 
 type ChatSlice = {
@@ -77,7 +76,7 @@ const createPersonaSlice: StateCreator<PersonaSlice> = set => ({
   pin: '',
   id: '',
   dissappearingMessages: 'None',
-  qr_code: '',
+  // qr_code: '',
   isUserInfoFetched: false,
   setUserInfoStatus: (status: boolean) => set({isUserInfoFetched: status}),
   setUserPersona: set,
@@ -195,7 +194,6 @@ const createStatusSlice: StateCreator<StatusSlice> = set => ({
   bottomSheetType: null,
 
   navigation: null,
-  setNavigation: navigation => set(() => ({navigation})),
   updateKeys: set,
 });
 

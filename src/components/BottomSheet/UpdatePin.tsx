@@ -21,7 +21,7 @@ type UpdatePinProps = {
 };
 
 const UpdatePin: React.FC<UpdatePinProps> = ({cancel}) => {
-  const token = useAppStore(state => state.token);
+  const {token} = useAppStore();
   const [oldPin, setOldPin] = useState<string>('');
   const [newPin, setNewPin] = useState<string>('');
   const [loading, setIsLoading] = useState<boolean>(false);
@@ -46,7 +46,6 @@ const UpdatePin: React.FC<UpdatePinProps> = ({cancel}) => {
       console.log('This is res');
 
       if (res.status === 200) {
-        console.log('This is res', res.data);
         setIsLoading(false);
         cancel();
         Alert.alert('Pin Updated', 'Your pin has been updated');

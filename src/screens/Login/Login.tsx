@@ -22,16 +22,16 @@ type LoginScreenProps = {
 };
 
 const Login: React.FC<LoginScreenProps> = ({navigation}) => {
-  const {setNavigation} = useAppStore();
+  const {updateKeys} = useAppStore();
   const [username, setUsername] = useState('');
   const [pin, setPin] = useState('');
   const onPress = useLogin(username, pin, setUsername, setPin, navigation);
   useCheckToken(navigation);
 
-  // Store navigation in store
+  // Store navigation in zustand to use it later in the part of app where navigation is needed -> bottom tab navigation/PersonasList
   useEffect(() => {
-    setNavigation(navigation);
-  }, [navigation, setNavigation]);
+    updateKeys({navigation});
+  }, [navigation, updateKeys]);
 
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.safeAreaView}>
