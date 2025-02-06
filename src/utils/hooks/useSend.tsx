@@ -14,16 +14,10 @@ const useSend = (
   setMessage: (text: string) => void,
   setCameraOptions: (data: boolean) => void,
 ) => {
-  const socket = useAppStore(state => state.socket);
-  const token = useAppStore(state => state.token);
-  const id = useAppStore(state => state.id);
-  const selectedChatData = useAppStore(state => state.selectedChatData);
+  const {socket, id, selectedChatData, updateKeys, updateSelectedChatMessages} =
+    useAppStore();
   const dissapearingTimeFrame = useAppStore(
     state => state.dissappearingMessages,
-  );
-  const updateKeys = useAppStore(state => state.updateKeys);
-  const updateSelectedChatMessages = useAppStore(
-    state => state.updateSelectedChatMessages,
   );
 
   const compressImage = async (uri: string) => {
@@ -164,12 +158,7 @@ const useSend = (
 
         try {
           //7. Post the compressed file to store on the server
-          const uploadResponse = await apiClient.post(UPLOAD_FILE, formData, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'multipart/form-data',
-            },
-          });
+          const uploadResponse = await apiClient.post(UPLOAD_FILE, formData);
 
           //8. Emit the event when upload is successful
           if (uploadResponse.status === 200) {
@@ -225,7 +214,6 @@ const useSend = (
       selectedChatData?._id,
       id,
       dissapearingTimeFrame,
-      token,
       socket,
     ],
   );

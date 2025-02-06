@@ -5,23 +5,13 @@ import {GET_ALL_MESSAGES} from '../../api/apis';
 import {useAppStore} from '../../store';
 
 const useMessages = (flatListRef: any) => {
-  const token = useAppStore(state => state.token);
-  const updateSelectedChatMessages = useAppStore(
-    state => state.updateSelectedChatMessages,
-  );
-  const selectedChatData = useAppStore(state => state.selectedChatData);
+  const {updateSelectedChatMessages, selectedChatData} = useAppStore();
 
   const [pagination, setPagination] = useState({
     isLoading: false,
     hasMore: true,
     page: 0,
   });
-
-  const refetch = useCallback(() => {
-    setPagination(prev => ({...prev, page: 0, isLoading: false}));
-    updateSelectedChatMessages(() => []);
-    getAllMessages();
-  }, []);
 
   const getAllMessages = useCallback(async () => {
     const {isLoading, hasMore, page} = pagination;
@@ -33,15 +23,10 @@ const useMessages = (flatListRef: any) => {
     setPagination(prev => ({...prev, isLoading: true}));
 
     try {
-      const response = await apiClient.post(
-        GET_ALL_MESSAGES,
-        {id: selectedChatData?._id, page},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await apiClient.post(GET_ALL_MESSAGES, {
+        id: selectedChatData?._id,
+        page,
+      });
 
       if (response.status === 200) {
         const {messages, hasMore: updatedHasMore} = response.data;
@@ -77,15 +62,23 @@ const useMessages = (flatListRef: any) => {
     } finally {
       setPagination(prev => ({...prev, isLoading: false}));
     }
-  }, [pagination, selectedChatData?._id, token, updateSelectedChatMessages]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagination, selectedChatData?._id, updateSelectedChatMessages]);
 
   const loadMoreItem = useCallback(() => {
     if (!pagination.isLoading && pagination.hasMore) {
       getAllMessages();
     }
-  }, [pagination]);
+  }, [pagination, getAllMessages]);
+
+  const refetch = useCallback(() => {
+    setPagination(prev => ({...prev, page: 0, isLoading: false}));
+    updateSelectedChatMessages(() => []);
+    getAllMessages();
+  }, [getAllMessages, updateSelectedChatMessages]);
 
   // Scroll to end function
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   const scrollToBottom = useCallback((time: number = 0, flatListRef: any) => {
     if (flatListRef) {
       setTimeout(() => {
@@ -97,13 +90,13 @@ const useMessages = (flatListRef: any) => {
   // Scroll to end on mount
   useEffect(() => {
     scrollToBottom(1000, flatListRef);
-  }, []);
+  }, [flatListRef, scrollToBottom]);
 
   useEffect(() => {
     if (selectedChatData?._id) {
       getAllMessages();
     }
-  }, [selectedChatData]);
+  }, [getAllMessages, selectedChatData]);
 
   return {loadMoreItem, isLoading: pagination.isLoading, scrollToBottom};
 };

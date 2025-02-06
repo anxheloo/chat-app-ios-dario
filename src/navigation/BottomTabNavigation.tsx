@@ -37,21 +37,21 @@ const BottomTabNavigation = () => {
         initialRouteName="Messages"
         screenOptions={{
           // animation: 'fade',
-          transitionSpec: {
-            animation: 'timing',
-            config: {
-              duration: 150,
-              easing: Easing.inOut(Easing.ease),
-            },
-          },
-          sceneStyleInterpolator: ({current}) => ({
-            sceneStyle: {
-              opacity: current.progress.interpolate({
-                inputRange: [-1, 0, 1],
-                outputRange: [0, 1, 0],
-              }),
-            },
-          }),
+          // transitionSpec: {
+          //   animation: 'timing',
+          //   config: {
+          //     duration: 150,
+          //     easing: Easing.inOut(Easing.ease),
+          //   },
+          // },
+          // sceneStyleInterpolator: ({current}) => ({
+          //   sceneStyle: {
+          //     opacity: current.progress.interpolate({
+          //       inputRange: [-1, 0, 1],
+          //       outputRange: [0, 1, 0],
+          //     }),
+          //   },
+          // }),
           headerShown: false,
           tabBarStyle: styles.container,
         }}>
@@ -124,5 +124,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#E5E5E5',
+    overflow: 'hidden',
   },
 });

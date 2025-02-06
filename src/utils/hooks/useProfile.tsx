@@ -4,23 +4,15 @@ import {apiClient} from '../../api/apiClient';
 import {useAppStore} from '../../store';
 
 const useProfile = () => {
-  const {setUserPersona, updateKeys, token, navigation} = useAppStore();
+  const {setUserPersona, updateKeys, navigation} = useAppStore();
 
   const updateProfilePic = async (avatar: number): Promise<void> => {
     updateKeys({isUploading: true});
 
     try {
-      const res = await apiClient.post(
-        UPDATE_USER_PROFILE_PIC,
-        {
-          avatar: avatar,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const res = await apiClient.post(UPDATE_USER_PROFILE_PIC, {
+        avatar: avatar,
+      });
 
       if (res.status === 200) {
         setUserPersona({avatar: res.data.avatar});

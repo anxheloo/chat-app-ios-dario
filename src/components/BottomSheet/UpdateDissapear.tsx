@@ -24,7 +24,7 @@ type UpdateMessagesProps = {
 };
 
 const UpdateDissapear: React.FC<UpdateMessagesProps> = memo(({cancel}) => {
-  const {setUserPersona, token, dissappearingMessages} = useAppStore();
+  const {setUserPersona, dissappearingMessages} = useAppStore();
   const [selectableOption, setSelectableOption] = useState<string>(
     dissappearingMessages,
   );
@@ -87,17 +87,9 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = memo(({cancel}) => {
     setIsLoading(true);
 
     try {
-      const res = await apiClient.post(
-        UPDATE_DISSAPEARING_MESSAGES,
-        {
-          dissappearingMessages: selectableOption,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const res = await apiClient.post(UPDATE_DISSAPEARING_MESSAGES, {
+        dissappearingMessages: selectableOption,
+      });
 
       if (res.status === 200) {
         console.log('This is res', res.data);
@@ -111,7 +103,7 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = memo(({cancel}) => {
       setIsLoading(false);
       Alert.alert('Update Error', error.response.data.message);
     }
-  }, [cancel, selectableOption, setUserPersona, toggleDropdown, token]);
+  }, [cancel, selectableOption, setUserPersona, toggleDropdown]);
 
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.contentContainer}>

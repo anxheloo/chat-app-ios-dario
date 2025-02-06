@@ -13,7 +13,6 @@ import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import ReusableInput from '../ReusableInput';
 import {UPDATE_PIN} from '../../api/apis';
 import {apiClient} from '../../api/apiClient';
-import {useAppStore} from '../../store';
 import LockIcon from '../../assets/icons/profile/LockIcon';
 
 type UpdatePinProps = {
@@ -21,7 +20,6 @@ type UpdatePinProps = {
 };
 
 const UpdatePin: React.FC<UpdatePinProps> = ({cancel}) => {
-  const {token} = useAppStore();
   const [oldPin, setOldPin] = useState<string>('');
   const [newPin, setNewPin] = useState<string>('');
   const [loading, setIsLoading] = useState<boolean>(false);
@@ -30,18 +28,10 @@ const UpdatePin: React.FC<UpdatePinProps> = ({cancel}) => {
     setIsLoading(true);
 
     try {
-      const res = await apiClient.post(
-        UPDATE_PIN,
-        {
-          oldPin: oldPin,
-          newPin: newPin,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const res = await apiClient.post(UPDATE_PIN, {
+        oldPin: oldPin,
+        newPin: newPin,
+      });
 
       console.log('This is res');
 

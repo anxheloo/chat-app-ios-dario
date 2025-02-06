@@ -15,7 +15,6 @@ const useUserInfo = () => {
     isUserInfoFetched,
     setUserInfoStatus,
     updateKeys,
-    token,
   } = useAppStore();
 
   // Get user info function
@@ -27,22 +26,10 @@ const useUserInfo = () => {
     updateKeys({loading: true});
 
     try {
-      // const res = await apiClient.get(GET_USER_INFO, {
-      //   headers: {
-      //     Authorization: `Bearer ${token}`,
-      //   },
-      // });
-
       const [userRes, conversationsRes, friendsRes] = await Promise.all([
-        apiClient.get(GET_USER_INFO, {
-          headers: {Authorization: `Bearer ${token}`},
-        }),
-        apiClient.get(GET_CONVERSATIONS, {
-          headers: {Authorization: `Bearer ${token}`},
-        }),
-        apiClient.get(GET_ALL_FRIENDS, {
-          headers: {Authorization: `Bearer ${token}`},
-        }),
+        apiClient.get(GET_USER_INFO),
+        apiClient.get(GET_CONVERSATIONS),
+        apiClient.get(GET_ALL_FRIENDS),
       ]);
 
       if (
@@ -68,7 +55,6 @@ const useUserInfo = () => {
   }, [
     isUserInfoFetched,
     updateKeys,
-    token,
     setUserInfoStatus,
     setUserPersona,
     updateFuncChat,
@@ -78,7 +64,7 @@ const useUserInfo = () => {
   useEffect(() => {
     console.log('This is getUserInfo step 2');
     getUserInfo();
-  }, [getUserInfo, token]);
+  }, [getUserInfo]);
 };
 
 export default useUserInfo;

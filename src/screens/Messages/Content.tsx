@@ -15,7 +15,6 @@ type ContentProps = {
 
 const Content: React.FC<ContentProps> = memo(({navigation}) => {
   const {loading, id: userId, conversations} = useAppStore();
-  // const userId = useAppStore(state => state.id);
   const [search, setSearch] = useState<string>('');
   const [debouncedSearch, setDebounceSearch] = useState<string>('');
 
@@ -71,7 +70,7 @@ const Content: React.FC<ContentProps> = memo(({navigation}) => {
           <Conversations
             conversation={item}
             navigation={navigation}
-            backgroundColor="white"
+            backgroundColor={'white'}
           />
         )}
         keyExtractor={item => item._id}

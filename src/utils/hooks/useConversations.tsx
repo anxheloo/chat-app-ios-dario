@@ -4,18 +4,13 @@ import {useAppStore} from '../../store';
 import {Alert} from 'react-native';
 
 const useConversations = () => {
-  const token = useAppStore(state => state.token);
-  const updateFuncChat = useAppStore(state => state.updateFuncChat);
+  const {updateFuncChat} = useAppStore();
   const updateKeys = useAppStore(state => state.updateKeys);
 
   const getConversations = async () => {
     updateKeys({loading: true});
     try {
-      const res = await apiClient.get(GET_CONVERSATIONS, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await apiClient.get(GET_CONVERSATIONS);
 
       if (res.status === 200) {
         updateFuncChat({conversations: res.data.conversations});
@@ -28,7 +23,6 @@ const useConversations = () => {
     }
   };
 
-  // return {getConversations, loading};
   return getConversations;
 };
 

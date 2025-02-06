@@ -6,16 +6,13 @@ import {DELETE_MESSAGE} from '../../api/apis';
 import {useAppStore} from '../../store';
 
 const DeleteMsg = React.memo(() => {
-  const token = useAppStore(state => state.token);
-  const updateFuncChat = useAppStore(state => state.updateFuncChat);
-  const updateSelectedChatMessages = useAppStore(
-    state => state.updateSelectedChatMessages,
-  );
-  const selectedMsgToDelete = useAppStore(
-    state => state.selectedMessageToDelete,
-  );
-  const socket = useAppStore(state => state.socket);
-  const id = useAppStore(state => state.id);
+  const {
+    updateFuncChat,
+    updateSelectedChatMessages,
+    selectedMessageToDelete: selectedMsgToDelete,
+    socket,
+    id,
+  } = useAppStore();
 
   const isShown = selectedMsgToDelete !== null;
   const msgId = selectedMsgToDelete?._id;
@@ -23,15 +20,7 @@ const DeleteMsg = React.memo(() => {
   // Delete Specific message
   const handleDelete = async () => {
     try {
-      const res = await apiClient.post(
-        DELETE_MESSAGE,
-        {msgId: msgId},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const res = await apiClient.post(DELETE_MESSAGE, {msgId: msgId});
 
       if (res.status === 200) {
         console.log('This is the new conversation:', res.data.conversation);

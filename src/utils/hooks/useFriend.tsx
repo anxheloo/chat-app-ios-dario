@@ -5,9 +5,7 @@ import {GET_ALL_FRIENDS} from '../../api/apis';
 import {useAppStore} from '../../store';
 
 const useFriend = () => {
-  const token = useAppStore(state => state.token);
-  const updateFuncChat = useAppStore(state => state.updateFuncChat);
-  const updateKeys = useAppStore(state => state.updateKeys);
+  const {updateFuncChat, updateKeys} = useAppStore();
 
   console.log('Inside useFriend hook step 1 ');
 
@@ -17,11 +15,7 @@ const useFriend = () => {
     updateKeys({loading: true});
     // setLoading(true);
     try {
-      const res = await apiClient.get(GET_ALL_FRIENDS, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await apiClient.get(GET_ALL_FRIENDS);
 
       if (res.status === 200) {
         updateFuncChat({friends: res.data.friends});
@@ -33,7 +27,7 @@ const useFriend = () => {
       updateKeys({loading: false});
       // setLoading(false);
     }
-  }, [token, updateFuncChat, updateKeys]);
+  }, [updateFuncChat, updateKeys]);
 
   return getFriends;
 };

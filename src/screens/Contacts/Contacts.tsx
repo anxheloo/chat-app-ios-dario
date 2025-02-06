@@ -8,7 +8,6 @@ type Props = {
 };
 
 const Contacts: React.FC<Props> = ({navigation}) => {
-  console.log('Inside Contacts');
   return <ContactsList navigation={navigation} />;
 };
 

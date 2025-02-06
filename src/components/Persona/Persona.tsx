@@ -11,10 +11,11 @@ import Avatar from './Avatar';
 import {useAppStore} from '../../store';
 import {Contact, NavigationProps} from '../../utils/types';
 import {COLORS, FONTSIZE} from '../../theme/theme';
-import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
+import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import DeleteIcon from '../../assets/icons/Chat/DeleteIcon';
 import {DELETE_FRIEND} from '../../api/apis';
 import {apiClient} from '../../api/apiClient';
+import {useFocusEffect} from '@react-navigation/native';
 
 type PersonaProps = {
   contact: Contact;
@@ -36,11 +37,11 @@ const Persona: React.FC<PersonaProps> = ({
     updateKeys,
     id: senderId,
     username: senderUsername,
-    token,
     socket,
     updateFriends,
   } = useAppStore();
   const [loading, setLoading] = useState(false);
+  const [opacity, setOpacity] = useState(0);
 
   // Select contact to update chat
   const selectContact = () => {
@@ -56,15 +57,7 @@ const Persona: React.FC<PersonaProps> = ({
     setLoading(true);
 
     try {
-      const res = await apiClient.post(
-        DELETE_FRIEND,
-        {friendId: contact._id},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const res = await apiClient.post(DELETE_FRIEND, {friendId: contact._id});
 
       if (res.status === 200) {
         setLoading(false);
@@ -82,7 +75,7 @@ const Persona: React.FC<PersonaProps> = ({
       setLoading(false);
       Alert.alert(error.response.data.message, 'Please try again.');
     }
-  }, [contact._id, senderId, senderUsername, socket, token, updateFriends]);
+  }, [contact._id, senderId, senderUsername, socket, updateFriends]);
 
   const renderRightActions = useCallback(() => {
     if (version && version === 'search') {
@@ -92,7 +85,7 @@ const Persona: React.FC<PersonaProps> = ({
     return (
       <TouchableOpacity
         onPress={deleteContact}
-        style={styles.renderRightActions}>
+        style={[styles.renderRightActions, {opacity: opacity}]}>
         {loading ? (
           <ActivityIndicator size="small" color="white" />
         ) : (
@@ -100,10 +93,22 @@ const Persona: React.FC<PersonaProps> = ({
         )}
       </TouchableOpacity>
     );
-  }, [version, deleteContact, loading]);
+  }, [version, deleteContact, opacity, loading]);
+
+  useFocusEffect(() => {
+    setOpacity(1);
+
+    return () => {
+      setOpacity(0);
+    };
+  });
 
   return (
-    <Swipeable renderRightActions={renderRightActions} overshootRight={false}>
+    <ReanimatedSwipeable
+      friction={2}
+      renderRightActions={renderRightActions}
+      overshootRight={false}
+      key={contact._id}>
       <TouchableOpacity
         activeOpacity={1}
         style={[
@@ -125,7 +130,7 @@ const Persona: React.FC<PersonaProps> = ({
           <Text style={styles.username}>@{contact.username}</Text>
         </View>
       </TouchableOpacity>
-    </Swipeable>
+    </ReanimatedSwipeable>
   );
 };
 
