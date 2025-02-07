@@ -4,14 +4,14 @@ import {Message, Conversation, Contact} from './types';
 import {Alert} from 'react-native';
 
 export const useSocket = () => {
-  const updateFuncChat = useAppStore(state => state.updateFuncChat);
-  const userId = useAppStore(state => state.id);
-  const initializeSocket = useAppStore(state => state.initializeSocket);
-  const disconnectSocket = useAppStore(state => state.disconnectSocket);
-  const updateSelectedChatMessages = useAppStore(
-    state => state.updateSelectedChatMessages,
-  );
-  const updateFriends = useAppStore(state => state.updateFriends);
+  const {
+    updateFuncChat,
+    id: userId,
+    initializeSocket,
+    disconnectSocket,
+    updateSelectedChatMessages,
+    updateFriends,
+  } = useAppStore();
 
   const handleReceiveMessage = useCallback(
     (message: any) => {
@@ -121,7 +121,7 @@ export const useSocket = () => {
     [updateFuncChat],
   );
 
-  const handleConverationUpdated = useCallback(
+  const handleConversationUpdated = useCallback(
     (conversation: Conversation) => {
       console.log('Conversation emited from backend:', conversation);
 
@@ -175,36 +175,49 @@ export const useSocket = () => {
     [updateFriends],
   );
 
-  const loginalert = () => {
-    Alert.alert('Login', 'You have been logged in.');
-  };
+  // const loginalert = () => {
+  //   Alert.alert('Login', 'You have been logged in.');
+  // };
 
   useEffect(() => {
+    if (!userId) {
+      console.log('No user ID found, disconnecting socket.');
+      disconnectSocket(); // Disconnect if user logs out
+      return;
+    }
+
+    console.log('User ID detected, initializing socket:', userId);
     const socket = initializeSocket();
 
-    console.log('THis is userId:', userId);
-
     if (socket) {
+      // socket.off('receiveMessage', handleReceiveMessage);
+      // socket.off('messageDeleted', handleMessageDeleted);
+      // socket.off('conversationUpdated', handleConversationUpdated);
+      // socket.off('friendCreated', notifyReceiver);
+      // socket.off('friendDeleted', friendDeleted);
+
       socket.on('receiveMessage', handleReceiveMessage);
       socket.on('messageDeleted', handleMessageDeleted);
-      socket.on('conversationUpdated', handleConverationUpdated);
+      socket.on('conversationUpdated', handleConversationUpdated);
       socket.on('friendCreated', notifyReceiver);
       socket.on('friendDeleted', friendDeleted);
-      socket.on('login', loginalert);
     }
 
     return () => {
       console.log('socket disconected from useSocket');
       disconnectSocket();
     };
-  }, [
-    disconnectSocket,
-    friendDeleted,
-    handleConverationUpdated,
-    handleMessageDeleted,
-    handleReceiveMessage,
-    initializeSocket,
-    notifyReceiver,
-    userId,
-  ]);
+
+    // return () => {
+    //   console.log('Cleaning up socket listeners...');
+    //   if (socket) {
+    //     socket.off('receiveMessage', handleReceiveMessage);
+    //     socket.off('messageDeleted', handleMessageDeleted);
+    //     socket.off('conversationUpdated', handleConversationUpdated);
+    //     socket.off('friendCreated', notifyReceiver);
+    //     socket.off('friendDeleted', friendDeleted);
+    //   }
+    // };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
 };

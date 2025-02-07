@@ -22,6 +22,8 @@ const DeleteMsg = React.memo(() => {
     try {
       const res = await apiClient.post(DELETE_MESSAGE, {msgId: msgId});
 
+      console.log('this is msgid', msgId);
+
       if (res.status === 200) {
         console.log('This is the new conversation:', res.data.conversation);
 
@@ -38,19 +40,6 @@ const DeleteMsg = React.memo(() => {
           }),
         );
 
-        // updateFuncChat({
-        //   selectedChatMessages: selectedChatMessages.map(msg => {
-        //     if (msg._id === msgId) {
-        //       return {
-        //         ...msg,
-        //         messageType: 'deleted',
-        //         content: 'Message deleted',
-        //       };
-        //     }
-        //     return msg;
-        //   }),
-        // });
-
         socket?.emit('deleteSpecificMessage', {
           messageId: msgId,
           senderId: id,
@@ -66,7 +55,6 @@ const DeleteMsg = React.memo(() => {
   };
 
   const closeModal = () => {
-    // setShowModal(false);
     updateFuncChat({selectedMessageToDelete: null});
   };
 

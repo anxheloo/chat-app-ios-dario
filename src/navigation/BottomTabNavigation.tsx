@@ -1,5 +1,5 @@
 import React from 'react';
-import {Easing, StyleSheet} from 'react-native';
+import {StyleSheet} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Messages from '../screens/Messages/Messages';
 import Calls from '../screens/Calls/Calls';
