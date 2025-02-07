@@ -13,7 +13,7 @@ const useMessages = (flatListRef: any) => {
     page: 0,
   });
 
-  const getAllMessages = useCallback(async () => {
+  const getAllMessages = async () => {
     const {isLoading, hasMore, page} = pagination;
 
     if (isLoading || !hasMore) {
@@ -45,37 +45,34 @@ const useMessages = (flatListRef: any) => {
             hasMore: updatedHasMore,
           }));
         }
-        // setHasMore(updatedHasMore);
+        // else {
+        //   setPagination(prev => ({
+        //     ...prev,
+        //     hasMore: false,
+        //   }));
+        // }
       }
     } catch (error) {
-      // Alert.alert('Error', 'Failed to get messages', [
-      //   {text: 'Try again', onPress: refetch},
-      // ]);
-      Alert.alert('Alert Title', 'My Alert Msg', [
-        {
-          text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
+      Alert.alert('Error', 'Failed to get messages', [
         {text: 'Try again', onPress: refetch},
       ]);
     } finally {
       setPagination(prev => ({...prev, isLoading: false}));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination, selectedChatData?._id, updateSelectedChatMessages]);
+  };
 
-  const loadMoreItem = useCallback(() => {
+  const loadMoreItem = () => {
     if (!pagination.isLoading && pagination.hasMore) {
       getAllMessages();
     }
-  }, [pagination, getAllMessages]);
+  };
 
   const refetch = useCallback(() => {
     setPagination(prev => ({...prev, page: 0, isLoading: false}));
     updateSelectedChatMessages(() => []);
     getAllMessages();
-  }, [getAllMessages, updateSelectedChatMessages]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Scroll to end function
   // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -96,7 +93,8 @@ const useMessages = (flatListRef: any) => {
     if (selectedChatData?._id) {
       getAllMessages();
     }
-  }, [getAllMessages, selectedChatData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedChatData]);
 
   return {loadMoreItem, isLoading: pagination.isLoading, scrollToBottom};
 };

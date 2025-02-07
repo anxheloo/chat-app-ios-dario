@@ -130,7 +130,7 @@ export const useSocket = () => {
         if (item._id === conversation._id) {
           return {
             ...item,
-            lastMessage: conversation.lastMessage,
+            lastMessage: conversation?.lastMessage,
             lastMessageTime: conversation.lastMessageTime,
           };
         }
