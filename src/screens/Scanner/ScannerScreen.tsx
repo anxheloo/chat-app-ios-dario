@@ -13,14 +13,14 @@ import {BORDERRADIUS} from '../../theme/theme';
 import ReusableText from '../../components/ReusableText';
 import {usePermission} from '../../utils/usePermission';
 import {useIsFocused} from '@react-navigation/native';
-import {useAppStore} from '../../store';
 
 type ScannerScreenProps = {
   navigation: NavigationProps;
 };
-function ScannerScreen({navigation}: ScannerScreenProps): React.ReactElement {
+const ScannerScreen = ({
+  navigation,
+}: ScannerScreenProps): React.ReactElement => {
   const {requestCameraPermission} = usePermission();
-  const {updateKeys} = useAppStore();
 
   useEffect(() => {
     // updateKeys({bottomSheetType: null});
@@ -35,7 +35,8 @@ function ScannerScreen({navigation}: ScannerScreenProps): React.ReactElement {
     if (!hasPermission) {
       navigation.goBack();
     }
-  }, [navigation, requestCameraPermission, updateKeys]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // 1. Use a simple default back camera
 
@@ -53,7 +54,9 @@ function ScannerScreen({navigation}: ScannerScreenProps): React.ReactElement {
         return;
       }
 
-      navigation?.navigate('ScannedUser', {recipientId}); // Navigate to UserDetailsScreen
+      setTimeout(() => {
+        navigation?.navigate('ScannedUser', {recipientId});
+      }, 300);
     },
     [navigation],
   );
@@ -115,7 +118,7 @@ function ScannerScreen({navigation}: ScannerScreenProps): React.ReactElement {
       </TouchableOpacity>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {

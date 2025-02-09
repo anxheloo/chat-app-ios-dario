@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
@@ -11,6 +10,7 @@ type EmptyChatProps = {
   navigation: NavigationProps;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const EmptyChat: React.FC<EmptyChatProps> = ({navigation}) => {
   const {updateKeys} = useAppStore();
 

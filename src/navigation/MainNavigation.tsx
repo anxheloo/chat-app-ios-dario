@@ -10,12 +10,13 @@ import ScannerScreen from '../screens/Scanner/ScannerScreen';
 import ScannedUser from '../screens/Scanner/ScannedUser';
 import {RootStackParamList} from '../utils/types';
 import FullScreenMedia from '../screens/FullScreenMedia/FullScreenMedia';
+import {navigationRef} from './navigationRef';
 
 const MainNavigation = () => {
   const Stack = createNativeStackNavigator<RootStackParamList>();
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator
         screenOptions={{
           animation: 'fade',

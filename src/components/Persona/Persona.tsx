@@ -9,17 +9,16 @@ import {
 } from 'react-native';
 import Avatar from './Avatar';
 import {useAppStore} from '../../store';
-import {Contact, NavigationProps} from '../../utils/types';
+import {Contact} from '../../utils/types';
 import {COLORS, FONTSIZE} from '../../theme/theme';
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import DeleteIcon from '../../assets/icons/Chat/DeleteIcon';
 import {DELETE_FRIEND} from '../../api/apis';
 import {apiClient} from '../../api/apiClient';
-import {useFocusEffect} from '@react-navigation/native';
+import {navigate} from '../../navigation/navigationRef';
 
 type PersonaProps = {
   contact: Contact;
-  navigation?: NavigationProps | null;
   backgroundColor?: string;
   cancel?: () => void;
   version?: string;
@@ -27,7 +26,6 @@ type PersonaProps = {
 
 const Persona: React.FC<PersonaProps> = ({
   contact,
-  navigation,
   backgroundColor,
   cancel,
   version,
@@ -41,7 +39,6 @@ const Persona: React.FC<PersonaProps> = ({
     updateFriends,
   } = useAppStore();
   const [loading, setLoading] = useState(false);
-  const [opacity, setOpacity] = useState(0);
 
   // Select contact to update chat
   const selectContact = () => {
@@ -50,7 +47,7 @@ const Persona: React.FC<PersonaProps> = ({
       cancel();
     }
     updateFuncChat({selectedChatData: contact});
-    navigation?.navigate('Chat');
+    navigate('Chat');
   };
 
   const deleteContact = useCallback(async () => {
@@ -85,7 +82,7 @@ const Persona: React.FC<PersonaProps> = ({
     return (
       <TouchableOpacity
         onPress={deleteContact}
-        style={[styles.renderRightActions, {opacity: opacity}]}>
+        style={[styles.renderRightActions]}>
         {loading ? (
           <ActivityIndicator size="small" color="white" />
         ) : (
@@ -93,15 +90,7 @@ const Persona: React.FC<PersonaProps> = ({
         )}
       </TouchableOpacity>
     );
-  }, [version, deleteContact, opacity, loading]);
-
-  useFocusEffect(() => {
-    setOpacity(1);
-
-    return () => {
-      setOpacity(0);
-    };
-  });
+  }, [version, deleteContact, loading]);
 
   return (
     <ReanimatedSwipeable

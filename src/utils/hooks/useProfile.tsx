@@ -2,9 +2,10 @@ import {Alert} from 'react-native';
 import {UPDATE_USER_PROFILE_PIC} from '../../api/apis';
 import {apiClient} from '../../api/apiClient';
 import {useAppStore} from '../../store';
+import {navigate} from '../../navigation/navigationRef';
 
 const useProfile = () => {
-  const {setUserPersona, updateKeys, navigation} = useAppStore();
+  const {setUserPersona, updateKeys} = useAppStore();
 
   const updateProfilePic = async (avatar: number): Promise<void> => {
     updateKeys({isUploading: true});
@@ -28,7 +29,7 @@ const useProfile = () => {
   const selectAvatar = (avatar: number): void => {
     setUserPersona({avatar: avatar});
     updateKeys({bottomSheetType: null});
-    navigation?.navigate('CreatePin');
+    navigate('CreatePin');
   };
 
   return {updateProfilePic, selectAvatar};

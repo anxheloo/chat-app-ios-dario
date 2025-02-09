@@ -19,7 +19,6 @@ import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeabl
 import DeleteIcon from '../../assets/icons/Chat/DeleteIcon';
 import {DELETE_CONVERSATION} from '../../api/apis';
 import {apiClient} from '../../api/apiClient';
-import {useFocusEffect} from '@react-navigation/native';
 
 type ConversationsProps = {
   conversation: Conversation;
@@ -32,7 +31,6 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
   ({conversation, navigation, backgroundColor, cancel}) => {
     const {updateFuncChat, id: loggedInUserId, conversations} = useAppStore();
     const [loading, setLoading] = useState(false);
-    const [opacity, setOpacity] = useState(0);
 
     const participant = useMemo(() => {
       return conversation.participants.find(
@@ -123,7 +121,7 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
       return (
         <TouchableOpacity
           onPress={deleteConversation}
-          style={[styles.renderRightActions, {opacity: opacity}]}>
+          style={[styles.renderRightActions]}>
           {loading ? (
             <ActivityIndicator size="small" color="white" />
           ) : (
@@ -131,15 +129,7 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
           )}
         </TouchableOpacity>
       );
-    }, [deleteConversation, loading, opacity]);
-
-    useFocusEffect(() => {
-      setOpacity(1);
-
-      return () => {
-        setOpacity(0);
-      };
-    });
+    }, [deleteConversation, loading]);
 
     if (!participant) {
       return null;

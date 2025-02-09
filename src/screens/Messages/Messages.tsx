@@ -6,7 +6,6 @@ import {useSocket} from '../../utils/useSocket';
 type MessagesScreenProps = {
   navigation: NavigationProps;
 };
-
 const Messages: React.FC<MessagesScreenProps> = ({navigation}) => {
   useSocket();
 

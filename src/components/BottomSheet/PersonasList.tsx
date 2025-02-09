@@ -15,13 +15,14 @@ import CloseIcon from '../../assets/icons/messages/CloseIcon';
 import Persona from '../Persona/Persona';
 import AddIcon from '../../assets/icons/AddIcon';
 import {useAppStore} from '../../store';
+import {navigate} from '../../navigation/navigationRef';
 
 type PersonasListProps = {
   cancel: () => void;
 };
 
 const PersonasList: React.FC<PersonasListProps> = ({cancel}) => {
-  const {friends, navigation} = useAppStore();
+  const {friends} = useAppStore();
   const [search, setSearch] = useState<string>('');
   const [debouncedSearch, setDebounceSearch] = useState<string>('');
 
@@ -52,9 +53,10 @@ const PersonasList: React.FC<PersonasListProps> = ({cancel}) => {
     cancel();
 
     setTimeout(() => {
-      navigation?.navigate('Scanner');
+      // navigation?.navigate('Scanner');
+      navigate('Scanner');
     }, 300);
-  }, [cancel, navigation]);
+  }, [cancel]);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -98,12 +100,7 @@ const PersonasList: React.FC<PersonasListProps> = ({cancel}) => {
           contentContainerStyle={styles.list}
           data={searchedFriends}
           renderItem={({item}) => (
-            <Persona
-              contact={item}
-              navigation={navigation}
-              cancel={cancel}
-              version="search"
-            />
+            <Persona contact={item} cancel={cancel} version="search" />
           )}
           keyExtractor={item => item._id}
           // ListEmptyComponent={<Text>ska kontakte</Text>}

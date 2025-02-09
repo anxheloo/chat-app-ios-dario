@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {
   StyleSheet,
   View,
@@ -32,6 +32,11 @@ const CreatePersona: React.FC<CreatePersonaScreenProps> = ({navigation}) => {
       setUserPersona({username: ''});
     };
   }, [setUserPersona]);
+
+  const handleContinue = useCallback(() => {
+    Keyboard.dismiss();
+    updateKeys({bottomSheetType: 'create-avatar'});
+  }, [updateKeys]);
 
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.safeAreaView}>
@@ -79,10 +84,7 @@ const CreatePersona: React.FC<CreatePersonaScreenProps> = ({navigation}) => {
                   Already have an account? Sign In
                 </ReusableText>
               </View>
-              <ReusableButton
-                text="Continue"
-                onPress={() => updateKeys({bottomSheetType: 'create-avatar'})}
-              />
+              <ReusableButton text="Continue" onPress={handleContinue} />
             </View>
           </View>
         </TouchableWithoutFeedback>

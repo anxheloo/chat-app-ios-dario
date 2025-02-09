@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -15,23 +15,16 @@ import ReusableButton from '../../components/ReusableButton';
 import {NavigationProps} from '../../utils/types';
 import useLogin from '../../utils/hooks/useLogin';
 import useCheckToken from '../../utils/hooks/useCheckToken';
-import {useAppStore} from '../../store';
 
 type LoginScreenProps = {
   navigation: NavigationProps;
 };
 
 const Login: React.FC<LoginScreenProps> = ({navigation}) => {
-  const {updateKeys} = useAppStore();
   const [username, setUsername] = useState('');
   const [pin, setPin] = useState('');
   const onPress = useLogin(username, pin, setUsername, setPin, navigation);
   useCheckToken(navigation);
-
-  // Store navigation in zustand to use it later in the part of app where navigation is needed -> bottom tab navigation/PersonasList
-  useEffect(() => {
-    updateKeys({navigation});
-  }, [navigation, updateKeys]);
 
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.safeAreaView}>

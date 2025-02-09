@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {Alert} from 'react-native';
 import {apiClient} from '../../api/apiClient';
 import {ADD_FRIEND, GET_SCANNED_USER} from '../../api/apis';
@@ -15,7 +15,7 @@ const useScannedUser = (scannedUserId: string, navigation: NavigationProps) => {
     _id: '',
   });
 
-  const getScannedUserDetails = useCallback(async (recipientId: string) => {
+  const getScannedUserDetails = async (recipientId: string) => {
     setLoading(true);
 
     // Fetch user details from server
@@ -34,9 +34,9 @@ const useScannedUser = (scannedUserId: string, navigation: NavigationProps) => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
-  const addFriend = useCallback(async () => {
+  const addFriend = async () => {
     try {
       const res = await apiClient.post(ADD_FRIEND, {
         recipientId: scannedUserId,
@@ -51,11 +51,12 @@ const useScannedUser = (scannedUserId: string, navigation: NavigationProps) => {
     } catch (error: any) {
       Alert.alert('Error', error.response.data.message);
     }
-  }, [scannedUserId, updateFriends, socket, senderId, navigation, scannedUser]);
+  };
 
   useEffect(() => {
     getScannedUserDetails(scannedUserId);
-  }, [getScannedUserDetails, scannedUserId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return {loading, scannedUser, addFriend};
 };

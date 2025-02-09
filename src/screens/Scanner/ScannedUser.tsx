@@ -1,5 +1,5 @@
 import React from 'react';
-import {StatusBar, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {StatusBar, StyleSheet, TouchableOpacity} from 'react-native';
 import {SAFE_AREA_PADDING} from './Constants';
 import {RootStackParamList} from '../../utils/types';
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
@@ -8,7 +8,8 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import Avatar from '../../components/Persona/Avatar';
 import useScannedUser from '../../utils/hooks/useScannedUser';
 import FullScreenLoader from '../../components/Loading/FullScreenLoader';
-import {BlurView} from '@react-native-community/blur';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {COLORS} from '../../theme/theme';
 
 type ScannedUserProps = NativeStackScreenProps<
   RootStackParamList,
@@ -16,7 +17,7 @@ type ScannedUserProps = NativeStackScreenProps<
 >;
 
 const ScannedUser: React.FC<ScannedUserProps> = ({route, navigation}) => {
-  const {recipientId} = route.params;
+  const {recipientId} = route?.params;
   const {loading, scannedUser, addFriend} = useScannedUser(
     recipientId,
     navigation,
@@ -29,18 +30,11 @@ const ScannedUser: React.FC<ScannedUserProps> = ({route, navigation}) => {
   }
 
   return (
-    <View style={styles.content}>
+    <SafeAreaView style={styles.content}>
       <StatusBar hidden />
 
-      <View style={StyleSheet.absoluteFill}>
-        <BlurView
-          style={StyleSheet.absoluteFill}
-          blurType="dark"
-          blurAmount={20}
-          reducedTransparencyFallbackColor="black"
-        />
-      </View>
       <Avatar
+        backgroundColor={COLORS.LightGray2}
         width={70}
         height={70}
         avatarWidth={52.5}
@@ -48,14 +42,14 @@ const ScannedUser: React.FC<ScannedUserProps> = ({route, navigation}) => {
         src={Number(scannedUser?.avatar)}
       />
 
-      <ReusableText fontSize={26} fontWeight={700} color="white">
+      <ReusableText fontSize={26} fontWeight={700} color="black">
         @{scannedUser?.username}
       </ReusableText>
 
       <ReusableText
         fontSize={14}
         fontWeight={300}
-        color="white"
+        color="black"
         textAlign="center">
         This persona will be notified if you choose to send a friend request
       </ReusableText>
@@ -64,7 +58,7 @@ const ScannedUser: React.FC<ScannedUserProps> = ({route, navigation}) => {
         style={{paddingTop: 20}}
         fontSize={16}
         fontWeight={400}
-        color="white"
+        color="black"
         textDecorationLine="underline"
         onPress={addFriend}>
         Send Request
@@ -73,18 +67,14 @@ const ScannedUser: React.FC<ScannedUserProps> = ({route, navigation}) => {
       <TouchableOpacity style={styles.backButton} onPress={navigation.goBack}>
         <CloseIcon width={35} height={35} />
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-
   content: {
     flex: 1,
-    backgroundColor: 'rgba(140, 140, 140, 0.3)',
+    backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
     gap: 20,
