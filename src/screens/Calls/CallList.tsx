@@ -1,6 +1,5 @@
 import React, {useCallback, useState} from 'react';
 import {FlatList, StyleSheet, View} from 'react-native';
-import {NavigationProps} from '../../utils/types';
 import {useAppStore} from '../../store';
 import FullScreenLoader from '../../components/Loading/FullScreenLoader';
 import EmptyCall from './EmptyCall';
@@ -9,12 +8,7 @@ import SearchIcon from '../../assets/icons/messages/SearchIcon';
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
 import Persona from '../../components/Persona/Persona';
 
-type Props = {
-  // openBottomSheet: () => void;
-  navigation: NavigationProps;
-};
-
-const CallList: React.FC<Props> = ({navigation}) => {
+const CallList = () => {
   const loading = useAppStore(state => state.loading);
   const calls = useAppStore(state => state.calls);
   const [search, setSearch] = useState<string>('');
@@ -41,9 +35,7 @@ const CallList: React.FC<Props> = ({navigation}) => {
       <FlatList
         contentContainerStyle={styles.content}
         data={calls}
-        renderItem={({item}) => (
-          <Persona contact={item} navigation={navigation} />
-        )}
+        renderItem={({item}) => <Persona contact={item} />}
         keyExtractor={item => item._id}
         initialNumToRender={10}
       />

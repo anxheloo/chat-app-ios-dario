@@ -24,10 +24,11 @@ type UpdateMessagesProps = {
 };
 
 const UpdateDissapear: React.FC<UpdateMessagesProps> = memo(({cancel}) => {
-  const {setUserPersona, dissappearingMessages} = useAppStore();
-  const [selectableOption, setSelectableOption] = useState<string>(
-    dissappearingMessages,
-  );
+  const setUserPersona = useAppStore(state => state.setUserPersona);
+  const disappearingMessages = useAppStore(state => state.disappearingMessages);
+
+  const [selectableOption, setSelectableOption] =
+    useState<string>(disappearingMessages);
   const [loading, setIsLoading] = useState<boolean>(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -88,13 +89,13 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = memo(({cancel}) => {
 
     try {
       const res = await apiClient.post(UPDATE_DISSAPEARING_MESSAGES, {
-        dissappearingMessages: selectableOption,
+        disappearingMessages: selectableOption,
       });
 
       if (res.status === 200) {
         console.log('This is res', res.data);
         setIsLoading(false);
-        setUserPersona({dissappearingMessages: res.data.dissappearingMessages});
+        setUserPersona({disappearingMessages: res.data.disappearingMessages});
         toggleDropdown();
         cancel();
         Alert.alert('Successfully Updated', 'Your time frame has been updated');
@@ -150,7 +151,7 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = memo(({cancel}) => {
                 fontWeight={FONTWEIGHT[300]}
                 fontSize={FONTSIZE.md}
                 style={{flex: 1}}>
-                {dissappearingMessages}
+                {disappearingMessages}
               </ReusableText>
               <View
                 style={{

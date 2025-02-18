@@ -12,6 +12,7 @@ import {BORDERRADIUS} from '../../../../theme/theme';
 import {Message, NavigationProps} from '../../../../utils/types';
 import {useNavigation} from '@react-navigation/native';
 import PlayIcon from '../../../../assets/icons/messages/PlayIcon';
+import {formatDuration} from '../../../../utils/helpers';
 
 type VideoProps = {
   message: Message;
@@ -33,14 +34,16 @@ const VideoComponent: React.FC<VideoProps> = memo(
       }
     }, [uploading, navigation, message]);
 
-    const formatDuration = useMemo(() => {
-      let duration: any = Math.floor(message?.duration ?? 0);
-      let m: string | number = Math.floor(duration / 60);
-      m = m >= 10 ? m : '0' + m;
-      duration = Math.floor(duration % 60);
-      duration = duration >= 10 ? duration : '0' + duration;
-      return m + ':' + duration;
-    }, [message?.duration]);
+    // const formatDuration = useMemo(() => {
+    //   let duration: any = Math.floor(message?.duration ?? 0);
+    //   let m: string | number = Math.floor(duration / 60);
+    //   m = m >= 10 ? m : '0' + m;
+    //   duration = Math.floor(duration % 60);
+    //   duration = duration >= 10 ? duration : '0' + duration;
+    //   return m + ':' + duration;
+    // }, [message?.duration]);
+
+    const format = formatDuration(message?.duration ?? 0);
 
     return (
       <View style={styles.container}>
@@ -64,7 +67,7 @@ const VideoComponent: React.FC<VideoProps> = memo(
         )}
 
         <View style={styles.videoDuration}>
-          <Text style={styles.durationText}>{formatDuration}</Text>
+          <Text style={styles.durationText}>{format}</Text>
         </View>
 
         {!uploading && (

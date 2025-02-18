@@ -5,7 +5,8 @@ import {useAppStore} from '../../store';
 import {navigate} from '../../navigation/navigationRef';
 
 const useProfile = () => {
-  const {setUserPersona, updateKeys} = useAppStore();
+  const setUserPersona = useAppStore(state => state.setUserPersona);
+  const updateKeys = useAppStore(state => state.updateKeys);
 
   const updateProfilePic = async (avatar: number): Promise<void> => {
     updateKeys({isUploading: true});

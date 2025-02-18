@@ -6,8 +6,10 @@ import MainNavigation from './src/navigation/MainNavigation';
 import InternetPopup from './src/components/Internet/InternetPopup';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import CustomBottomSheetModal from './src/components/BottomSheet/CustomBottomSheetModal';
+// import {useSocket} from './src/utils/useSocket';
 
 const App = () => {
+  // useSocket();
   // const CustomStatusBar = ({
   //   backgroundColor,
   //   barStyle,
@@ -44,6 +46,8 @@ const App = () => {
             barStyle={'dark-content'}
             />
             )} */
+
+  console.log('THis is app.js:');
 
   return (
     <GestureHandlerRootView style={styles.gestureHandlerContainer}>

@@ -11,6 +11,7 @@ import ScannedUser from '../screens/Scanner/ScannedUser';
 import {RootStackParamList} from '../utils/types';
 import FullScreenMedia from '../screens/FullScreenMedia/FullScreenMedia';
 import {navigationRef} from './navigationRef';
+import JoinScreen from '../screens/Calls/JoinScreen';
 
 const MainNavigation = () => {
   const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -59,6 +60,11 @@ const MainNavigation = () => {
         <Stack.Screen
           name="ScannedUser"
           component={ScannedUser}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="JoinScreen"
+          component={JoinScreen}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

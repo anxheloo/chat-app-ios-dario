@@ -2,16 +2,20 @@ import {useCallback, useEffect} from 'react';
 import {useAppStore} from '../store';
 import {Message, Conversation, Contact} from './types';
 import {Alert} from 'react-native';
+import {goBack, navigate} from '../navigation/navigationRef';
+import {RTCIceCandidate, RTCSessionDescription} from 'react-native-webrtc';
+import {RTCSessionDescriptionInit} from 'react-native-webrtc/lib/typescript/RTCSessionDescription';
 
 export const useSocket = () => {
-  const {
-    updateFuncChat,
-    id: userId,
-    initializeSocket,
-    disconnectSocket,
-    updateSelectedChatMessages,
-    updateFriends,
-  } = useAppStore();
+  const updateFuncChat = useAppStore(state => state.updateFuncChat);
+  const userId = useAppStore(state => state.id);
+  const initializeSocket = useAppStore(state => state.initializeSocket);
+  const disconnectSocket = useAppStore(state => state.disconnectSocket);
+  const updateSelectedChatMessages = useAppStore(
+    state => state.updateSelectedChatMessages,
+  );
+  const updateFriends = useAppStore(state => state.updateFriends);
+  const updateWebRTCState = useAppStore(state => state.updateWebRTCState);
 
   const handleReceiveMessage = useCallback(
     (message: any) => {
@@ -68,27 +72,6 @@ export const useSocket = () => {
     },
     [updateFuncChat, updateSelectedChatMessages],
   );
-  // const handleConversationUpdated = useCallback(
-  //   ({conversationId, lastMessage, lastMessageTime}:{conversationId: string, lastMessage: any, lastMessageTime: string}) => {
-  //     const {conversations} = useAppStore.getState();
-
-  //     const updatedContacts = directMessagesContacts.map(conversation => {
-  //       if (conversation._id === conversationId) {
-  //         return {
-  //           ...conversation,
-  //           lastMessage,
-  //           lastMessageTime,
-  //         };
-  //       }
-  //       return conversation;
-  //     });
-
-  //     updateFuncChat({conversations: updatedContacts});
-  //   },
-  //   [],
-  // );
-
-  // Handle message deletion
 
   const handleMessageDeleted = useCallback(
     ({messageId}: {messageId: string}) => {
@@ -175,9 +158,82 @@ export const useSocket = () => {
     [updateFriends],
   );
 
-  // const loginalert = () => {
-  //   Alert.alert('Login', 'You have been logged in.');
-  // };
+  // ==============================================================================================
+
+  // Call Event Handlers
+  const handleIncomingCall = useCallback(
+    ({
+      caller,
+      callType,
+      offer,
+    }: {
+      caller: Contact;
+      callType: 'video' | 'audio';
+      offer: RTCSessionDescription;
+    }) => {
+      console.log('Incoming call from:', caller.username);
+      updateWebRTCState({
+        callState: 'incoming',
+        caller,
+        callType,
+        offer,
+      });
+      navigate('JoinScreen');
+    },
+    [updateWebRTCState],
+  );
+
+  const handleCallAccepted = useCallback(
+    ({answer}: {answer: RTCSessionDescriptionInit}) => {
+      console.log('Call accepted');
+      updateWebRTCState({
+        callState: 'active',
+        answer,
+      });
+    },
+    [updateWebRTCState],
+  );
+
+  const handleCallRejected = useCallback(() => {
+    console.log('Call rejected');
+    updateWebRTCState({
+      callState: 'idle',
+      caller: null,
+      callType: null,
+    });
+    goBack();
+  }, [updateWebRTCState]);
+
+  const handleCallEnded = () => {
+    console.log('Call ended');
+    updateWebRTCState({
+      callState: 'idle',
+      caller: null,
+      callType: null,
+      localStream: null,
+      remoteStream: null,
+      peerConnection: null,
+    });
+    goBack();
+  };
+
+  const ICECandidateReceived = async ({
+    candidate,
+  }: {
+    candidate: RTCIceCandidate;
+  }) => {
+    const peerConnection = useAppStore.getState().peerConnection;
+
+    if (peerConnection) {
+      try {
+        await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+      } catch (error) {
+        console.error('Error adding ICE candidate:', error);
+      }
+    }
+  };
+
+  // ==============================================================================================
 
   useEffect(() => {
     if (!userId) {
@@ -190,21 +246,27 @@ export const useSocket = () => {
     const socket = initializeSocket();
 
     if (socket) {
-      // socket.off('receiveMessage', handleReceiveMessage);
-      // socket.off('messageDeleted', handleMessageDeleted);
-      // socket.off('conversationUpdated', handleConversationUpdated);
-      // socket.off('friendCreated', notifyReceiver);
-      // socket.off('friendDeleted', friendDeleted);
-
       socket.on('receiveMessage', handleReceiveMessage);
       socket.on('messageDeleted', handleMessageDeleted);
       socket.on('conversationUpdated', handleConversationUpdated);
       socket.on('friendCreated', notifyReceiver);
       socket.on('friendDeleted', friendDeleted);
+
+      // Call event listeners
+      socket.on('incomingCall', handleIncomingCall);
+      socket.on('callAccepted', handleCallAccepted);
+      socket.on('callRejected', handleCallRejected);
+      socket.on('callEnded', handleCallEnded);
+      socket?.on('ICECandidateReceived', ICECandidateReceived);
     }
 
     return () => {
       console.log('socket disconected from useSocket');
+      socket.off('receiveMessage');
+      socket.off('messageDeleted');
+      socket.off('conversationUpdated');
+      socket.off('friendCreated');
+      socket.off('friendDeleted');
       disconnectSocket();
     };
 

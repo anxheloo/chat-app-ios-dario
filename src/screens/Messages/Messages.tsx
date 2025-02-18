@@ -1,15 +1,11 @@
 import React from 'react';
 import Content from './Content';
-import {NavigationProps} from '../../utils/types';
 import {useSocket} from '../../utils/useSocket';
 
-type MessagesScreenProps = {
-  navigation: NavigationProps;
-};
-const Messages: React.FC<MessagesScreenProps> = ({navigation}) => {
+const Messages = () => {
   useSocket();
 
-  return <Content navigation={navigation} />;
+  return <Content />;
 };
 
 export default Messages;

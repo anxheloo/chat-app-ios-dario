@@ -1,12 +1,16 @@
 import React, {memo, useCallback} from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+
+import {useAppStore} from '../../store';
+
 import ScanIcon from '../../assets/icons/messages/ScanIcon';
 import ReusableText from '../ReusableText';
-import {useAppStore} from '../../store';
-import {useNavigation} from '@react-navigation/native';
+
 import {NavigationProps} from '../../utils/types';
 import useUserInfo from '../../utils/hooks/useUserInfo';
-// import {useSocket} from '../../utils/useSocket';
+import {permission} from '../../utils/permissions';
+import {checkPermissionStatus} from '../../utils/helpers';
 
 const Header = memo(() => {
   const username = useAppStore(state => state.username);
@@ -17,14 +21,15 @@ const Header = memo(() => {
 
   //Open Scanner
   const openScanner = useCallback(async () => {
-    navigation.navigate('Scanner');
+    const status = await checkPermissionStatus(permission.camera);
+    if (status) {
+      navigation.navigate('Scanner');
+    }
   }, [navigation]);
 
   const navigateToHomePage = useCallback(() => {
     navigation?.replace('BottomTabNavigation', {screen: 'Messages'});
   }, [navigation]);
-
-  console.log('This is header step 1');
 
   return (
     <View style={styles.container}>

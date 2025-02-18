@@ -5,7 +5,10 @@ import {GET_ALL_MESSAGES} from '../../api/apis';
 import {useAppStore} from '../../store';
 
 const useMessages = (flatListRef: any) => {
-  const {updateSelectedChatMessages, selectedChatData} = useAppStore();
+  const updateSelectedChatMessages = useAppStore(
+    state => state.updateSelectedChatMessages,
+  );
+  const selectedChatData = useAppStore(state => state.selectedChatData);
 
   const [pagination, setPagination] = useState({
     isLoading: false,

@@ -1,4 +1,5 @@
 package com.reactnativechatapparbri
+import com.oney.WebRTCModule.WebRTCModuleOptions
 
 import android.os.Bundle;
 import com.facebook.react.ReactActivity
@@ -10,6 +11,10 @@ class MainActivity : ReactActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(null)
+
+      // Initialize the WebRTC module options.
+     val options = WebRTCModuleOptions.getInstance()
+        options.enableMediaProjectionService = true
   }
 
   /**

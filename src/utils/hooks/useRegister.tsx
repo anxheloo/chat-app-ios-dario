@@ -1,5 +1,4 @@
-import React from 'react';
-import {Alert, StyleSheet, View} from 'react-native';
+import {Alert} from 'react-native';
 import {apiClient} from '../../api/apiClient';
 import {SIGNUP_ROUTES} from '../../api/apis';
 import {useAppStore} from '../../store';
@@ -33,7 +32,7 @@ const useRegister = (navigation: NavigationProps) => {
         await saveToken(response.data.token);
         setToken(response.data.token);
 
-        navigation.replace('BottomTabNavigation');
+        navigation.replace('BottomTabNavigation', {screen: 'Messages'});
       }
     } catch (error: any) {
       updateKeys({loading: false, message: 'Register Failed'});
@@ -46,7 +45,5 @@ const useRegister = (navigation: NavigationProps) => {
 
   return handleRegister;
 };
-
-const styles = StyleSheet.create({});
 
 export default useRegister;

@@ -1,5 +1,7 @@
 import moment from 'moment';
 import {Message} from './types';
+import {request, check, RESULTS} from 'react-native-permissions';
+import {Alert, Linking} from 'react-native';
 
 // Check if a message is image
 export const checkIfImage = (fileUrl: string): boolean => {
@@ -28,4 +30,54 @@ export const preprocessMessages = (messages: Message[]) => {
     lastMessageDate = currentMessageDate;
     return {...message, showDate};
   });
+};
+
+export const formatDuration = (messageDuration: number) => {
+  if (messageDuration) {
+    let duration: any = Math.floor(messageDuration ?? 0);
+    let m: string | number = Math.floor(duration / 60);
+    m = m >= 10 ? m : '0' + m;
+    duration = Math.floor(duration % 60);
+    duration = duration >= 10 ? duration : '0' + duration;
+    return m + ':' + duration;
+  }
+};
+
+const handleBlockedPermission = () => {
+  Alert.alert(
+    'Permission Blocked',
+    'You have blocked this permission. Please go to settings and enable it to use this feature.',
+    [
+      {text: 'Cancel', style: 'cancel'},
+      {
+        text: 'Go to settings',
+        onPress: () => {
+          Linking.openSettings();
+        },
+      },
+    ],
+    {cancelable: false},
+  );
+};
+
+export const checkPermissionStatus = async (permissionType: any) => {
+  try {
+    const status = await check(permissionType);
+
+    if (status === RESULTS.GRANTED) {
+      return true;
+    } else {
+      const newStatus = await request(permissionType);
+
+      if (newStatus === RESULTS.GRANTED) {
+        return true;
+      } else {
+        handleBlockedPermission();
+        return false;
+      }
+    }
+  } catch (error) {
+    console.error('Error checking permission:', error);
+    return false;
+  }
 };

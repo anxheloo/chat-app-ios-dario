@@ -4,7 +4,7 @@ import {useAppStore} from '../../store';
 import {Alert} from 'react-native';
 
 const useConversations = () => {
-  const {updateFuncChat} = useAppStore();
+  const updateFuncChat = useAppStore(state => state.updateFuncChat);
   const updateKeys = useAppStore(state => state.updateKeys);
 
   const getConversations = async () => {

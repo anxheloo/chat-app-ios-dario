@@ -1,4 +1,4 @@
-import {useCallback, useEffect} from 'react';
+import {useEffect} from 'react';
 import {Alert} from 'react-native';
 import {useAppStore} from '../../store';
 import {apiClient} from '../../api/apiClient';
@@ -9,16 +9,14 @@ import {
 } from '../../api/apis';
 
 const useUserInfo = () => {
-  const {
-    setUserPersona,
-    updateFuncChat,
-    isUserInfoFetched,
-    setUserInfoStatus,
-    updateKeys,
-  } = useAppStore();
+  const setUserInfoStatus = useAppStore(state => state.setUserInfoStatus);
+  const updateKeys = useAppStore(state => state.updateKeys);
+  const updateFuncChat = useAppStore(state => state.updateFuncChat);
+  const isUserInfoFetched = useAppStore(state => state.isUserInfoFetched);
+  const setUserPersona = useAppStore(state => state.setUserPersona);
 
   // Get user info function
-  const getUserInfo = useCallback(async () => {
+  const getUserInfo = async () => {
     if (isUserInfoFetched) {
       return;
     }
@@ -52,19 +50,14 @@ const useUserInfo = () => {
     } finally {
       updateKeys({loading: false});
     }
-  }, [
-    isUserInfoFetched,
-    updateKeys,
-    setUserInfoStatus,
-    setUserPersona,
-    updateFuncChat,
-  ]);
+  };
 
   //Get user info
   useEffect(() => {
     console.log('This is getUserInfo step 2');
     getUserInfo();
-  }, [getUserInfo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 };
 
 export default useUserInfo;

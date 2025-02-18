@@ -12,7 +12,8 @@ const useLogin = (
   setPin: (text: string) => void,
   navigation: NavigationProps,
 ) => {
-  const {updateKeys, setToken} = useAppStore();
+  const updateKeys = useAppStore(state => state.updateKeys);
+  const setToken = useAppStore(state => state.setToken);
 
   const validateInput = (): boolean => {
     if (!username || !pin) {
@@ -32,13 +33,13 @@ const useLogin = (
   };
 
   const handleLogin = async () => {
+    console.log('Inside handleLogin');
     updateKeys({loading: true});
     try {
       const response = await apiClient.post(LOGIN_ROUTE, {username, pin});
 
       if (response.status === 200) {
         console.log('This is response.status:', response.status);
-        updateKeys({loading: false});
 
         await saveToken(response.data.token);
         setToken(response.data.token);
@@ -47,8 +48,6 @@ const useLogin = (
       }
     } catch (error: any) {
       console.log('This is error:', error);
-
-      updateKeys({loading: false});
       Alert.alert('Login Error', error?.response.data.message);
       setUsername('');
       setPin('');

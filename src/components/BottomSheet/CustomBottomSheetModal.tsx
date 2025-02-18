@@ -17,7 +17,8 @@ import useProfile from '../../utils/hooks/useProfile';
 
 const CustomBottomSheetModal = () => {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
-  const {bottomSheetType, updateKeys} = useAppStore();
+  const bottomSheetType = useAppStore(state => state.bottomSheetType);
+  const updateKeys = useAppStore(state => state.updateKeys);
   const {updateProfilePic, selectAvatar} = useProfile();
   const snapPoints = useMemo(() => ['25%', '50%', '75%'], []);
 

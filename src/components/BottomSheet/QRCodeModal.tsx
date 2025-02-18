@@ -10,7 +10,7 @@ type UpdatePinProps = {
 };
 
 const QRCodeModal: React.FC<UpdatePinProps> = ({cancel}) => {
-  const {id: userId} = useAppStore();
+  const userId = useAppStore(state => state.id);
   const [error, setError] = useState(false);
 
   return (

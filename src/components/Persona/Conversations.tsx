@@ -29,7 +29,9 @@ type ConversationsProps = {
 
 const Conversations: React.FC<ConversationsProps> = React.memo(
   ({conversation, navigation, backgroundColor, cancel}) => {
-    const {updateFuncChat, id: loggedInUserId, conversations} = useAppStore();
+    const updateFuncChat = useAppStore(state => state.updateFuncChat);
+    const loggedInUserId = useAppStore(state => state.id);
+    const conversations = useAppStore(state => state.conversations);
     const [loading, setLoading] = useState(false);
 
     const participant = useMemo(() => {

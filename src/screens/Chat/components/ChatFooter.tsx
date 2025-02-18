@@ -1,14 +1,20 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, {memo, useCallback, useState} from 'react';
-import {Alert, StyleSheet, TouchableOpacity, View} from 'react-native';
+import React, {useCallback, useState} from 'react';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
+
+import * as ImagePicker from 'react-native-image-picker';
+
+import {useAppStore} from '../../../store';
+
 import ReusableInput from '../../../components/ReusableInput';
+import CameraOptions from './CameraOptions';
+
+import useSend from '../../../utils/hooks/useSend';
+
+import {permission} from '../../../utils/permissions';
+import {checkPermissionStatus} from '../../../utils/helpers';
+
 import MicrophoneIcon from '../../../assets/icons/Chat/MicrophoneIcon';
 import CameraIcon from '../../../assets/icons/Chat/CameraIcon';
-import {useAppStore} from '../../../store';
-import * as ImagePicker from 'react-native-image-picker';
-import CameraOptions from './CameraOptions';
-import {usePermission} from '../../../utils/usePermission';
-import useSend from '../../../utils/hooks/useSend';
 
 type ImagePickerType = 'capture' | 'library';
 
@@ -16,8 +22,6 @@ const ChatFooter = () => {
   const updateKeys = useAppStore(state => state.updateKeys);
   const [message, setMessage] = useState('');
   const [cameraOptions, setCameraOptions] = useState(false);
-  const {requestCameraPermission, requestPhotoLibraryPermission} =
-    usePermission();
 
   const {sendMessage, handleCameraUpload} = useSend(
     message,
@@ -28,8 +32,9 @@ const ChatFooter = () => {
   const onButtonPress = useCallback(
     async (type: ImagePickerType, options: any) => {
       if (type === 'capture') {
-        const hasPermission = await requestCameraPermission();
-        if (hasPermission) {
+        const status = await checkPermissionStatus(permission.camera);
+
+        if (status) {
           updateKeys({loading: true});
           ImagePicker.launchCamera(options, async (res: any) => {
             if (!res.didCancel && !res.error) {
@@ -43,12 +48,11 @@ const ChatFooter = () => {
               );
             }
           });
-        } else {
-          Alert.alert('Error', 'Camera permission not granted');
         }
       } else {
-        const hasPermission = await requestPhotoLibraryPermission();
-        if (hasPermission) {
+        const status = await checkPermissionStatus(permission.photoLibrary);
+
+        if (status) {
           updateKeys({loading: true});
           ImagePicker.launchImageLibrary(options, async (res: any) => {
             console.log('res', res);
@@ -63,18 +67,18 @@ const ChatFooter = () => {
               );
             }
           });
-        } else {
-          Alert.alert('Error', 'Gallery permission not granted');
         }
       }
     },
-    [
-      handleCameraUpload,
-      requestCameraPermission,
-      requestPhotoLibraryPermission,
-      updateKeys,
-    ],
+    [handleCameraUpload, updateKeys],
   );
+
+  const onMicPress = async () => {
+    const status = await checkPermissionStatus(permission.microphone);
+    if (status) {
+      console.log('Microphone permission granted');
+    }
+  };
 
   return (
     <View style={styles.footerContainer}>
@@ -91,7 +95,7 @@ const ChatFooter = () => {
       </View>
 
       <TouchableOpacity>
-        <MicrophoneIcon width={24} height={24} />
+        <MicrophoneIcon width={24} height={24} onPress={onMicPress} />
       </TouchableOpacity>
       <TouchableOpacity onPress={() => setCameraOptions(prev => !prev)}>
         <CameraIcon width={24} height={24} />

@@ -6,7 +6,9 @@ import {useAppStore} from '../../store';
 import {NavigationProps} from '../types';
 
 const useScannedUser = (scannedUserId: string, navigation: NavigationProps) => {
-  const {socket, id: senderId, updateFriends} = useAppStore();
+  const socket = useAppStore(state => state.socket);
+  const senderId = useAppStore(state => state.id);
+  const updateFriends = useAppStore(state => state.updateFriends);
   const [loading, setLoading] = useState(false);
 
   const [scannedUser, setScannedUser] = useState({

@@ -30,14 +30,13 @@ const Persona: React.FC<PersonaProps> = ({
   cancel,
   version,
 }) => {
-  const {
-    updateFuncChat,
-    updateKeys,
-    id: senderId,
-    username: senderUsername,
-    socket,
-    updateFriends,
-  } = useAppStore();
+  const updateFuncChat = useAppStore(state => state.updateFuncChat);
+  const updateKeys = useAppStore(state => state.updateKeys);
+  const senderId = useAppStore(state => state.id);
+  const senderUsername = useAppStore(state => state.username);
+  const socket = useAppStore(state => state.socket);
+  const updateFriends = useAppStore(state => state.updateFriends);
+
   const [loading, setLoading] = useState(false);
 
   // Select contact to update chat

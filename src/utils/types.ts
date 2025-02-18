@@ -6,9 +6,12 @@ export type RootStackParamList = {
   Profile: undefined;
   Messages: undefined;
   Calls: undefined;
+  OutgoingCallScreen: undefined;
+  IncomingCallScreen: undefined;
+  JoinCallScreen: undefined;
+  JoinScreen: undefined;
   Contacts: undefined;
   Login: undefined;
-  // BottomTabNavigation: undefined;
   BottomTabNavigation: {
     screen?: 'Messages' | 'Calls' | 'Contacts' | 'Profile';
     params?: undefined;

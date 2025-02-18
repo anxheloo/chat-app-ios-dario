@@ -4,21 +4,29 @@
 <dict>
 
 
-	<!-- Required with iOS 10 and higher -->
-	<key>NSCameraUsageDescription</key>
-	<string>Camera access is required to capture photos and videos.</string>
+<!-- Camera Permission -->
+<key>NSCameraUsageDescription</key>
+<string>Camera access is required for video calls.</string>
+
+<!-- Microphone Permission -->
+<key>NSMicrophoneUsageDescription</key>
+<string>Microphone access is required for voice calls.</string>
+
+<!-- Photo Library (If needed for saving videos or images) -->
+<key>NSPhotoLibraryUsageDescription</key>
+<string>Photo Library access is required to save media files.</string>
 
 	<!-- Required with iOS 11 and higher: include this only if you are planning to use the camera roll -->
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Photo Library access is required to select photos and videos.</string>
 
-	<!-- Include this only if you are planning to use the camera roll -->
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Photo Library access is required to select photos and videos.</string>
+<!-- Background Mode for Audio/Video Calls -->
+<key>UIBackgroundModes</key>
+<array>
+    <string>audio</string>
+    <string>voip</string>
+</array>
 
-	<!-- Include this only if you are planning to use the microphone for video recording -->
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Microphone access is required to record voice.</string>
 
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>

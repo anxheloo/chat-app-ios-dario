@@ -22,7 +22,6 @@ const ImageComponent: React.FC<ImageProps> = ({
   isSender,
 }) => {
   const navigation = useNavigation<NavigationProps>();
-  // const [upload, setUpload] = useState(true);
 
   const openImage = useCallback(() => {
     if (!uploading) {

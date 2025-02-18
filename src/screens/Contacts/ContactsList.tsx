@@ -65,7 +65,7 @@ const ContactsList: React.FC<ContentProps> = ({navigation}) => {
         renderItem={({item}) => (
           <Persona
             contact={item}
-            navigation={navigation}
+            // navigation={navigation}
             backgroundColor="white"
           />
         )}

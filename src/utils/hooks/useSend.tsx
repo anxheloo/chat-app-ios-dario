@@ -14,11 +14,14 @@ const useSend = (
   setMessage: (text: string) => void,
   setCameraOptions: (data: boolean) => void,
 ) => {
-  const {socket, id, selectedChatData, updateKeys, updateSelectedChatMessages} =
-    useAppStore();
-  const dissapearingTimeFrame = useAppStore(
-    state => state.dissappearingMessages,
+  const socket = useAppStore(state => state.socket);
+  const selectedChatData = useAppStore(state => state.selectedChatData);
+  const updateKeys = useAppStore(state => state.updateKeys);
+  const updateSelectedChatMessages = useAppStore(
+    state => state.updateSelectedChatMessages,
   );
+  const disappearingMessages = useAppStore(state => state.disappearingMessages);
+  const id = useAppStore(state => state.id);
 
   const compressImage = async (uri: string) => {
     try {
@@ -64,7 +67,7 @@ const useSend = (
           recipient: selectedChatData?._id,
           messageType: 'text',
           fileUrl: undefined,
-          expiresAt: dissapearingTimeFrame,
+          expiresAt: disappearingMessages,
         },
       ],
     });
@@ -75,7 +78,7 @@ const useSend = (
     socket,
     id,
     selectedChatData?._id,
-    dissapearingTimeFrame,
+    disappearingMessages,
     setMessage,
   ]);
 
@@ -83,7 +86,6 @@ const useSend = (
     async (res: any) => {
       if (res.assets?.length) {
         console.log('this is res from camera upload', res);
-        // console.log('this is base64 from camera upload', res.assets[0].base64);
 
         // 1.Check the total size of the selected images or videos
         let totalSize = res.assets.reduce(
@@ -126,7 +128,7 @@ const useSend = (
               // fileUrl: compressedUri,
               // thumbnailUrl: thumbnail, // Save thumbnail
               thumbnailUrl: null, // Save thumbnail
-              expiresAt: dissapearingTimeFrame,
+              expiresAt: disappearingMessages,
               uploading: true,
               duration: isVideo ? media.duration : null,
             };
@@ -158,7 +160,14 @@ const useSend = (
 
         try {
           //7. Post the compressed file to store on the server
-          const uploadResponse = await apiClient.post(UPLOAD_FILE, formData);
+          const uploadResponse = await apiClient.post(UPLOAD_FILE, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              // Accept: 'application/json',
+            },
+          });
+
+          console.log('This is uploadResponse: ', uploadResponse);
 
           //8. Emit the event when upload is successful
           if (uploadResponse.status === 200) {
@@ -186,11 +195,6 @@ const useSend = (
             );
 
             socket?.emit('sendMessage', {messages: uploadedMessages});
-          } else {
-            Alert.alert(
-              uploadResponse.data?.message || 'Upload failed',
-              'Error uploading media, try again!',
-            );
           }
         } catch (error: any) {
           updateSelectedChatMessages(currentMessages =>
@@ -213,7 +217,7 @@ const useSend = (
       selectedChatData?.conversationId,
       selectedChatData?._id,
       id,
-      dissapearingTimeFrame,
+      disappearingMessages,
       socket,
     ],
   );

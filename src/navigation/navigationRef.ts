@@ -10,3 +10,9 @@ export function navigate(name: string, params?: object) {
     navigationRef.dispatch(CommonActions.navigate(name, params));
   }
 }
+
+export function goBack() {
+  if (navigationRef.isReady()) {
+    navigationRef.dispatch(CommonActions.goBack());
+  }
+}

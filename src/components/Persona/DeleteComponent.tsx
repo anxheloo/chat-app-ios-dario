@@ -12,7 +12,8 @@ import {apiClient} from '../../api/apiClient';
 import {Conversation} from '../../utils/types';
 
 const DeleteComponent = () => {
-  const {updateFuncChat, conversations} = useAppStore();
+  const updateFuncChat = useAppStore(state => state.updateFuncChat);
+  const conversations = useAppStore(state => state.conversations);
 
   const [loading, setLoading] = useState(false);
 

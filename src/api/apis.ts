@@ -1,7 +1,7 @@
 // export const HOST = 'http://172.20.10.3:8000';
 
-// export const HOST = 'http://192.168.1.197:8000';
-export const HOST = 'https://chat-app-main-server.onrender.com';
+export const HOST = 'http://192.168.1.251:8000';
+// export const HOST = 'https://chat-app-main-server.onrender.com';
 
 export const AUTH_ROUTES = 'api/auth';
 export const SIGNUP_ROUTES = `${AUTH_ROUTES}/signup`;
@@ -10,7 +10,7 @@ export const GET_USER_INFO = `${AUTH_ROUTES}/user_info`;
 export const UPDATE_USER_PROFILE_PIC = `${AUTH_ROUTES}/update-profile-pic`;
 export const UPDATE_USERNAME = `${AUTH_ROUTES}/update-username`;
 export const UPDATE_PIN = `${AUTH_ROUTES}/update-pin`;
-export const UPDATE_DISSAPEARING_MESSAGES = `${AUTH_ROUTES}/update-dissappearing-messages`;
+export const UPDATE_DISSAPEARING_MESSAGES = `${AUTH_ROUTES}/update-disappearing-messages`;
 
 export const CONTACTS_ROUTES = 'api/contacts';
 export const SEARCH = `${CONTACTS_ROUTES}/search`;

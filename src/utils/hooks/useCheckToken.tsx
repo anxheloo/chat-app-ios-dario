@@ -4,7 +4,7 @@ import {useAppStore} from '../../store';
 import {NavigationProps} from '../types';
 
 const useCheckToken = (navigation: NavigationProps) => {
-  const {setToken} = useAppStore();
+  const setToken = useAppStore(state => state.setToken);
 
   const checkToken = useCallback(async () => {
     const token = await getToken();

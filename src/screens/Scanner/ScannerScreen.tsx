@@ -1,18 +1,24 @@
-import React, {useEffect} from 'react';
-import {useCallback} from 'react';
+import React, {useCallback} from 'react';
 import {StatusBar, StyleSheet, TouchableOpacity, View} from 'react-native';
-import type {Code} from 'react-native-vision-camera';
-import {useCameraDevice, useCodeScanner} from 'react-native-vision-camera';
-import {Camera} from 'react-native-vision-camera';
+import {
+  useCameraDevice,
+  useCodeScanner,
+  Camera,
+  Code,
+} from 'react-native-vision-camera';
+
+import {useIsFocused} from '@react-navigation/native';
+import {BlurView} from '@react-native-community/blur';
+
 import {SAFE_AREA_PADDING} from './Constants';
 import {useIsForeground} from '../../utils/useIsForeground';
 import {NavigationProps} from '../../utils/types';
+
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
-import {BlurView} from '@react-native-community/blur';
-import {BORDERRADIUS} from '../../theme/theme';
+
 import ReusableText from '../../components/ReusableText';
-import {usePermission} from '../../utils/usePermission';
-import {useIsFocused} from '@react-navigation/native';
+
+import {BORDERRADIUS} from '../../theme/theme';
 
 type ScannerScreenProps = {
   navigation: NavigationProps;
@@ -20,26 +26,7 @@ type ScannerScreenProps = {
 const ScannerScreen = ({
   navigation,
 }: ScannerScreenProps): React.ReactElement => {
-  const {requestCameraPermission} = usePermission();
-
-  useEffect(() => {
-    // updateKeys({bottomSheetType: null});
-
-    const request = async () => {
-      const hasPermission = await requestCameraPermission();
-      return hasPermission;
-    };
-
-    const hasPermission = request();
-
-    if (!hasPermission) {
-      navigation.goBack();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   // 1. Use a simple default back camera
-
   const device = useCameraDevice('back');
 
   // 2. Only activate Camera when the app is focused and this screen is currently opened

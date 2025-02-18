@@ -2,14 +2,15 @@ import {io} from 'socket.io-client';
 import {create, StateCreator} from 'zustand';
 import {HOST} from '../api/apis';
 import {Contact, Conversation, Message, NavigationProps} from '../utils/types';
+import {MediaStream, RTCPeerConnection} from 'react-native-webrtc';
+import {RTCSessionDescriptionInit} from 'react-native-webrtc/lib/typescript/RTCSessionDescription';
 
 type PersonaSlice = {
   username: string;
   avatar: number;
   pin: string;
   id: string;
-  dissappearingMessages: string;
-  // qr_code: string;
+  disappearingMessages: string;
   isUserInfoFetched: boolean;
   setUserInfoStatus: (status: boolean) => void;
   setUserPersona: (data: Partial<PersonaSlice>) => void;
@@ -58,6 +59,46 @@ type ChatSlice = {
   sortConversations: () => void;
 };
 
+type CallState = 'idle' | 'outgoing' | 'incoming' | 'active';
+
+type WebRTCSlice = {
+  localStream: MediaStream | null;
+  remoteStream: MediaStream | null;
+  peerConnection: RTCPeerConnection | null;
+  isMuted: boolean;
+  isVideoEnabled: boolean;
+  isFrontCamera: boolean;
+  callState: CallState;
+  callType: 'video' | 'audio' | null;
+  caller: Contact | null;
+  offer: RTCSessionDescriptionInit | null;
+  answer: RTCSessionDescriptionInit | null;
+  updateWebRTCState: (
+    data: Partial<Omit<WebRTCSlice, 'updateWebRTCState'>>,
+  ) => void;
+};
+
+const webRTCSlice: StateCreator<WebRTCSlice> = set => ({
+  // Initial state
+  localStream: null,
+  remoteStream: null,
+  peerConnection: null,
+  isMuted: false,
+  isVideoEnabled: true,
+  isFrontCamera: true,
+  callState: 'idle',
+  callType: null,
+  caller: null,
+  offer: null,
+  answer: null,
+  // Update function
+  updateWebRTCState: data =>
+    set(state => ({
+      ...state,
+      ...data,
+    })),
+});
+
 type SocketSlice = {
   socket: any | null;
   initializeSocket: () => any | null;
@@ -68,15 +109,15 @@ type CreateSlice = PersonaSlice &
   TokenSlice &
   StatusSlice &
   ChatSlice &
-  SocketSlice;
+  SocketSlice &
+  WebRTCSlice;
 
 const createPersonaSlice: StateCreator<PersonaSlice> = set => ({
   username: '',
   avatar: 0,
   pin: '',
   id: '',
-  dissappearingMessages: 'None',
-  // qr_code: '',
+  disappearingMessages: 'None',
   isUserInfoFetched: false,
   setUserInfoStatus: (status: boolean) => set({isUserInfoFetched: status}),
   setUserPersona: set,
@@ -124,11 +165,6 @@ const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
 
   sortConversations: () => {
     const {conversations} = get();
-    // const sortedContacts = [...conversations].sort((a, b) => {
-    //   if (a._id === message.conversationId) return -1;
-    //   if (b._id === message.conversationId) return 1;
-    //   return 0;
-    // });
 
     const sortedContacts = conversations.sort((a, b) => {
       const dateA = +Date.parse(a?.lastMessage?.createdAt ?? '');
@@ -140,49 +176,6 @@ const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
 
     set({conversations: sortedContacts});
   },
-
-  // sortContactsByLastConversation: (message: any) => {
-  //   const {id} = get() as CreateSlice;
-  //   const fromId =
-  //     message.sender._id === id ? message.recipient._id : message.sender._id;
-  //   const fromData =
-  //     message.sender._id === id ? message.recipient : message.sender;
-  //   const contacts = [...get().conversations];
-  //   const data = contacts.find(contact => contact._id === fromId);
-  //   const index = contacts.findIndex(contact => contact._id === fromId);
-  //   if (index !== -1 && index !== undefined) {
-  //     contacts.splice(index, 1);
-  //     if (data) {
-  //       contacts.unshift(data);
-  //     }
-  //   } else {
-  //     contacts.unshift(fromData);
-  //   }
-  //   set({conversations: contacts});
-  // },
-
-  // sortContactsByLastConversation: (message: any) => {
-  //   const {id} = get() as CreateSlice;
-  //   const contacts = [...get().conversations];
-
-  //   // Find the conversation involving this message
-  //   const conversationIndex = contacts.findIndex(contact =>
-  //     contact.participants.some(participant => participant._id === id),
-  //   );
-
-  //   if (conversationIndex !== -1) {
-  //     const [updatedConversation] = contacts.splice(conversationIndex, 1);
-
-  //     // Update lastMessage details
-  //     updatedConversation.lastMessageType = message._id;
-  //     updatedConversation.lastMessageTime = message.createdAt;
-
-  //     // Move the updated conversation to the top
-  //     contacts.unshift(updatedConversation);
-  //   }
-
-  //   set({conversations: contacts});
-  // },
 });
 
 // Status Slice
@@ -205,12 +198,19 @@ const socketSlice: StateCreator<SocketSlice> = (set, get) => ({
     if (id && !get().socket) {
       const socketInstance = io(HOST, {
         query: {userId: id},
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 3000,
       });
 
       set({socket: socketInstance});
 
       socketInstance.on('connect', () => {
         console.log('Connected to socket server');
+      });
+
+      socketInstance.on('connect_error', error => {
+        console.error('Socket connection error:', error);
       });
 
       return socketInstance;
@@ -227,10 +227,11 @@ const socketSlice: StateCreator<SocketSlice> = (set, get) => ({
 });
 
 export const useAppStore = create<CreateSlice>()((...args) => ({
-  // ...createAuthSlice(...args),
   ...createPersonaSlice(...args),
   ...createStatusSlice(...args),
   ...chatSlice(...args),
   ...socketSlice(...args),
   ...createTokenSlice(...args),
+  // ...callSlice(...args),
+  ...webRTCSlice(...args),
 }));

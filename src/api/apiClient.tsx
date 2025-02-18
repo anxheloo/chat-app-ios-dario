@@ -9,7 +9,7 @@ export const apiClient = axios.create({
 apiClient.interceptors.request.use(
   async config => {
     try {
-      const {token} = useAppStore.getState();
+      const token = useAppStore.getState().token;
 
       if (token && config.baseURL?.startsWith(HOST)) {
         config.headers.Authorization = `Bearer ${token}`;

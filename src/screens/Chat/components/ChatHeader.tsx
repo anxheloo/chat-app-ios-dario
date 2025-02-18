@@ -7,12 +7,29 @@ import Avatar from '../../../components/Persona/Avatar';
 import {COLORS} from '../../../theme/theme';
 import CallIcon from '../../../assets/icons/BottomTabIcons/Call-Icon';
 import VideoIcon from '../../../assets/icons/Chat/VideoIcon';
+import {NavigationProps} from '../../../utils/types';
 
 const ChatHeader = memo(() => {
-  const navigation = useNavigation();
-  const {selectedChatData} = useAppStore();
+  const navigation = useNavigation<NavigationProps>();
+  const {selectedChatData, id, avatar, username, updateWebRTCState} =
+    useAppStore.getState();
 
   const goBack = () => navigation.goBack();
+
+  const handleCall = (callType: 'audio' | 'video') => {
+    if (selectedChatData) {
+      updateWebRTCState({
+        callState: 'outgoing',
+        callType,
+        caller: {
+          _id: id,
+          username,
+          avatar,
+        },
+      });
+      navigation.navigate('JoinScreen');
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -35,19 +52,11 @@ const ChatHeader = memo(() => {
         </ReusableText>
       </View>
 
-      <TouchableOpacity
-        style={styles.icon}
-        onPress={() => {
-          console.log('Video icon clicked');
-        }}>
+      <TouchableOpacity style={styles.icon} onPress={() => handleCall('video')}>
         <VideoIcon width={'100%'} height={'100%'} fill={'#212121'} />
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.icon}
-        onPress={() => {
-          console.log('Call icon clicked');
-        }}>
+      <TouchableOpacity style={styles.icon} onPress={() => handleCall('audio')}>
         <CallIcon width={'100%'} height={'100%'} fill={'#212121'} />
       </TouchableOpacity>
     </View>

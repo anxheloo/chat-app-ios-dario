@@ -6,13 +6,15 @@ import {DELETE_MESSAGE} from '../../api/apis';
 import {useAppStore} from '../../store';
 
 const DeleteMsg = React.memo(() => {
-  const {
-    updateFuncChat,
-    updateSelectedChatMessages,
-    selectedMessageToDelete: selectedMsgToDelete,
-    socket,
-    id,
-  } = useAppStore();
+  const updateFuncChat = useAppStore(state => state.updateFuncChat);
+  const updateSelectedChatMessages = useAppStore(
+    state => state.updateSelectedChatMessages,
+  );
+  const selectedMsgToDelete = useAppStore(
+    state => state.selectedMessageToDelete,
+  );
+  const socket = useAppStore(state => state.socket);
+  const id = useAppStore(state => state.id);
 
   const isShown = selectedMsgToDelete !== null;
   const msgId = selectedMsgToDelete?._id;

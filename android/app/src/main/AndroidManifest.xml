@@ -1,17 +1,45 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+
+<uses-feature android:name="android.hardware.camera" />
+<uses-feature android:name="android.hardware.camera.autofocus" />
+<uses-feature android:name="android.hardware.audio.output" />
+<uses-feature android:name="android.hardware.microphone" />
+<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+<uses-permission android:name="android.permission.VIBRATE"/>
+<uses-permission android:name="android.permission-group.CAMERA"/>
+
+<!-- Camera and Microphone Permissions -->
+<uses-permission android:name="android.permission.CAMERA" />
+<uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+<!-- Internet and Networking -->
 <uses-permission android:name="android.permission.INTERNET" />
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
 <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
-<uses-permission android:name="android.permission.VIBRATE"/>
-<uses-permission android:name="android.permission.CAMERA" />
+<!-- Storage and Media Permissions for API < 30 -->
 <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+<!-- Manage Storage for API ≥ 30 (Only if required) -->
+<uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+
+<!-- New Media Permissions for API ≥ 30 -->
 <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-<uses-permission android:name="android.permission-group.CAMERA"/>
+<uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+
+
+<!-- Bluetooth Permissions for Audio Devices -->
+<uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+<uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
+<!-- Foreground Service Permissions (Required for Voice/Video Calls) -->
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
 
     <queries>
         <intent>

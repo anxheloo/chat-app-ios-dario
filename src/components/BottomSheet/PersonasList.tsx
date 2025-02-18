@@ -22,7 +22,7 @@ type PersonasListProps = {
 };
 
 const PersonasList: React.FC<PersonasListProps> = ({cancel}) => {
-  const {friends} = useAppStore();
+  const friends = useAppStore(state => state.friends);
   const [search, setSearch] = useState<string>('');
   const [debouncedSearch, setDebounceSearch] = useState<string>('');
 

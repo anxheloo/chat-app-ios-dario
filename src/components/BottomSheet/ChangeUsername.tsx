@@ -21,7 +21,8 @@ type ChangeUsernameProps = {
 };
 
 const ChangeUsername: React.FC<ChangeUsernameProps> = ({cancel}) => {
-  const {setUserPersona, username: globalUsername} = useAppStore();
+  const setUserPersona = useAppStore(state => state.setUserPersona);
+  const globalUsername = useAppStore(state => state.username);
   const [username, setUsername] = useState<string>(globalUsername);
   const [loading, setIsLoading] = useState<boolean>(false);
 

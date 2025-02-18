@@ -5,7 +5,8 @@ import {GET_ALL_FRIENDS} from '../../api/apis';
 import {useAppStore} from '../../store';
 
 const useFriend = () => {
-  const {updateFuncChat, updateKeys} = useAppStore();
+  const updateFuncChat = useAppStore(state => state.updateFuncChat);
+  const updateKeys = useAppStore(state => state.updateKeys);
 
   console.log('Inside useFriend hook step 1 ');
 

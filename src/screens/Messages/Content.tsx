@@ -8,13 +8,13 @@ import FullScreenLoader from '../../components/Loading/FullScreenLoader';
 import ReusableInput from '../../components/ReusableInput';
 import SearchIcon from '../../assets/icons/messages/SearchIcon';
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
+import {useNavigation} from '@react-navigation/native';
 
-type ContentProps = {
-  navigation: NavigationProps;
-};
-
-const Content: React.FC<ContentProps> = memo(({navigation}) => {
-  const {loading, id: userId, conversations} = useAppStore();
+const Content = memo(() => {
+  const navigation = useNavigation<NavigationProps>();
+  const loading = useAppStore(state => state.loading);
+  const userId = useAppStore(state => state.id);
+  const conversations = useAppStore(state => state.conversations);
   const [search, setSearch] = useState<string>('');
   const [debouncedSearch, setDebounceSearch] = useState<string>('');
 
