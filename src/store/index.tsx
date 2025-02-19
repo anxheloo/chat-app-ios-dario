@@ -65,17 +65,20 @@ type WebRTCSlice = {
   localStream: MediaStream | null;
   remoteStream: MediaStream | null;
   peerConnection: RTCPeerConnection | null;
-  isMuted: boolean;
-  isVideoEnabled: boolean;
-  isFrontCamera: boolean;
   callState: CallState;
   callType: 'video' | 'audio' | null;
   caller: Contact | null;
-  offer: RTCSessionDescriptionInit | null;
-  answer: RTCSessionDescriptionInit | null;
   updateWebRTCState: (
     data: Partial<Omit<WebRTCSlice, 'updateWebRTCState'>>,
   ) => void;
+
+  resetCallState: () => void;
+
+  isMuted: boolean;
+  isVideoEnabled: boolean;
+  isFrontCamera: boolean;
+  offer: RTCSessionDescriptionInit | null;
+  answer: RTCSessionDescriptionInit | null;
 };
 
 const webRTCSlice: StateCreator<WebRTCSlice> = set => ({
@@ -83,12 +86,13 @@ const webRTCSlice: StateCreator<WebRTCSlice> = set => ({
   localStream: null,
   remoteStream: null,
   peerConnection: null,
-  isMuted: false,
-  isVideoEnabled: true,
-  isFrontCamera: true,
   callState: 'idle',
   callType: null,
   caller: null,
+
+  isMuted: false,
+  isVideoEnabled: true,
+  isFrontCamera: true,
   offer: null,
   answer: null,
   // Update function
@@ -97,6 +101,16 @@ const webRTCSlice: StateCreator<WebRTCSlice> = set => ({
       ...state,
       ...data,
     })),
+
+  resetCallState: () =>
+    set({
+      localStream: null,
+      remoteStream: null,
+      peerConnection: null,
+      callState: 'idle',
+      callType: null,
+      caller: null,
+    }),
 });
 
 type SocketSlice = {

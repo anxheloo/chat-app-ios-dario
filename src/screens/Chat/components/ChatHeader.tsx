@@ -8,6 +8,8 @@ import {COLORS} from '../../../theme/theme';
 import CallIcon from '../../../assets/icons/BottomTabIcons/Call-Icon';
 import VideoIcon from '../../../assets/icons/Chat/VideoIcon';
 import {NavigationProps} from '../../../utils/types';
+import {checkPermissionStatus} from '../../../utils/helpers';
+import {permission} from '../../../utils/permissions';
 
 const ChatHeader = memo(() => {
   const navigation = useNavigation<NavigationProps>();
@@ -16,8 +18,21 @@ const ChatHeader = memo(() => {
 
   const goBack = () => navigation.goBack();
 
-  const handleCall = (callType: 'audio' | 'video') => {
-    if (selectedChatData) {
+  const handleCall = async (callType: 'audio' | 'video') => {
+    let status;
+
+    if (callType === 'audio') {
+      await checkPermissionStatus(permission.microphone).then(micStatus => {
+        status = micStatus;
+      });
+    } else if (callType === 'video') {
+      const micStatus = await checkPermissionStatus(permission.microphone);
+      const cameraStatus = await checkPermissionStatus(permission.camera);
+
+      status = micStatus && cameraStatus;
+    }
+
+    if (selectedChatData && status) {
       updateWebRTCState({
         callState: 'outgoing',
         callType,

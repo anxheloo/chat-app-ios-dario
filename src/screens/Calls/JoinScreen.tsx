@@ -1,12 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {useEffect} from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-  Alert,
-} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Alert} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {
   RTCView,
   RTCPeerConnection,
@@ -18,6 +13,11 @@ import {
 } from 'react-native-webrtc';
 import {useAppStore} from '../../store';
 import {goBack} from '../../navigation/navigationRef';
+import {
+  createPeerConnection,
+  getLocalStream,
+  servers,
+} from '../../utils/webrtc';
 
 declare module 'react-native-webrtc' {
   interface RTCPeerConnection {
@@ -54,62 +54,130 @@ const JoinScreen = () => {
 
   const initializeCall = async (isVideoCall: boolean) => {
     try {
-      // Create new RTCPeerConnection
-      const pc = new RTCPeerConnection({
-        iceServers: [
-          {urls: 'stun:stun.l.google.com:19302'},
-          {urls: 'stun:stun1.l.google.com:19302'},
-        ],
+      // Step 1: Get local media (audio + video if needed)
+      const ls = await mediaDevices.getUserMedia({
+        audio: true,
+        video: isVideoCall
+          ? {width: 500, height: 300, frameRate: 30, facingMode: 'user'}
+          : false,
       });
 
-      // Handle ICE candidates
-      pc.onicecandidate = async event => {
-        console.log('Inside onicecandidate');
+      // Step 2: Create Peer Connection
+      const pc = new RTCPeerConnection(servers);
 
-        if (event.candidate && caller) {
-          socket?.emit('ICECandidate', {
-            ICECandidateReceived: useAppStore.getState().selectedChatData?._id,
+      // Step 3: Add Local Stream to Connection
+      ls?.getTracks().forEach(track => pc?.addTrack(track, ls));
+
+      // Step 4: Handle Remote Stream
+      pc.ontrack = event => {
+        console.log('Receiving remote stream:', event.streams[0]);
+        updateWebRTCState({remoteStream: event.streams[0]});
+      };
+
+      // Step 5: Handle ICE Candidates
+      pc.onicecandidate = event => {
+        if (event.candidate) {
+          socket.emit('ice-candidate', {
+            to: useAppStore.getState().selectedChatData?._id,
             candidate: event.candidate,
           });
         }
       };
 
-      // Handle incoming streams
-      pc.ontrack = event => {
-        if (event.streams?.[0]) {
-          updateWebRTCState({remoteStream: event.streams[0]});
-        }
-      };
-
-      // Get user media
-      const stream = await mediaDevices.getUserMedia({
-        audio: true,
-        video: isVideoCall
-          ? {
-              width: 500,
-              height: 300,
-              frameRate: 30,
-              facingMode: isFrontCamera ? 'user' : 'environment',
-            }
-          : false,
+      // Step 6: Create an Offer and Set Local Description
+      const o = await pc.createOffer({
+        offerToReceiveAudio: true,
+        offerToReceiveVideo: isVideoCall,
       });
 
-      // Add tracks to peer connection
-      stream.getTracks().forEach(track => {
-        pc.addTrack(track, stream);
+      await pc.setLocalDescription(o);
+
+      // Step 7: Send Offer to Other User
+      // socket.emit('offer', {
+      //   to: useAppStore.getState().selectedChatData?._id,
+      //   offer: o,
+      //   caller,
+      // });
+
+      socket.emit('incomingCall', {
+        to: useAppStore.getState().selectedChatData?._id,
+        offer: o,
+        caller,
+        callType: isVideoCall ? 'video' : 'audio',
       });
 
+      // Step 8: Update State
       updateWebRTCState({
-        localStream: stream,
         peerConnection: pc,
-        isVideoEnabled: isVideoCall,
+        localStream: ls,
       });
-
-      return pc;
     } catch (error) {
       console.error('Error initializing call:', error);
       Alert.alert('Error', 'Failed to initialize call');
-      handleEndCall();
+    }
+  };
+
+  const acceptCall = async () => {
+    if (!offer || !caller) {
+      return;
+    }
+
+    try {
+      // Step 1: Create a Peer Connection
+      const pc = new RTCPeerConnection(servers);
+
+      // Step 2: Get local stream (microphone/video)
+      const ls = await mediaDevices.getUserMedia({
+        audio: true,
+        video:
+          callType === 'video'
+            ? {width: 500, height: 300, frameRate: 30, facingMode: 'user'}
+            : false,
+      });
+
+      ls.getTracks().forEach(track => pc.addTrack(track, ls));
+
+      // Step 3: Handle Remote Stream
+      pc.ontrack = (event: any) => {
+        console.log('Receiving remote stream:', event.streams[0]);
+        updateWebRTCState({remoteStream: event.streams[0]});
+      };
+
+      // Step 4: Handle ICE Candidates
+      pc.onicecandidate = event => {
+        if (event.candidate) {
+          socket.emit('ice-candidate', {
+            to: caller?._id,
+            candidate: event.candidate,
+          });
+        }
+      };
+
+      // Step 5: Set the Remote Description
+      if (offer) {
+        await pc.setRemoteDescription(new RTCSessionDescription(offer));
+      }
+
+      // Step 6: Create an Answer
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+
+      // Step 7: Send the Answer back
+      socket?.emit('answer', {
+        to: caller?._id,
+        answer,
+      });
+
+      // Step 8: Update State
+      updateWebRTCState({
+        localStream: ls,
+        peerConnection: pc,
+        callState: 'active',
+      });
+    } catch (error) {
+      console.log('This is error: ', error);
+      console.log('THis is error.response.data:', error.response?.data);
+      Alert.alert('Error', 'Incoming call Failed');
     }
   };
 
@@ -122,14 +190,12 @@ const JoinScreen = () => {
       peerConnection.close();
     }
 
-    const recipientId =
+    const to =
       caller?._id === useAppStore.getState().id
         ? useAppStore.getState().selectedChatData?._id
         : caller?._id;
 
-    socket?.emit('endCall', {
-      recipientId: recipientId,
-    });
+    socket.emit('callRejected', {to});
 
     updateWebRTCState({
       localStream: null,
@@ -145,98 +211,12 @@ const JoinScreen = () => {
     goBack();
   };
 
-  const handleIncomingCall = async () => {
-    if (!offer || !caller) {
-      return;
-    }
-
-    try {
-      const pc = await initializeCall(callType === 'video');
-      if (!pc) {
-        return;
-      }
-
-      await pc.setRemoteDescription(new RTCSessionDescription(offer));
-      const answer = await pc.createAnswer();
-      await pc.setLocalDescription(answer);
-
-      socket?.emit('answer', {
-        callerId: caller._id,
-        answer,
-      });
-
-      updateWebRTCState({callState: 'active'});
-    } catch (error) {
-      console.error('Error handling incoming call:', error);
-      Alert.alert('Error', 'Failed to accept call');
-      handleEndCall();
-    }
-  };
-
-  const handleOutgoingCall = async () => {
-    if (!caller) {
-      return;
-    }
-
-    try {
-      const pc = await initializeCall(callType === 'video');
-      if (!pc) {
-        return;
-      }
-
-      const offer = await pc.createOffer({
-        offerToReceiveAudio: true,
-        offerToReceiveVideo: callType === 'video',
-      });
-
-      await pc.setLocalDescription(offer);
-
-      socket.emit('initiateCall', {
-        caller,
-        recipientId: useAppStore.getState().selectedChatData?._id,
-        offer,
-        callType,
-      });
-    } catch (error) {
-      console.error('Error making outgoing call:', error);
-      Alert.alert('Error', 'Failed to make call');
-      handleEndCall();
-    }
-  };
-
-  const toggleMute = () => {
-    if (localStream) {
-      localStream.getAudioTracks().forEach(track => {
-        track.enabled = !track.enabled;
-      });
-      updateWebRTCState({isMuted: !isMuted});
-    }
-  };
-
-  const toggleVideo = () => {
-    if (localStream && callType === 'video') {
-      localStream.getVideoTracks().forEach(track => {
-        track.enabled = !track.enabled;
-      });
-      updateWebRTCState({isVideoEnabled: !isVideoEnabled});
-    }
-  };
-
-  const switchCamera = () => {
-    if (localStream && callType === 'video') {
-      localStream.getVideoTracks().forEach(track => {
-        // @ts-ignore: React Native WebRTC specific method
-        track._switchCamera();
-      });
-      updateWebRTCState({isFrontCamera: !isFrontCamera});
-    }
-  };
-
   useEffect(() => {
     if (callState === 'incoming') {
-      handleIncomingCall();
+      // handleIncomingCall();
+      console.log('Incoming');
     } else if (callState === 'outgoing') {
-      handleOutgoingCall();
+      initializeCall(callType === 'video');
     }
 
     return () => {
@@ -248,8 +228,9 @@ const JoinScreen = () => {
         peerConnection.close();
       }
 
-      socket?.off('ICECandidateReceived');
+      // socket?.off('ICECandidateReceived');
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [callState]);
 
   const renderCallStatus = () => {
@@ -285,7 +266,17 @@ const JoinScreen = () => {
 
       <Text style={styles.status}>{renderCallStatus()}</Text>
 
-      <View style={styles.controls}>
+      {callState === 'incoming' && (
+        <TouchableOpacity onPress={acceptCall}>
+          <Text style={{color: 'white'}}>Accept Call</Text>
+        </TouchableOpacity>
+      )}
+
+      <TouchableOpacity onPress={handleEndCall}>
+        <Text style={{color: 'white'}}>Decline Call</Text>
+      </TouchableOpacity>
+
+      {/* <View style={styles.controls}>
         <TouchableOpacity
           style={[styles.controlButton, isMuted && styles.controlButtonActive]}
           onPress={toggleMute}>
@@ -316,7 +307,7 @@ const JoinScreen = () => {
             </TouchableOpacity>
           </>
         )}
-      </View>
+      </View> */}
     </SafeAreaView>
   );
 };

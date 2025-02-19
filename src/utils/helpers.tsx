@@ -32,6 +32,7 @@ export const preprocessMessages = (messages: Message[]) => {
   });
 };
 
+// Format the duration number of a message
 export const formatDuration = (messageDuration: number) => {
   if (messageDuration) {
     let duration: any = Math.floor(messageDuration ?? 0);
@@ -43,6 +44,7 @@ export const formatDuration = (messageDuration: number) => {
   }
 };
 
+// Handle blocked permission
 const handleBlockedPermission = () => {
   Alert.alert(
     'Permission Blocked',
@@ -60,6 +62,7 @@ const handleBlockedPermission = () => {
   );
 };
 
+//  Handle Check Permissions
 export const checkPermissionStatus = async (permissionType: any) => {
   try {
     const status = await check(permissionType);
