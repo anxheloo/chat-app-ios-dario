@@ -1,13 +1,14 @@
 import React from 'react';
 import {StatusBar, StyleSheet} from 'react-native';
+
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+
 import MainNavigation from './src/navigation/MainNavigation';
 import InternetPopup from './src/components/Internet/InternetPopup';
+
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import CustomBottomSheetModal from './src/components/BottomSheet/CustomBottomSheetModal';
-// import {useSocket} from './src/utils/useSocket';
-
 const App = () => {
   // useSocket();
   // const CustomStatusBar = ({

@@ -1,15 +1,13 @@
 import {useCallback, useEffect} from 'react';
-import {useAppStore} from '../store';
-import {Message, Conversation, Contact} from './types';
 import {Alert} from 'react-native';
-import {
-  // mediaDevices,
-  RTCSessionDescription,
-  // RTCPeerConnection,
-  RTCIceCandidate,
-} from 'react-native-webrtc';
-// import {servers} from './webrtc';
+
 import {goBack, navigate} from '../navigation/navigationRef';
+
+import {RTCSessionDescription, RTCIceCandidate} from 'react-native-webrtc';
+
+import {useAppStore} from '../store';
+
+import {Message, Conversation, Contact} from './types';
 
 export const useSocket = () => {
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
@@ -166,63 +164,7 @@ export const useSocket = () => {
 
   // ==============================================================================================
 
-  // const handleOffer = async ({
-  //   offer,
-  //   caller,
-  // }: {
-  //   offer: any;
-  //   caller: Contact;
-  // }) => {
-  //   const socket = useAppStore.getState().socket;
-  //   const callType = useAppStore.getState().callType;
-
-  //   // Step 1: Create a Peer Connection
-  //   const pc = new RTCPeerConnection(servers);
-
-  //   // Step 2: Get local stream (microphone/video)
-  //   const ls = await mediaDevices.getUserMedia({
-  //     audio: true,
-  //     video:
-  //       callType === 'video'
-  //         ? {width: 500, height: 300, frameRate: 30, facingMode: 'user'}
-  //         : false,
-  //   });
-
-  //   ls.getTracks().forEach(track => pc.addTrack(track, ls));
-
-  //   // Step 3: Handle Remote Stream
-  //   pc.ontrack = (event: any) => {
-  //     console.log('Receiving remote stream:', event.streams[0]);
-  //     updateWebRTCState({remoteStream: event.streams[0]});
-  //   };
-
-  //   // Step 4: Handle ICE Candidates
-  //   pc.onicecandidate = event => {
-  //     if (event.candidate) {
-  //       socket.emit('ice-candidate', {
-  //         to: caller?._id,
-  //         candidate: event.candidate,
-  //       });
-  //     }
-  //   };
-
-  //   // Step 5: Set the Remote Description
-  //   await pc.setRemoteDescription(new RTCSessionDescription(offer));
-
-  //   // Step 6: Create an Answer
-  //   const answer = await pc.createAnswer();
-  //   await pc.setLocalDescription(answer);
-
-  //   // Step 7: Send the Answer back
-  //   socket?.emit('answer', {
-  //     to: caller?._id,
-  //     answer,
-  //   });
-
-  //   // Step 8: Update State
-  //   updateWebRTCState({localStream: ls, peerConnection: pc});
-  // };
-
+  // WebRTC
   const incomingCall = async ({offer, caller, callType}: any) => {
     console.log('Incoming call from:', caller.username);
 
@@ -242,6 +184,7 @@ export const useSocket = () => {
     const peerConnection = useAppStore.getState().peerConnection;
 
     if (peerConnection) {
+      updateWebRTCState({answer, callState: 'active'});
       await peerConnection?.setRemoteDescription(
         new RTCSessionDescription(answer),
       );
@@ -251,16 +194,20 @@ export const useSocket = () => {
   const iceCandidate = async ({candidate}: {candidate: any}) => {
     const peerConnection = useAppStore.getState().peerConnection;
 
+    console.log('This is peer connection inside iceCandidate:', peerConnection);
+
     if (peerConnection) {
       await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
     }
   };
 
   const callRejected = async ({message}: {message: string}) => {
+    console.log('Inside call Rejected');
+
     const localStream = useAppStore.getState().localStream;
     const peerConnection = useAppStore.getState().peerConnection;
 
-    if (message) {
+    if (message !== 'Offline') {
       Alert.alert(message);
     } else {
       Alert.alert('User is offline');
@@ -274,16 +221,7 @@ export const useSocket = () => {
       peerConnection.close();
     }
 
-    updateWebRTCState({
-      localStream: null,
-      remoteStream: null,
-      peerConnection: null,
-      callState: 'idle',
-      callType: null,
-      caller: null,
-      offer: null,
-      answer: null,
-    });
+    resetCallState();
 
     goBack();
   };

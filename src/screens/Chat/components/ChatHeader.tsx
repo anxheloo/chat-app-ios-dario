@@ -13,18 +13,16 @@ import {permission} from '../../../utils/permissions';
 
 const ChatHeader = memo(() => {
   const navigation = useNavigation<NavigationProps>();
-  const {selectedChatData, id, avatar, username, updateWebRTCState} =
-    useAppStore.getState();
+  const {selectedChatData, updateWebRTCState} = useAppStore.getState();
 
   const goBack = () => navigation.goBack();
 
   const handleCall = async (callType: 'audio' | 'video') => {
-    let status;
+    let status: boolean;
 
     if (callType === 'audio') {
-      await checkPermissionStatus(permission.microphone).then(micStatus => {
-        status = micStatus;
-      });
+      const micStatus = await checkPermissionStatus(permission.microphone);
+      status = micStatus;
     } else if (callType === 'video') {
       const micStatus = await checkPermissionStatus(permission.microphone);
       const cameraStatus = await checkPermissionStatus(permission.camera);
@@ -32,15 +30,10 @@ const ChatHeader = memo(() => {
       status = micStatus && cameraStatus;
     }
 
-    if (selectedChatData && status) {
+    if (status) {
       updateWebRTCState({
         callState: 'outgoing',
         callType,
-        caller: {
-          _id: id,
-          username,
-          avatar,
-        },
       });
       navigation.navigate('JoinScreen');
     }

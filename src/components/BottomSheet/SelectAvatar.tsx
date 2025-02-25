@@ -1,9 +1,12 @@
 import React, {memo, useState} from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
-import ReusableText from '../ReusableText';
+
 import {BORDERRADIUS, COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
-import {useAppStore} from '../../store';
 import {avatarUrls} from '../../utils/constants';
+
+import {useAppStore} from '../../store';
+
+import ReusableText from '../ReusableText';
 import Avatar from '../Persona/Avatar';
 import ReusableButton from '../ReusableButton';
 
@@ -89,6 +92,7 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     justifyContent: 'space-between',
+    paddingBottom: 20,
   },
 
   textContainer: {

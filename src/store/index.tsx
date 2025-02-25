@@ -110,6 +110,8 @@ const webRTCSlice: StateCreator<WebRTCSlice> = set => ({
       callState: 'idle',
       callType: null,
       caller: null,
+      offer: null,
+      answer: null,
     }),
 });
 

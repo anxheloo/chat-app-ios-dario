@@ -1,16 +1,19 @@
+import React from 'react';
+import {navigationRef} from './navigationRef';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import React from 'react';
+
+import BottomTabNavigation from './BottomTabNavigation';
+
+import {RootStackParamList} from '../utils/types';
+
 import CreatePersona from '../screens/Persona/CreatePersona';
 import CreatePin from '../screens/Persona/CreatePin';
-import BottomTabNavigation from './BottomTabNavigation';
 import Login from '../screens/Login/Login';
 import Chat from '../screens/Chat/Chat';
 import ScannerScreen from '../screens/Scanner/ScannerScreen';
 import ScannedUser from '../screens/Scanner/ScannedUser';
-import {RootStackParamList} from '../utils/types';
 import FullScreenMedia from '../screens/FullScreenMedia/FullScreenMedia';
-import {navigationRef} from './navigationRef';
 import JoinScreen from '../screens/Calls/JoinScreen';
 
 const MainNavigation = () => {
@@ -19,6 +22,7 @@ const MainNavigation = () => {
   return (
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator
+        id={undefined}
         screenOptions={{
           animation: 'fade',
         }}>

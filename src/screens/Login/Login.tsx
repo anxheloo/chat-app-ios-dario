@@ -7,12 +7,17 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
+
+import {NavigationProps} from '../../utils/types';
+
 import {SafeAreaView} from 'react-native-safe-area-context';
-import ReusableText from '../../components/ReusableText';
+
 import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
+
+import ReusableText from '../../components/ReusableText';
 import ReusableInput from '../../components/ReusableInput';
 import ReusableButton from '../../components/ReusableButton';
-import {NavigationProps} from '../../utils/types';
+
 import useLogin from '../../utils/hooks/useLogin';
 import useCheckToken from '../../utils/hooks/useCheckToken';
 
