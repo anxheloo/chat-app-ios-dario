@@ -2,12 +2,13 @@ import React, {memo} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {useAppStore} from '../../store';
 import {avatarUrls} from '../../utils/constants';
-import {BORDERRADIUS} from '../../theme/theme';
+import {BORDERRADIUS, COLORS} from '../../theme/theme';
 import EditIcon from '../../assets/icons/profile/EditIcon';
 
 type AvatarProps = {
   width: number;
   height: number;
+  borderRadius?: number;
   avatarWidth: number;
   avatarHeight: number;
   backgroundColor?: string;
@@ -19,9 +20,10 @@ const Avatar: React.FC<AvatarProps> = memo(
   ({
     width,
     height,
+    borderRadius = BORDERRADIUS.radius_14,
     avatarWidth,
     avatarHeight,
-    backgroundColor = 'white',
+    backgroundColor = COLORS.White,
     routeName,
     src,
   }) => {
@@ -30,7 +32,11 @@ const Avatar: React.FC<AvatarProps> = memo(
     const Avatar = avatarUrls[src ?? avatar];
 
     return (
-      <View style={[styles.container, {backgroundColor, width, height}]}>
+      <View
+        style={[
+          styles.container,
+          {backgroundColor, width, height, borderRadius},
+        ]}>
         {routeName === 'Profile' && (
           <View style={styles.editContainer}>
             <EditIcon width={10} height={12} />
@@ -46,7 +52,7 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: BORDERRADIUS.radius_14,
+    // borderRadius: BORDERRADIUS.radius_14,
     position: 'relative',
   },
 

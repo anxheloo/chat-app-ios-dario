@@ -1,47 +1,29 @@
-import React, {memo} from 'react';
+import React, {memo, useCallback} from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
-import ReusableText from '../../../components/ReusableText';
+
 import {useNavigation} from '@react-navigation/native';
 import {useAppStore} from '../../../store';
+
+import ReusableText from '../../../components/ReusableText';
 import Avatar from '../../../components/Persona/Avatar';
+
 import {COLORS} from '../../../theme/theme';
+
 import CallIcon from '../../../assets/icons/BottomTabIcons/Call-Icon';
 import VideoIcon from '../../../assets/icons/Chat/VideoIcon';
+
 import {NavigationProps} from '../../../utils/types';
-import {checkPermissionStatus} from '../../../utils/helpers';
-import {permission} from '../../../utils/permissions';
+import {handleCall} from '../../../utils/webrtc';
 
 const ChatHeader = memo(() => {
   const navigation = useNavigation<NavigationProps>();
-  const {selectedChatData, updateWebRTCState} = useAppStore.getState();
-
-  const goBack = () => navigation.goBack();
-
-  const handleCall = async (callType: 'audio' | 'video') => {
-    let status: boolean;
-
-    if (callType === 'audio') {
-      const micStatus = await checkPermissionStatus(permission.microphone);
-      status = micStatus;
-    } else if (callType === 'video') {
-      const micStatus = await checkPermissionStatus(permission.microphone);
-      const cameraStatus = await checkPermissionStatus(permission.camera);
-
-      status = micStatus && cameraStatus;
-    }
-
-    if (status) {
-      updateWebRTCState({
-        callState: 'outgoing',
-        callType,
-      });
-      navigation.navigate('JoinScreen');
-    }
-  };
+  const {selectedChatData} = useAppStore.getState();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const goBack = useCallback(() => navigation.goBack(), []);
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.backBtn} onPress={goBack}>
+      <TouchableOpacity onPress={goBack}>
         <ReusableText fontWeight={500}>Back</ReusableText>
       </TouchableOpacity>
 
@@ -93,11 +75,6 @@ const styles = StyleSheet.create({
   },
 
   icon: {width: 24, height: 24, marginHorizontal: 10},
-
-  backBtn: {
-    padding: 10,
-    borderRadius: 8,
-  },
 });
 
 export default ChatHeader;

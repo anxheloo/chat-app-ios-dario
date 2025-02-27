@@ -226,6 +226,25 @@ export const useSocket = () => {
     goBack();
   };
 
+  const toggleCamera = async () => {
+    const {peerConnection, remoteStream, callType} = useAppStore.getState();
+
+    if (!peerConnection) {
+      return;
+    }
+
+    callType === 'video'
+      ? updateWebRTCState({callType: 'audio'})
+      : updateWebRTCState({callType: 'video'});
+
+    // remoteStream?.getVideoTracks().forEach(track => {
+    //   callType === 'video' ? (track.enabled = false) : (track.enabled = true);
+    // });
+    remoteStream?.getVideoTracks().forEach(track => {
+      track.enabled = !track.enabled;
+    });
+  };
+
   useEffect(() => {
     if (!userId) {
       console.log('No user ID found, disconnecting socket.');
@@ -248,6 +267,7 @@ export const useSocket = () => {
       socket.on('answer', answerCall);
       socket.on('ice-candidate', iceCandidate);
       socket.on('callRejected', callRejected);
+      socket.on('toggle-camera', toggleCamera);
     }
 
     return () => {

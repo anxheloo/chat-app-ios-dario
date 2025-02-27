@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {useMemo} from 'react';
 import {FlatList, StyleSheet, View} from 'react-native';
 import {useAppStore} from '../../store';
 import {NavigationProps} from '../../utils/types';
@@ -8,6 +8,7 @@ import FullScreenLoader from '../../components/Loading/FullScreenLoader';
 import ReusableInput from '../../components/ReusableInput';
 import SearchIcon from '../../assets/icons/messages/SearchIcon';
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
+import useSearch from '../../utils/hooks/useSearch';
 
 type ContentProps = {
   navigation: NavigationProps;
@@ -15,9 +16,7 @@ type ContentProps = {
 
 const ContactsList: React.FC<ContentProps> = ({navigation}) => {
   const friends = useAppStore(state => state.friends);
-  const loading = useAppStore(state => state.loading);
-  const [search, setSearch] = useState<string>('');
-  const [debouncedSearch, setDebounceSearch] = useState<string>('');
+  const {search, updateSearch, clearSearch, debouncedSearch} = useSearch();
 
   const searchedFriends = useMemo(
     () =>
@@ -26,24 +25,6 @@ const ContactsList: React.FC<ContentProps> = ({navigation}) => {
       ),
     [debouncedSearch, friends],
   );
-
-  const updateSearch = (searchTerm: string) => {
-    setSearch(searchTerm);
-
-    const t = setTimeout(() => {
-      setDebounceSearch(searchTerm);
-    }, 300);
-
-    return () => clearTimeout(t);
-  };
-
-  const clearSearch = useCallback((): void => {
-    setSearch('');
-  }, []);
-
-  if (loading) {
-    return <FullScreenLoader version={'flex'} />;
-  }
 
   if (!friends.length) {
     return <EmptyContacts navigation={navigation} />;
@@ -55,23 +36,21 @@ const ContactsList: React.FC<ContentProps> = ({navigation}) => {
         placeholder="Search"
         value={search}
         onChange={updateSearch}
+        marginHorizontal={20}
         onPress={clearSearch}
-        icon1={<SearchIcon width={15} height={15} />}
-        icon2={<CloseIcon width={15} height={15} />}
+        icon1={<SearchIcon width={15} height={15} fill={'#000'} />}
+        icon2={<CloseIcon width={15} height={15} fill={'#000'} />}
       />
       <FlatList
         contentContainerStyle={styles.content}
         data={searchedFriends}
         renderItem={({item}) => (
-          <Persona
-            contact={item}
-            // navigation={navigation}
-            backgroundColor="white"
-          />
+          <Persona contact={item} backgroundColor="white" />
         )}
         keyExtractor={item => item._id}
         initialNumToRender={10}
       />
+      <FullScreenLoader version={'absolute'} />
     </View>
   );
 };

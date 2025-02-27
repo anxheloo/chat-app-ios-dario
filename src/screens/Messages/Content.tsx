@@ -1,53 +1,41 @@
-import React, {memo, useCallback, useMemo, useState} from 'react';
+import React, {memo, useMemo} from 'react';
 import {FlatList, StyleSheet, View} from 'react-native';
-import EmptyChat from './EmptyChat';
+
 import {useAppStore} from '../../store';
 import {NavigationProps} from '../../utils/types';
+import {useNavigation} from '@react-navigation/native';
+import useSearch from '../../utils/hooks/useSearch';
+
+import EmptyChat from './EmptyChat';
 import Conversations from '../../components/Persona/Conversations';
 import FullScreenLoader from '../../components/Loading/FullScreenLoader';
 import ReusableInput from '../../components/ReusableInput';
+
 import SearchIcon from '../../assets/icons/messages/SearchIcon';
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
-import {useNavigation} from '@react-navigation/native';
+import {COLORS} from '../../theme/theme';
 
 const Content = memo(() => {
   const navigation = useNavigation<NavigationProps>();
-  const loading = useAppStore(state => state.loading);
-  const userId = useAppStore(state => state.id);
   const conversations = useAppStore(state => state.conversations);
-  const [search, setSearch] = useState<string>('');
-  const [debouncedSearch, setDebounceSearch] = useState<string>('');
+  const {search, updateSearch, clearSearch, debouncedSearch} = useSearch();
 
   const searchedConversations = useMemo(
     () =>
       conversations.filter(
         conversation =>
           conversation.participants
-            .filter(participant => participant._id !== userId)
+            .filter(
+              participant => participant._id !== useAppStore.getState().id,
+            )
             .filter(contact =>
               contact.username
                 .toLowerCase()
                 .includes(debouncedSearch.toLowerCase()),
             ).length > 0,
       ),
-    [conversations, debouncedSearch, userId],
+    [conversations, debouncedSearch],
   );
-
-  const clearSearch = useCallback(() => setSearch(''), []);
-
-  const updateSearch = (searchTerm: string) => {
-    setSearch(searchTerm);
-
-    const t = setTimeout(() => {
-      setDebounceSearch(searchTerm);
-    }, 300);
-
-    return () => clearTimeout(t);
-  };
-
-  if (loading) {
-    return <FullScreenLoader version={'flex'} />;
-  }
 
   if (!conversations.length) {
     return <EmptyChat navigation={navigation} />;
@@ -60,8 +48,9 @@ const Content = memo(() => {
         value={search}
         onChange={updateSearch}
         onPress={clearSearch}
-        icon1={<SearchIcon width={15} height={15} />}
-        icon2={<CloseIcon width={15} height={15} />}
+        marginHorizontal={20}
+        icon1={<SearchIcon width={15} height={15} fill={'#000'} />}
+        icon2={<CloseIcon width={15} height={15} fill={'#000'} />}
       />
       <FlatList
         contentContainerStyle={styles.content}
@@ -76,7 +65,9 @@ const Content = memo(() => {
         keyExtractor={item => item._id}
         initialNumToRender={20}
         maxToRenderPerBatch={20}
+        scrollEnabled={true}
       />
+      <FullScreenLoader version={'absolute'} />
     </View>
   );
 });
@@ -84,7 +75,7 @@ const Content = memo(() => {
 const styles = StyleSheet.create({
   content: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: COLORS.White,
   },
 });
 

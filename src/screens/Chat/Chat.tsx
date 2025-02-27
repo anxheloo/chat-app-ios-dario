@@ -13,7 +13,6 @@ import ChatContainer from './components/ChatContainer';
 import ChatFooter from './components/ChatFooter';
 
 const Chat = () => {
-  const loading = useAppStore(state => state.loading);
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
 
   useEffect(() => {
@@ -33,8 +32,7 @@ const Chat = () => {
           <ChatContainer />
           <ChatFooter />
         </View>
-
-        {loading && <FullScreenLoader version={'absolute'} />}
+        <FullScreenLoader version={'absolute'} />
       </SafeAreaView>
       <DeleteMsg />
     </KeyboardAvoidingView>

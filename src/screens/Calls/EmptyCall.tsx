@@ -1,12 +1,10 @@
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
+
 import ReusableText from '../../components/ReusableText';
-import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import CallIcon from '../../assets/icons/Calls/Call';
 
-// type EmptyChatProps = {
-//   openBottomSheet: () => void;
-// };
+import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 
 const EmptyCall = () => {
   return (
@@ -44,6 +42,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 50,
+    paddingHorizontal: 20,
+    backgroundColor: 'white',
   },
 
   container1: {alignItems: 'center', gap: 10},

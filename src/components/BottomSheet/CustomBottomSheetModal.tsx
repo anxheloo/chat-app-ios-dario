@@ -1,25 +1,30 @@
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
+import {StyleSheet} from 'react-native';
+
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import React, {useCallback, useEffect, useMemo, useRef} from 'react';
-import {StyleSheet} from 'react-native';
+
 import {COLORS} from '../../theme/theme';
+
 import {useAppStore} from '../../store';
+import useProfile from '../../utils/hooks/useProfile';
+
 import PersonasList from './PersonasList';
 import QRCodeModal from './QRCodeModal';
 import UpdatePin from './UpdatePin';
 import UpdateDissapear from './UpdateDissapear';
 import ChangeUsername from './ChangeUsername';
 import SelectAvatar from './SelectAvatar';
-import useProfile from '../../utils/hooks/useProfile';
 
 const CustomBottomSheetModal = () => {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const bottomSheetType = useAppStore(state => state.bottomSheetType);
   const updateKeys = useAppStore(state => state.updateKeys);
   const {updateProfilePic, selectAvatar} = useProfile();
+
   const snapPoints = useMemo(() => ['25%', '50%', '75%'], []);
 
   useEffect(() => {
@@ -95,7 +100,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.LightGray2,
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
-    paddingBottom: 20,
+    paddingBottom: 10,
   },
 
   indicatorContainer: {

@@ -1,8 +1,11 @@
 import React from 'react';
 import {StyleSheet, Text, TouchableOpacity, View, Alert} from 'react-native';
+
 import {BORDERRADIUS, COLORS, FONTSIZE} from '../../theme/theme';
+
 import {apiClient} from '../../api/apiClient';
 import {DELETE_MESSAGE} from '../../api/apis';
+
 import {useAppStore} from '../../store';
 
 const DeleteMsg = React.memo(() => {
@@ -77,7 +80,7 @@ const DeleteMsg = React.memo(() => {
 
             <TouchableOpacity
               onPress={handleDelete}
-              style={[styles.btn, {backgroundColor: 'white'}]}>
+              style={[styles.btn, {backgroundColor: COLORS.White}]}>
               <Text style={styles.deleteBtn}>Delete</Text>
             </TouchableOpacity>
           </View>

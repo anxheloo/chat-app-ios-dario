@@ -21,9 +21,11 @@ const SelectAvatar: React.FC<SelectAvatarProps> = memo(({cancel, setFunc}) => {
   return (
     <View style={styles.contentContainer}>
       <View style={styles.header}>
-        <ReusableText fontSize={FONTSIZE.md} fontWeight={300} onPress={cancel}>
-          Cancel
-        </ReusableText>
+        <TouchableOpacity onPress={cancel}>
+          <ReusableText fontSize={FONTSIZE.md} fontWeight={300}>
+            Cancel
+          </ReusableText>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.mainContainer}>
@@ -62,7 +64,7 @@ const SelectAvatar: React.FC<SelectAvatarProps> = memo(({cancel, setFunc}) => {
                   key={index}
                   onPress={() => setAvatar(index)}
                   style={[styles.avatarItem, {borderColor: borderColor}]}>
-                  <SelectedAvatar width={37.5} height={37.5} />
+                  <SelectedAvatar width={47.5} height={47.5} />
                 </TouchableOpacity>
               );
             })}
@@ -103,7 +105,6 @@ const styles = StyleSheet.create({
   },
 
   selectableIconParent: {
-    // marginTop: 40,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -116,25 +117,25 @@ const styles = StyleSheet.create({
 
   avatarContainer: {
     flexDirection: 'row',
+    gap: 20,
     flexWrap: 'wrap',
     justifyContent: 'center',
-    maxWidth: 250,
   },
 
   avatarContainer2: {
-    // marginTop: 40,
-    // marginBottom: 40,
     alignItems: 'center',
+    paddingBottom: 20,
+    paddingHorizontal: 15,
   },
 
   avatarItem: {
-    width: 50,
-    height: 50,
+    width: 60,
+    height: 60,
     borderWidth: 1,
     borderRadius: BORDERRADIUS.radius_14,
     justifyContent: 'center',
     alignItems: 'center',
-    margin: 5,
+    // margin: 5,
   },
 
   avatarImage: {

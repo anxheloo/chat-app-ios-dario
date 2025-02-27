@@ -6,23 +6,35 @@ import {useAppStore} from '../../../store';
 import ReusableText from '../../../components/ReusableText';
 import Avatar from '../../../components/Persona/Avatar';
 
-const AudioUserDetails = () => {
+// Version  = 'header' is used in the VideoCallHeader.tsx
+// If no version is passed, the default version is used (JoinScreen.tsx)
+
+type Props = {
+  version?: 'header' | 'default';
+};
+
+const AudioUserDetails: React.FC<Props> = ({version = 'default'}) => {
   const {caller, selectedChatData} = useAppStore.getState();
   const username = caller ? caller?.username : selectedChatData?.username;
   const avatarSrc = caller ? caller?.avatar : selectedChatData?.avatar;
+  const isDefaultVersion = version === 'default';
 
   return (
-    <View style={styles.container}>
+    <View style={isDefaultVersion ? styles.container : styles.versionStyles}>
       <Avatar
-        width={70}
-        height={70}
-        avatarWidth={53}
-        avatarHeight={53}
+        width={isDefaultVersion ? 70 : 26}
+        height={isDefaultVersion ? 70 : 26}
+        avatarWidth={isDefaultVersion ? 53 : 20}
+        avatarHeight={isDefaultVersion ? 53 : 20}
+        borderRadius={isDefaultVersion ? 14 : 100}
         backgroundColor="white"
         src={avatarSrc}
       />
 
-      <ReusableText fontSize={26} fontWeight={700} color="white">
+      <ReusableText
+        fontSize={isDefaultVersion ? 26 : 14}
+        fontWeight={700}
+        color="white">
         @{username}
       </ReusableText>
     </View>
@@ -33,8 +45,15 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 20,
-    zIndex: 4,
+  },
+
+  versionStyles: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 7,
   },
 });
 

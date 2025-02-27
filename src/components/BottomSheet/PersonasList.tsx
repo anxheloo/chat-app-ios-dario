@@ -92,8 +92,8 @@ const PersonasList: React.FC<PersonasListProps> = ({cancel}) => {
           onChange={updateSearch}
           onPress={clearSearch}
           backgroundColor="white"
-          icon1={<SearchIcon width={15} height={15} />}
-          icon2={<CloseIcon width={15} height={15} />}
+          icon1={<SearchIcon width={15} height={15} fill={'#000'} />}
+          icon2={<CloseIcon width={15} height={15} fill={'#000'} />}
         />
 
         <FlatList

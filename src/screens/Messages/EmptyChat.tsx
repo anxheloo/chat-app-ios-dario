@@ -1,8 +1,10 @@
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
-import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
+
 import MessagingIcon from '../../assets/icons/messages/MessagingIcon';
 import ReusableText from '../../components/ReusableText';
+
+import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import {NavigationProps} from '../../utils/types';
 import {useAppStore} from '../../store';
 
@@ -31,14 +33,16 @@ const EmptyChat: React.FC<EmptyChatProps> = ({navigation}) => {
         </ReusableText>
       </View>
 
-      <ReusableText
-        fontSize={16}
-        fontWeight={FONTWEIGHT[400]}
-        textAlign="center"
-        textDecorationLine="underline"
+      <TouchableOpacity
         onPress={() => updateKeys({bottomSheetType: 'start-conversation'})}>
-        Start Conversation
-      </ReusableText>
+        <ReusableText
+          fontSize={16}
+          fontWeight={FONTWEIGHT[400]}
+          textAlign="center"
+          textDecorationLine="underline">
+          Start Conversation
+        </ReusableText>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -49,6 +53,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 50,
+    paddingHorizontal: 20,
+    backgroundColor: 'white',
   },
 
   container1: {alignItems: 'center', gap: 10},

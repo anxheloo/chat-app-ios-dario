@@ -6,6 +6,7 @@ import {
   KeyboardAvoidingView,
   Keyboard,
   TouchableWithoutFeedback,
+  Platform,
 } from 'react-native';
 import ReusableText from '../../components/ReusableText';
 import {BORDERRADIUS, COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
@@ -74,6 +75,7 @@ const CreatePersona: React.FC<CreatePersonaScreenProps> = ({navigation}) => {
                       source={require('../../assets/icons/info-icon.png')}
                     />
                   }
+                  // marginHorizontal={20}
                 />
 
                 <ReusableText
@@ -101,8 +103,8 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    backgroundColor: 'white',
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingBottom: Platform.OS === 'ios' ? 0 : 20,
   },
 
   textContainer: {

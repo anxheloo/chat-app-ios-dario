@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Alert, StyleSheet} from 'react-native';
+import {Alert, StyleSheet, View} from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -18,6 +18,7 @@ import BtnGroup from './components/BtnGroup';
 import AudioUserDetails from './components/AudioUserDetails';
 
 import {servers} from '../../utils/webrtc';
+import VideoCallHeader from './components/VideoCallHeader';
 
 declare module 'react-native-webrtc' {
   interface RTCPeerConnection {
@@ -45,13 +46,18 @@ const JoinScreen = () => {
   const remoteStream = useAppStore(state => state.remoteStream);
   const socket = useAppStore(state => state.socket);
   const updateWebRTCState = useAppStore(state => state.updateWebRTCState);
+  const resetCallState = useAppStore(state => state.resetCallState);
 
   useEffect(() => {
     if (callState === 'outgoing') {
       initializeCall(callType === 'video');
     }
+
+    return () => {
+      resetCallState();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [callState]);
+  }, []);
 
   const initializeCall = async (isVideoCall: boolean) => {
     const {username, id, avatar} = useAppStore.getState();
@@ -132,23 +138,27 @@ const JoinScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {callType === 'video' && remoteStream && (
+      {callState === 'active' && callType === 'video' && <VideoCallHeader />}
+
+      {callType === 'video' && remoteStream ? (
         <RTCView
+          mirror={true}
           streamURL={remoteStream?.toURL()}
           style={styles.remoteStream}
           objectFit="cover"
         />
+      ) : (
+        <AudioUserDetails />
       )}
 
       {callType === 'video' && localStream && (
         <RTCView
+          mirror={true}
           streamURL={localStream?.toURL()}
           style={styles.localStream}
           objectFit="cover"
         />
       )}
-
-      {(callType === 'audio' || callState !== 'active') && <AudioUserDetails />}
 
       <BtnGroup />
     </SafeAreaView>
@@ -169,7 +179,7 @@ const styles = StyleSheet.create({
   },
   localStream: {
     position: 'absolute',
-    top: 120,
+    top: 160,
     right: 20,
     width: 100,
     height: 140,

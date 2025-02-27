@@ -1,6 +1,8 @@
 import {useEffect} from 'react';
 import {Alert} from 'react-native';
+
 import {useAppStore} from '../../store';
+
 import {apiClient} from '../../api/apiClient';
 import {
   GET_ALL_FRIENDS,

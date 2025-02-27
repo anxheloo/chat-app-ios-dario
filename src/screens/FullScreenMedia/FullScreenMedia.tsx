@@ -10,8 +10,6 @@ type Props = NativeStackScreenProps<RootStackParamList, 'FullScreenMedia'>;
 const FullScreenMedia: React.FC<Props> = ({route, navigation}) => {
   const {fileUrl, type} = route.params;
 
-  console.log('This is file Url:', fileUrl);
-
   return (
     <View style={styles.container}>
       <CloseIcon
@@ -19,6 +17,7 @@ const FullScreenMedia: React.FC<Props> = ({route, navigation}) => {
         width={24}
         height={24}
         style={styles.closeIcon}
+        fill={'#fff'}
       />
 
       {type === 'image' ? (

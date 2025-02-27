@@ -1,3 +1,4 @@
+import React, {memo, useCallback, useRef, useState} from 'react';
 import {
   View,
   StyleSheet,
@@ -10,12 +11,15 @@ import {
   Easing,
   ActivityIndicator,
 } from 'react-native';
-import React, {memo, useCallback, useRef, useState} from 'react';
+
+import {useAppStore} from '../../store';
+
 import ReusableText from '../ReusableText';
+
 import {BORDERRADIUS, COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import {UPDATE_DISSAPEARING_MESSAGES} from '../../api/apis';
 import {apiClient} from '../../api/apiClient';
-import {useAppStore} from '../../store';
+
 import ClockIcon from '../../assets/icons/profile/ClockIcon';
 import RightIcon from '../../assets/icons/profile/RighArrow';
 
@@ -49,7 +53,7 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = memo(({cancel}) => {
   const toggleDropdown = useCallback(() => {
     if (isExpanded) {
       setIsExpanded(false);
-      // Animate closing
+      // Close dropdown
       Animated.parallel([
         Animated.timing(dropdownHeight, {
           toValue: 0,
@@ -65,11 +69,11 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = memo(({cancel}) => {
         }),
       ]).start();
     } else {
-      // Animate opening
+      // open dropdown
       setIsExpanded(true);
       Animated.parallel([
         Animated.timing(dropdownHeight, {
-          toValue: 320,
+          toValue: 350,
           duration: 300,
           easing: Easing.ease,
           useNativeDriver: false,
@@ -111,12 +115,11 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = memo(({cancel}) => {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.contentContainer}>
           <View style={styles.header}>
-            <ReusableText
-              fontSize={FONTSIZE.md}
-              fontWeight={300}
-              onPress={cancel}>
-              Cancel
-            </ReusableText>
+            <TouchableOpacity onPress={cancel}>
+              <ReusableText fontSize={FONTSIZE.md} fontWeight={300}>
+                Cancel
+              </ReusableText>
+            </TouchableOpacity>
 
             <ReusableText
               fontSize={FONTSIZE.md}
@@ -172,7 +175,6 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = memo(({cancel}) => {
                     key={item}
                     style={styles.option}
                     onPress={() => {
-                      // setIsExpanded(false);
                       setSelectableOption(item);
                     }}>
                     <View style={styles.circle}>
@@ -218,9 +220,8 @@ const styles = StyleSheet.create({
 
   button: {
     width: '100%',
-    maxWidth: 320,
     alignSelf: 'center',
-    backgroundColor: 'white',
+    backgroundColor: COLORS.White,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
@@ -230,14 +231,13 @@ const styles = StyleSheet.create({
   },
 
   optionsContainer: {
-    backgroundColor: 'white',
+    backgroundColor: COLORS.White,
     width: '100%',
-    maxWidth: 320,
     alignSelf: 'center',
     borderRadius: BORDERRADIUS.radius_14,
     marginTop: 10,
+    gap: 8,
     justifyContent: 'space-between',
-    gap: 15,
     overflow: 'hidden',
   },
 

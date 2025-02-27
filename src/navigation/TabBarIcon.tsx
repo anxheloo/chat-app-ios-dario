@@ -1,5 +1,5 @@
 import React from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import {COLORS} from '../theme/theme';
 
 type Props = {
@@ -32,9 +32,9 @@ const TabBarIcon: React.FC<Props> = ({Icon, focused, label}) => {
 const styles = StyleSheet.create({
   iconWrapper: {
     width: 100,
-    height: 60,
-    marginTop: 7,
-    transform: Platform.OS === 'android' ? [{translateY: -15}] : undefined,
+    // height: 60,
+    // marginTop: 7,
+    // transform: Platform.OS === 'android' ? [{translateY: -15}] : undefined,
     gap: 7,
     justifyContent: 'center',
     alignItems: 'center',

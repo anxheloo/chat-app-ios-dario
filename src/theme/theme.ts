@@ -2,12 +2,14 @@ interface Color {
   Black: string;
   LightGray: string;
   LightGray2: string;
+  White: string;
 }
 
 export const COLORS: Color = {
   Black: '#212121',
   LightGray: '#ACB9C7',
   LightGray2: '#F9FAFC',
+  White: '#FFFFFF',
 };
 
 //   interface FontFamily {

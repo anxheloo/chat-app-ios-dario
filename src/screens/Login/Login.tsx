@@ -2,8 +2,8 @@ import React, {useState} from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
+  Platform,
   StyleSheet,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
@@ -57,22 +57,23 @@ const Login: React.FC<LoginScreenProps> = ({navigation}) => {
                   value={username}
                   onChange={setUsername}
                   icon1={<ReusableText fontSize={FONTSIZE.md}>@</ReusableText>}
+                  // marginHorizontal={20}
                 />
                 <ReusableInput
                   placeholder="PIN"
                   value={pin}
                   onChange={setPin}
                   isPassword={true}
+                  // marginHorizontal={20}
                 />
-                <TouchableOpacity
-                  onPress={() => navigation.navigate('CreatePersona')}>
-                  <ReusableText
-                    textDecorationLine="underline"
-                    fontWeight={FONTWEIGHT[300]}
-                    color={COLORS.Black}>
-                    Don't have an account? Sign up
-                  </ReusableText>
-                </TouchableOpacity>
+
+                <ReusableText
+                  onPress={() => navigation.navigate('CreatePersona')}
+                  textDecorationLine="underline"
+                  fontWeight={FONTWEIGHT[300]}
+                  color={COLORS.Black}>
+                  Don't have an account? Sign up
+                </ReusableText>
               </View>
 
               <ReusableButton text="Login" onPress={onPress} />
@@ -92,8 +93,8 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    backgroundColor: 'white',
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingBottom: Platform.OS === 'ios' ? 0 : 20,
   },
 
   textContainer: {

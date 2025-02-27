@@ -6,6 +6,7 @@ import {
   Keyboard,
   Alert,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import React, {useCallback, useState} from 'react';
 import ReusableText from '../ReusableText';
@@ -57,12 +58,11 @@ const ChangeUsername: React.FC<ChangeUsernameProps> = ({cancel}) => {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.contentContainer}>
         <View style={styles.header}>
-          <ReusableText
-            fontSize={FONTSIZE.md}
-            fontWeight={300}
-            onPress={cancel}>
-            Cancel
-          </ReusableText>
+          <TouchableOpacity onPress={cancel}>
+            <ReusableText fontSize={FONTSIZE.md} fontWeight={300}>
+              Cancel
+            </ReusableText>
+          </TouchableOpacity>
 
           <ReusableText
             fontSize={FONTSIZE.md}
@@ -98,7 +98,7 @@ const ChangeUsername: React.FC<ChangeUsernameProps> = ({cancel}) => {
             onPress={clearSearch}
             backgroundColor="white"
             icon1={<ReusableText fontSize={FONTSIZE.md}>@</ReusableText>}
-            icon2={<CloseIcon width={15} height={15} />}
+            icon2={<CloseIcon width={15} height={15} fill={'#000'} />}
           />
         </View>
       </View>

@@ -8,8 +8,11 @@ import {
   RTCPeerConnection,
 } from 'react-native-webrtc';
 
-import {goBack} from '../navigation/navigationRef';
+import {goBack, navigate} from '../navigation/navigationRef';
+import {checkPermissionStatus} from './helpers';
+import {permission} from './permissions';
 
+// ICE servers
 export const servers = {
   iceServers: [
     {urls: 'stun:stun.l.google.com:19302'},
@@ -18,6 +21,32 @@ export const servers = {
   ],
 };
 
+// Start call
+export const handleCall = async (callType: 'audio' | 'video') => {
+  const {updateWebRTCState} = useAppStore.getState();
+  let status: boolean;
+
+  if (callType === 'audio') {
+    const micStatus = await checkPermissionStatus(permission.microphone);
+    status = micStatus;
+  } else {
+    const micStatus = await checkPermissionStatus(permission.microphone);
+    const cameraStatus = await checkPermissionStatus(permission.camera);
+
+    status = micStatus && cameraStatus;
+  }
+
+  if (status) {
+    updateWebRTCState({
+      callState: 'outgoing',
+      callType,
+    });
+
+    navigate('JoinScreen');
+  }
+};
+
+// Initialize call
 export const initializeCall = async (isVideoCall: boolean) => {
   const {username, id, avatar, updateWebRTCState, socket} =
     useAppStore.getState();
@@ -94,6 +123,7 @@ export const initializeCall = async (isVideoCall: boolean) => {
   }
 };
 
+// End call
 export const handleEndCall = () => {
   const {
     localStream,
@@ -104,6 +134,9 @@ export const handleEndCall = () => {
     socket,
   } = useAppStore.getState();
   const receiverId = caller?._id ? caller?._id : selectedChatData?._id;
+
+  console.log('This is localStream inside handleEndCall: ', localStream);
+  console.log('This is peerConnection inside handleEndCall:  ', peerConnection);
 
   if (localStream) {
     console.log('localStream');
@@ -134,6 +167,7 @@ export const handleEndCall = () => {
   goBack();
 };
 
+// Accept incoming call
 export const acceptCall = async () => {
   const {offer, caller, socket, updateWebRTCState, callType} =
     useAppStore.getState();
@@ -200,3 +234,55 @@ export const acceptCall = async () => {
     Alert.alert('Error', 'Incoming call Failed');
   }
 };
+
+// Switch camera for video calls
+export const switchCamera = () => {
+  const {localStream, remoteStream, updateWebRTCState} = useAppStore.getState();
+
+  if (!localStream || !remoteStream) {
+    return;
+  }
+  updateWebRTCState({localStream: remoteStream, remoteStream: localStream});
+};
+
+// Toggle camera for video calls
+export const toggleCamera = () => {
+  const {
+    localStream,
+    peerConnection,
+    selectedChatData,
+    updateWebRTCState,
+    caller,
+    callType,
+    socket,
+  } = useAppStore.getState();
+
+  const to = caller?._id ?? selectedChatData?._id;
+
+  if (!localStream || !peerConnection) {
+    return;
+  }
+
+  callType === 'video'
+    ? updateWebRTCState({callType: 'audio'})
+    : updateWebRTCState({callType: 'video'});
+
+  // localStream?.getVideoTracks().forEach(track => {
+  //   callType === 'video' ? (track.enabled = false) : (track.enabled = true);
+  // });
+  localStream?.getVideoTracks().forEach(track => {
+    track.enabled = !track.enabled;
+  });
+
+  socket?.emit('toggle-camera', {to});
+};
+
+// Toggle mic
+//  export const toggleMic = () => {
+//    const {localStream} = useAppStore.getState();
+
+//    localMicOn ? setlocalMicOn(false) : setlocalMicOn(true);
+//    localStream?.getAudioTracks().forEach(track => {
+//      localMicOn ? (track.enabled = false) : (track.enabled = true);
+//    });
+//  };

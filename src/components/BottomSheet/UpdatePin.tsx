@@ -6,6 +6,7 @@ import {
   KeyboardAvoidingView,
   Alert,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import React, {useState} from 'react';
 import ReusableText from '../ReusableText';
@@ -51,12 +52,11 @@ const UpdatePin: React.FC<UpdatePinProps> = ({cancel}) => {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.contentContainer}>
           <View style={styles.header}>
-            <ReusableText
-              fontSize={FONTSIZE.md}
-              fontWeight={300}
-              onPress={cancel}>
-              Cancel
-            </ReusableText>
+            <TouchableOpacity onPress={cancel}>
+              <ReusableText fontSize={FONTSIZE.md} fontWeight={300}>
+                Cancel
+              </ReusableText>
+            </TouchableOpacity>
 
             <ReusableText
               fontSize={FONTSIZE.md}

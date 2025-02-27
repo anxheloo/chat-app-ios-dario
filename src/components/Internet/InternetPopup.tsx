@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     height: 34,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'white',
+    backgroundColor: COLORS.White,
   },
   deleteBtn: {fontWeight: '500', fontSize: FONTSIZE.md},
   cancelBtn: {fontWeight: '300', fontSize: FONTSIZE.md},

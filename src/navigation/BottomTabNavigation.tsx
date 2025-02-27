@@ -1,15 +1,18 @@
 import React from 'react';
 import {StyleSheet} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+
 import Messages from '../screens/Messages/Messages';
 import Calls from '../screens/Calls/Calls';
 import Contacts from '../screens/Contacts/Contacts';
 import Profile from '../screens/Profile/Profile';
+
 import MessageIcon from '../assets/icons/BottomTabIcons/MessageIcon';
 import CallIcon from '../assets/icons/BottomTabIcons/Call-Icon';
 import ContactsIcon from '../assets/icons/BottomTabIcons/ContactsIcon';
 import ProfileIcon from '../assets/icons/BottomTabIcons/ProfileIcon';
 import TabBarIcon from './TabBarIcon';
+
 import Layout from '../components/Layout/Layout';
 
 const MessageTabBarIcon = ({focused}: {focused: boolean}) => (
@@ -34,6 +37,7 @@ const BottomTabNavigation = () => {
   return (
     <Layout>
       <Tab.Navigator
+        id={undefined}
         initialRouteName="Messages"
         screenOptions={{
           // animation: 'fade',
@@ -54,6 +58,7 @@ const BottomTabNavigation = () => {
           // }),
           headerShown: false,
           tabBarStyle: styles.container,
+          tabBarPosition: 'bottom',
         }}>
         <Tab.Screen
           name="Messages"
@@ -112,12 +117,6 @@ export default BottomTabNavigation;
 
 const styles = StyleSheet.create({
   container: {
-    height: 56,
-    position: 'absolute',
-    bottom: 20,
-    marginLeft: '5%',
-    marginRight: '5%',
-    borderRadius: 14,
     backgroundColor: '#F9FAFC',
     display: 'flex',
     flexDirection: 'row',
@@ -125,5 +124,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E5E5E5',
     overflow: 'hidden',
+    shadowColor: 'transparent',
+    elevation: 0,
+    paddingBottom: 50,
+    paddingTop: 10,
   },
 });

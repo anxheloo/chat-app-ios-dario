@@ -50,6 +50,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 50,
+    backgroundColor: 'white',
   },
 
   container1: {alignItems: 'center', gap: 10},

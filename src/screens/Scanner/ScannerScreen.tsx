@@ -8,7 +8,7 @@ import {
 } from 'react-native-vision-camera';
 
 import {useIsFocused} from '@react-navigation/native';
-import {BlurView} from '@react-native-community/blur';
+// import {BlurView} from '@react-native-community/blur';
 
 import {SAFE_AREA_PADDING} from './Constants';
 import {useIsForeground} from '../../utils/useIsForeground';
@@ -43,7 +43,7 @@ const ScannerScreen = ({
 
       setTimeout(() => {
         navigation?.navigate('ScannedUser', {recipientId});
-      }, 300);
+      }, 500);
     },
     [navigation],
   );
@@ -57,15 +57,6 @@ const ScannerScreen = ({
   return (
     <View style={styles.container}>
       <StatusBar hidden />
-
-      <View style={StyleSheet.absoluteFill}>
-        <BlurView
-          style={StyleSheet.absoluteFill}
-          blurType="dark"
-          blurAmount={20}
-          reducedTransparencyFallbackColor="black"
-        />
-      </View>
 
       <View style={styles.textContainer}>
         <ReusableText
@@ -101,7 +92,7 @@ const ScannerScreen = ({
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => navigation.goBack()}>
-        <CloseIcon width={35} height={35} />
+        <CloseIcon width={35} height={35} fill={'#fff'} />
       </TouchableOpacity>
     </View>
   );

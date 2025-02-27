@@ -1,6 +1,6 @@
 // export const HOST = 'http://172.20.10.3:8000';
 
-// export const HOST = 'http://192.168.1.251:8000';
+// export const HOST = 'http://192.168.1.42:8000';
 export const HOST = 'https://chat-app-main-server.onrender.com';
 
 export const AUTH_ROUTES = 'api/auth';

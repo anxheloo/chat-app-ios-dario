@@ -1,24 +1,26 @@
+{
+  "extends": "@react-native/typescript-config/tsconfig.json",
+  "compilerOptions": {
+    // "strict": true,
+    "typeRoots": ["./types"]
+  }
+}
+
 // {
 //   "extends": "@react-native/typescript-config/tsconfig.json",
 //   "compilerOptions": {
-//     // "strict": true,
-//     "typeRoots": ["./types"]
-//   }
+//     // ... other options ...
+//     "typeRoots": ["./types", "./node_modules/@types"],
+//     "baseUrl": "src",
+//     "jsx": "react-native",
+//     "moduleResolution": "node16",
+//     "allowSyntheticDefaultImports": true,
+//     "resolveJsonModule": true,
+//     "esModuleInterop": true
+//     // "paths": {
+//     //   "@/*": ["src/*"]
+//     //   // "@/utils/*": ["src/utils/*"]
+//     // }
+//   },
+//   "include": ["src"]
 // }
-
-{
-  "compilerOptions": {
-    // ... other options ...
-    "typeRoots": ["./types", "./node_modules/@types"],
-    // "baseUrl": "./",
-    "jsx": "react-native",
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true
-    // "paths": {
-    //   "@/*": ["src/*"]
-    //   // "@/utils/*": ["src/utils/*"]
-    // }
-  }
-}

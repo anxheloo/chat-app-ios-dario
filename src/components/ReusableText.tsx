@@ -33,6 +33,7 @@ const ReusableText: React.FC<TextProps> = memo(
             color,
             textAlign,
             textDecorationLine,
+            paddingVertical: 5,
           } as TextStyle,
           style,
         ]}>

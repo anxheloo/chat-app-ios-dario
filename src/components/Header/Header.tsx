@@ -33,12 +33,9 @@ const Header = memo(() => {
 
   return (
     <View style={styles.container}>
-      <ReusableText
-        fontWeight={500}
-        style={styles.textStyles}
-        onPress={navigateToHomePage}>
-        @{username}
-      </ReusableText>
+      <TouchableOpacity onPress={navigateToHomePage}>
+        <ReusableText fontWeight={500}>@{username}</ReusableText>
+      </TouchableOpacity>
 
       <TouchableOpacity style={styles.icon} onPress={openScanner}>
         <ScanIcon width={'100%'} height={'100%'} />
@@ -52,18 +49,14 @@ const styles = StyleSheet.create({
     gap: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5E5',
     paddingHorizontal: 20,
-    paddingBottom: 20,
-    paddingTop: 10,
+    height: 60,
   },
 
-  textStyles: {
-    marginTop: 10,
-  },
-
-  icon: {width: 24, height: 24, alignSelf: 'flex-end'},
+  icon: {width: 24, height: 24},
 });
 
 export default Header;

@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     gap: 15,
     paddingHorizontal: 15,
     width: '100%',
-    maxWidth: 320,
+    // maxWidth: 320,
     height: 46,
     borderRadius: BORDERRADIUS.radius_14,
   },

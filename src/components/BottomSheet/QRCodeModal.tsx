@@ -1,8 +1,17 @@
-import {View, StyleSheet, ActivityIndicator} from 'react-native';
 import React, {useState} from 'react';
-import ReusableText from '../ReusableText';
-import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
+import {
+  View,
+  StyleSheet,
+  ActivityIndicator,
+  TouchableOpacity,
+} from 'react-native';
+
 import {useAppStore} from '../../store';
+
+import ReusableText from '../ReusableText';
+
+import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
+
 import QRCode from 'react-native-qrcode-svg';
 
 type UpdatePinProps = {
@@ -16,9 +25,11 @@ const QRCodeModal: React.FC<UpdatePinProps> = ({cancel}) => {
   return (
     <View style={styles.contentContainer}>
       <View style={styles.header}>
-        <ReusableText fontSize={FONTSIZE.md} fontWeight={300} onPress={cancel}>
-          Cancel
-        </ReusableText>
+        <TouchableOpacity onPress={cancel}>
+          <ReusableText fontSize={FONTSIZE.md} fontWeight={300}>
+            Cancel
+          </ReusableText>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.textContainer}>
@@ -65,7 +76,6 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   mainContent: {
-    // flex: 1,
     marginTop: 40,
     alignItems: 'center',
   },
@@ -74,8 +84,7 @@ const styles = StyleSheet.create({
     width: 220,
     height: 220,
     borderRadius: 14,
-    // overflow: 'hidden',
-    backgroundColor: 'white',
+    backgroundColor: COLORS.White,
     alignItems: 'center',
     justifyContent: 'center',
   },
