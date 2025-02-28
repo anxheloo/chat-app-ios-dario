@@ -1,7 +1,9 @@
 import moment from 'moment';
-import {Message} from './types';
-import {request, check, RESULTS} from 'react-native-permissions';
 import {Alert, Linking} from 'react-native';
+
+import {Message} from './types';
+
+import {request, check, RESULTS} from 'react-native-permissions';
 
 // Check if a message is image
 export const checkIfImage = (fileUrl: string): boolean => {

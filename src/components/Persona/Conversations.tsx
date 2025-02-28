@@ -4,21 +4,27 @@ import {
   Alert,
   StyleSheet,
   Text,
+  TouchableHighlight,
   TouchableOpacity,
   View,
 } from 'react-native';
+
 import Avatar from './Avatar';
 import {useAppStore} from '../../store';
-import {Conversation, NavigationProps} from '../../utils/types';
-import {COLORS, FONTSIZE} from '../../theme/theme';
-import moment from 'moment';
-import {checkIfImage, checkIfVideo} from '../../utils/helpers';
-import CameraIcon from '../../assets/icons/Chat/CameraIcon';
-import VideoIcon from '../../assets/icons/Chat/VideoIcon';
-import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
-import DeleteIcon from '../../assets/icons/Chat/DeleteIcon';
+
 import {DELETE_CONVERSATION} from '../../api/apis';
 import {apiClient} from '../../api/apiClient';
+
+import {Conversation, NavigationProps} from '../../utils/types';
+import {checkIfImage, checkIfVideo} from '../../utils/helpers';
+import {COLORS, FONTSIZE} from '../../theme/theme';
+
+import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
+import moment from 'moment';
+
+import CameraIcon from '../../assets/icons/Chat/CameraIcon';
+import VideoIcon from '../../assets/icons/Chat/VideoIcon';
+import DeleteIcon from '../../assets/icons/Chat/DeleteIcon';
 
 type ConversationsProps = {
   conversation: Conversation;
@@ -29,8 +35,7 @@ type ConversationsProps = {
 
 const Conversations: React.FC<ConversationsProps> = React.memo(
   ({conversation, navigation, backgroundColor, cancel}) => {
-    const updateFuncChat = useAppStore(state => state.updateFuncChat);
-    const loggedInUserId = useAppStore(state => state.id);
+    const {updateFuncChat, id: loggedInUserId} = useAppStore.getState();
     const conversations = useAppStore(state => state.conversations);
     const [loading, setLoading] = useState(false);
 
@@ -38,11 +43,7 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
       return conversation.participants.find(
         user => user._id !== loggedInUserId,
       );
-    }, [conversation, loggedInUserId]);
-
-    const content = conversation?.lastMessage?.content;
-    const messageType = conversation.lastMessage?.messageType;
-    const fileUrl = conversation.lastMessage?.fileUrl;
+    }, [conversation.participants, loggedInUserId]);
 
     // Select contact to update chat
     const selectContact = useCallback(() => {
@@ -61,6 +62,12 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
     }, [conversation._id, participant, updateFuncChat, navigation, cancel]);
 
     const renderLastMessage = useMemo(() => {
+      if (!conversation.lastMessage) {
+        return null;
+      }
+
+      const {messageType, content, fileUrl} = conversation?.lastMessage;
+
       if (messageType === 'text') {
         return (
           <Text style={styles.lastMessage} numberOfLines={1}>
@@ -94,7 +101,7 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
       }
 
       return null;
-    }, [messageType, fileUrl, content]);
+    }, [conversation.lastMessage]);
 
     const deleteConversation = useCallback(async () => {
       setLoading(true);
@@ -143,30 +150,33 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
         renderRightActions={renderRightActions}
         overshootRight={false}
         key={conversation._id}>
-        <TouchableOpacity
+        <TouchableHighlight
+          underlayColor={'white'}
           activeOpacity={1}
           style={[
             styles.container,
             {backgroundColor: backgroundColor ?? 'transparent'},
           ]}
           onPress={selectContact}>
-          <Avatar
-            width={46}
-            height={46}
-            avatarWidth={34}
-            avatarHeight={34}
-            backgroundColor={COLORS.LightGray2}
-            src={participant?.avatar}
-          />
-          <View style={styles.secondContainer}>
-            <Text style={styles.username}>@{participant?.username}</Text>
-            <View>{renderLastMessage}</View>
-          </View>
+          <>
+            <Avatar
+              width={46}
+              height={46}
+              avatarWidth={34}
+              avatarHeight={34}
+              backgroundColor={COLORS.LightGray2}
+              src={participant?.avatar}
+            />
+            <View style={styles.secondContainer}>
+              <Text style={styles.username}>@{participant?.username}</Text>
+              <View>{renderLastMessage}</View>
+            </View>
 
-          <Text style={[styles.messageDate]}>
-            {moment(conversation?.lastMessageTime).format('H:mm')}
-          </Text>
-        </TouchableOpacity>
+            <Text style={[styles.messageDate]}>
+              {moment(conversation?.lastMessageTime).format('H:mm')}
+            </Text>
+          </>
+        </TouchableHighlight>
       </ReanimatedSwipeable>
     );
   },

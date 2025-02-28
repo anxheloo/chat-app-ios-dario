@@ -15,9 +15,13 @@ import ScannerScreen from '../screens/Scanner/ScannerScreen';
 import ScannedUser from '../screens/Scanner/ScannedUser';
 import FullScreenMedia from '../screens/FullScreenMedia/FullScreenMedia';
 import JoinScreen from '../screens/Calls/JoinScreen';
+import {useSocket} from '../utils/useSocket';
 
 const MainNavigation = () => {
   const Stack = createNativeStackNavigator<RootStackParamList>();
+  useSocket();
+
+  console.log('Inside MainNavigation');
 
   return (
     <NavigationContainer ref={navigationRef}>

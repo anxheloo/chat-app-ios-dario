@@ -33,7 +33,6 @@ const useLogin = (
   };
 
   const handleLogin = async () => {
-    console.log('Inside handleLogin');
     updateKeys({loading: true});
     try {
       const response = await apiClient.post(LOGIN_ROUTE, {username, pin});

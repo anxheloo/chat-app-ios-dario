@@ -156,7 +156,7 @@ export const useSocket = () => {
 
       Alert.alert('Friend removal', `${senderUsername} removed you.`);
       updateFriends(current =>
-        current.filter(friend => friend._id !== senderId),
+        current.filter(friend => friend?._id !== senderId),
       );
     },
     [updateFriends],

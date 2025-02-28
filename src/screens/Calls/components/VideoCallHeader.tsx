@@ -12,7 +12,7 @@ const VideoCallHeader = () => {
 
   return (
     <View style={[styles.header, {top: insets.top}]}>
-      <Text>Back</Text>
+      <Text style={{opacity: 0}}>Back</Text>
       <AudioUserDetails version="header" />
       <SwitchIcon onPress={switchCamera} />
     </View>

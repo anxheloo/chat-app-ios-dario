@@ -1,21 +1,27 @@
-import React, {useCallback, useState} from 'react';
+import React, {memo, useCallback, useState} from 'react';
 import {
   ActivityIndicator,
   Alert,
   StyleSheet,
   Text,
+  TouchableHighlight,
   TouchableOpacity,
   View,
 } from 'react-native';
-import Avatar from './Avatar';
+
 import {useAppStore} from '../../store';
-import {Contact} from '../../utils/types';
+import Avatar from './Avatar';
+
 import {COLORS, FONTSIZE} from '../../theme/theme';
-import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
-import DeleteIcon from '../../assets/icons/Chat/DeleteIcon';
+import {Contact} from '../../utils/types';
+
+import ReanimatedSwipable from 'react-native-gesture-handler/ReanimatedSwipeable';
+
 import {DELETE_FRIEND} from '../../api/apis';
 import {apiClient} from '../../api/apiClient';
 import {navigate} from '../../navigation/navigationRef';
+
+import DeleteIcon from '../../assets/icons/Chat/DeleteIcon';
 
 type PersonaProps = {
   contact: Contact;
@@ -24,103 +30,107 @@ type PersonaProps = {
   version?: string;
 };
 
-const Persona: React.FC<PersonaProps> = ({
-  contact,
-  backgroundColor,
-  cancel,
-  version,
-}) => {
-  const updateFuncChat = useAppStore(state => state.updateFuncChat);
-  const updateKeys = useAppStore(state => state.updateKeys);
-  const senderId = useAppStore(state => state.id);
-  const senderUsername = useAppStore(state => state.username);
-  const socket = useAppStore(state => state.socket);
-  const updateFriends = useAppStore(state => state.updateFriends);
+const Persona: React.FC<PersonaProps> = memo(
+  ({contact, backgroundColor, cancel, version}) => {
+    const socket = useAppStore(state => state.socket);
+    const [loading, setLoading] = useState(false);
 
-  const [loading, setLoading] = useState(false);
+    // Select contact to update chat data and navigate to chat screen
+    const selectContact = useCallback(() => {
+      console.log('Inside select Contacts');
+      const {updateFuncChat, updateKeys} = useAppStore.getState();
+      updateKeys({bottomSheetType: null});
+      cancel?.();
+      updateFuncChat({selectedChatData: contact});
+      navigate('Chat');
+    }, [cancel, contact]);
 
-  // Select contact to update chat
-  const selectContact = () => {
-    updateKeys({bottomSheetType: null});
-    if (cancel) {
-      cancel();
-    }
-    updateFuncChat({selectedChatData: contact});
-    navigate('Chat');
-  };
+    const deleteContact = useCallback(async () => {
+      console.log('Inside delete contanct');
+      const {
+        updateFriends,
+        id: senderId,
+        username: senderUsername,
+      } = useAppStore.getState();
 
-  const deleteContact = useCallback(async () => {
-    setLoading(true);
+      setLoading(true);
 
-    try {
-      const res = await apiClient.post(DELETE_FRIEND, {friendId: contact._id});
-
-      if (res.status === 200) {
-        setLoading(false);
-        updateFriends(current =>
-          current.filter(item => item._id !== contact._id),
-        );
-
-        socket?.emit('deleteFriend', {
-          senderId: senderId,
-          friendId: contact._id,
-          senderUsername,
+      try {
+        const res = await apiClient.post(DELETE_FRIEND, {
+          friendId: contact?._id,
         });
-      }
-    } catch (error: any) {
-      setLoading(false);
-      Alert.alert(error.response.data.message, 'Please try again.');
-    }
-  }, [contact._id, senderId, senderUsername, socket, updateFriends]);
 
-  const renderRightActions = useCallback(() => {
-    if (version && version === 'search') {
-      return null;
-    }
+        if (res.status === 200) {
+          console.log('Inside delete contanct status 200');
+          updateFriends(current =>
+            current.filter(item => item._id !== contact._id),
+          );
+
+          socket?.emit('deleteFriend', {
+            senderId,
+            friendId: contact?._id,
+            senderUsername,
+          });
+        }
+      } catch (error: any) {
+        Alert.alert(error.response.data.message, 'Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    }, [contact._id, socket]);
+
+    const renderRightActions = useCallback(() => {
+      if (version && version === 'search') {
+        return null;
+      }
+
+      return (
+        <TouchableOpacity
+          onPress={deleteContact}
+          style={[styles.renderRightActions]}>
+          {loading ? (
+            <ActivityIndicator size="small" color="white" />
+          ) : (
+            <DeleteIcon width={17.5} height={21.5} color={'#FFFFFF'} />
+          )}
+        </TouchableOpacity>
+      );
+    }, [version, deleteContact, loading]);
 
     return (
-      <TouchableOpacity
-        onPress={deleteContact}
-        style={[styles.renderRightActions]}>
-        {loading ? (
-          <ActivityIndicator size="small" color="white" />
-        ) : (
-          <DeleteIcon width={17.5} height={21.5} color={'#FFFFFF'} />
-        )}
-      </TouchableOpacity>
+      <ReanimatedSwipable
+        friction={2}
+        renderRightActions={renderRightActions}
+        overshootRight={false}
+        key={contact._id}>
+        <TouchableHighlight
+          underlayColor={'white'}
+          activeOpacity={1}
+          style={[
+            version && version === 'search'
+              ? styles.container
+              : styles.containerVersion2,
+            {backgroundColor: backgroundColor ?? 'transparent'},
+          ]}
+          onPress={selectContact}>
+          <>
+            <Avatar
+              width={36}
+              height={36}
+              avatarWidth={27}
+              avatarHeight={27}
+              backgroundColor={COLORS.LightGray2}
+              src={contact.avatar}
+            />
+            <View style={styles.secondContainer}>
+              <Text style={styles.username}>@{contact.username}</Text>
+            </View>
+          </>
+        </TouchableHighlight>
+      </ReanimatedSwipable>
     );
-  }, [version, deleteContact, loading]);
-
-  return (
-    <ReanimatedSwipeable
-      friction={2}
-      renderRightActions={renderRightActions}
-      overshootRight={false}
-      key={contact._id}>
-      <TouchableOpacity
-        activeOpacity={1}
-        style={[
-          version && version === 'search'
-            ? styles.container
-            : styles.containerVersion2,
-          {backgroundColor: backgroundColor ?? 'transparent'},
-        ]}
-        onPress={selectContact}>
-        <Avatar
-          width={36}
-          height={36}
-          avatarWidth={27}
-          avatarHeight={27}
-          backgroundColor={COLORS.LightGray2}
-          src={contact.avatar}
-        />
-        <View style={styles.secondContainer}>
-          <Text style={styles.username}>@{contact.username}</Text>
-        </View>
-      </TouchableOpacity>
-    </ReanimatedSwipeable>
-  );
-};
+  },
+);
 
 const styles = StyleSheet.create({
   container: {

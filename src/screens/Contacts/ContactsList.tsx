@@ -1,13 +1,17 @@
 import React, {useMemo} from 'react';
 import {FlatList, StyleSheet, View} from 'react-native';
+
 import {useAppStore} from '../../store';
 import {NavigationProps} from '../../utils/types';
+
 import EmptyContacts from './EmptyContacts';
 import Persona from '../../components/Persona/Persona';
 import FullScreenLoader from '../../components/Loading/FullScreenLoader';
 import ReusableInput from '../../components/ReusableInput';
+
 import SearchIcon from '../../assets/icons/messages/SearchIcon';
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
+
 import useSearch from '../../utils/hooks/useSearch';
 
 type ContentProps = {

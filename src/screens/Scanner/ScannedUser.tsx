@@ -1,9 +1,7 @@
 import React from 'react';
-import {StatusBar, StyleSheet, TouchableOpacity} from 'react-native';
+import {StyleSheet, TouchableOpacity} from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
-
-import {SAFE_AREA_PADDING} from './Constants';
 
 import {RootStackParamList} from '../../utils/types';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -28,7 +26,6 @@ const ScannedUser: React.FC<ScannedUserProps> = ({route, navigation}) => {
 
   return (
     <SafeAreaView style={styles.content}>
-      <StatusBar hidden />
       <Avatar
         backgroundColor={COLORS.LightGray2}
         width={70}
@@ -56,7 +53,9 @@ const ScannedUser: React.FC<ScannedUserProps> = ({route, navigation}) => {
         onPress={addFriend}>
         Send Request
       </ReusableText>
-      <TouchableOpacity style={styles.backButton} onPress={navigation.goBack}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}>
         <CloseIcon width={35} height={35} fill={'#000'} />
       </TouchableOpacity>
       <FullScreenLoader version={'absolute'} />
@@ -76,8 +75,8 @@ const styles = StyleSheet.create({
 
   backButton: {
     position: 'absolute',
-    left: SAFE_AREA_PADDING.paddingLeft,
-    top: SAFE_AREA_PADDING.paddingTop,
+    left: 20,
+    top: 50,
   },
 });
 

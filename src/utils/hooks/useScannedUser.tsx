@@ -50,7 +50,11 @@ const useScannedUser = (scannedUserId: string, navigation: NavigationProps) => {
         updateFriends(current => [scannedUser, ...current]);
         socket?.emit('addFriend', {recipientId: scannedUserId, senderId: id});
         Alert.alert('Success', 'Friend successfully added!');
-        navigation?.navigate('BottomTabNavigation', {screen: 'Contacts'});
+        // navigation?.navigate('BottomTabNavigation', {screen: 'Contacts'});
+        navigation?.reset({
+          index: 0,
+          routes: [{name: 'BottomTabNavigation', params: {screen: 'Contacts'}}],
+        });
       }
     } catch (error: any) {
       Alert.alert('Error', error.response.data.message);

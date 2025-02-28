@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Alert, StyleSheet, View} from 'react-native';
+import {Alert, StyleSheet} from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -183,44 +183,17 @@ const styles = StyleSheet.create({
     right: 20,
     width: 100,
     height: 140,
-    backgroundColor: '#4a4a4a',
+    // backgroundColor: '#4a4a4a',
     borderRadius: 14,
     borderWidth: 1,
     borderColor: 'white',
-    zIndex: 3,
+    zIndex: 4,
   },
   status: {
     color: 'white',
     textAlign: 'center',
     padding: 10,
     fontSize: 16,
-  },
-  controls: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
-    padding: 20,
-    position: 'absolute',
-    bottom: 40,
-    left: 0,
-    right: 0,
-  },
-  controlButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#4a4a4a',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  controlButtonActive: {
-    backgroundColor: '#ff4646',
-  },
-  endCallButton: {
-    backgroundColor: '#ff4646',
-    width: 60,
-    height: 60,
-    borderRadius: 30,
   },
 });
 
