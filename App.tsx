@@ -10,21 +10,6 @@ import InternetPopup from './src/components/Internet/InternetPopup';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import CustomBottomSheetModal from './src/components/BottomSheet/CustomBottomSheetModal';
 const App = () => {
-  /* {Platform.OS === 'ios' ? (
-          <CustomStatusBar
-          backgroundColor="transparent"
-          barStyle="dark-content"
-          />
-          ) : (
-            <StatusBar
-            translucent={true}
-            backgroundColor="transparent"
-            barStyle={'dark-content'}
-            />
-            )} */
-
-  console.log('THis is app.js:');
-
   return (
     <GestureHandlerRootView style={styles.gestureHandlerContainer}>
       <BottomSheetModalProvider>

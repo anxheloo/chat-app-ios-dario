@@ -1,5 +1,5 @@
 import {useCallback, useEffect} from 'react';
-import {Alert} from 'react-native';
+import {Alert, AppState} from 'react-native';
 
 import {goBack, navigate} from '../navigation/navigationRef';
 
@@ -184,10 +184,11 @@ export const useSocket = () => {
     const peerConnection = useAppStore.getState().peerConnection;
 
     if (peerConnection) {
-      updateWebRTCState({answer, callState: 'active'});
       await peerConnection?.setRemoteDescription(
         new RTCSessionDescription(answer),
       );
+
+      updateWebRTCState({answer, callState: 'active'});
     }
   };
 
@@ -253,7 +254,7 @@ export const useSocket = () => {
     }
 
     console.log('User ID detected, initializing socket:', userId);
-    const socket = initializeSocket();
+    let socket = initializeSocket();
 
     if (socket) {
       socket.on('receiveMessage', handleReceiveMessage);
@@ -270,6 +271,17 @@ export const useSocket = () => {
       socket.on('toggle-camera', toggleCamera);
     }
 
+    // Reconnect when the app comes into focus
+    const appStateListener = AppState.addEventListener(
+      'change',
+      nextAppState => {
+        if (nextAppState === 'active' && !socket?.connected) {
+          console.log('🔄 App resumed: Reconnecting socket...');
+          socket = initializeSocket();
+        }
+      },
+    );
+
     return () => {
       console.log('socket disconected from useSocket');
       socket.off('receiveMessage');
@@ -277,6 +289,7 @@ export const useSocket = () => {
       socket.off('conversationUpdated');
       socket.off('friendCreated');
       socket.off('friendDeleted');
+      appStateListener.remove();
       disconnectSocket();
     };
 

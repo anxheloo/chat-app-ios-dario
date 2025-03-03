@@ -2,7 +2,12 @@
 import React, {useState} from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
 
-import {acceptCall, handleEndCall, toggleCamera} from '../../../utils/webrtc';
+import {
+  acceptCall,
+  endCall,
+  toggleCamera,
+  toggleMic,
+} from '../../../utils/webrtc';
 
 import {useAppStore} from '../../../store';
 import {COLORS} from '../../../theme/theme';
@@ -25,8 +30,14 @@ const BtnGroup = () => {
   const isActive = callState === 'active';
 
   // const toggleCamera = () => {
-  //   const {localStream, peerConnection, selectedChatData} =
-  //     useAppStore.getState();
+  //   const {
+  //     localStream,
+  //     peerConnection,
+  //     selectedChatData,
+  //     updateWebRTCState,
+  //     caller,
+  //     socket,
+  //   } = useAppStore.getState();
 
   //   const to = caller?._id ?? selectedChatData?._id;
 
@@ -48,14 +59,14 @@ const BtnGroup = () => {
   //   socket?.emit('toggle-camera', {to});
   // };
 
-  const toggleMic = () => {
-    const {localStream} = useAppStore.getState();
+  // const toggleMic = () => {
+  //   const {localStream} = useAppStore.getState();
 
-    localMicOn ? setlocalMicOn(false) : setlocalMicOn(true);
-    localStream?.getAudioTracks().forEach(track => {
-      localMicOn ? (track.enabled = false) : (track.enabled = true);
-    });
-  };
+  //   localMicOn ? setlocalMicOn(false) : setlocalMicOn(true);
+  //   localStream?.getAudioTracks().forEach(track => {
+  //     localMicOn ? (track.enabled = false) : (track.enabled = true);
+  //   });
+  // };
 
   // const acceptCall = async () => {
   //   console.log('THis is socket inside acceptCall:', socket);
@@ -132,7 +143,9 @@ const BtnGroup = () => {
       <View
         style={[styles.btnContainer, {gap: !isActive && isIncoming ? 70 : 30}]}>
         {!isIncoming && (
-          <TouchableOpacity style={styles.sideBtn} onPress={toggleMic}>
+          <TouchableOpacity
+            style={styles.sideBtn}
+            onPress={() => toggleMic(localMicOn, setlocalMicOn)}>
             {localMicOn ? <MicOff /> : <MicOn />}
           </TouchableOpacity>
         )}
@@ -140,7 +153,7 @@ const BtnGroup = () => {
         <View style={[styles.middleBtnContainer, {borderColor: '#FF675C'}]}>
           <TouchableOpacity
             style={[styles.middleBtn, {backgroundColor: '#FF675C'}]}
-            onPress={handleEndCall}>
+            onPress={endCall}>
             <EndCallIcon />
           </TouchableOpacity>
         </View>
@@ -172,7 +185,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 60,
     alignItems: 'center',
-    zIndex: 4,
   },
 
   btnContainer: {

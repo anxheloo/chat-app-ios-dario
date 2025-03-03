@@ -215,8 +215,10 @@ const socketSlice: StateCreator<SocketSlice> = (set, get) => ({
       const socketInstance = io(HOST, {
         query: {userId: id},
         reconnection: true,
-        reconnectionAttempts: 5,
+        reconnectionAttempts: Infinity,
+        // reconnectionAttempts: 5,
         reconnectionDelay: 3000,
+        transports: ['websocket'],
       });
 
       set({socket: socketInstance});
