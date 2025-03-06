@@ -1,7 +1,13 @@
 import {io} from 'socket.io-client';
 import {create, StateCreator} from 'zustand';
 import {HOST} from '../api/apis';
-import {Contact, Conversation, Message, NavigationProps} from '../utils/types';
+import {
+  Call,
+  Contact,
+  Conversation,
+  Message,
+  NavigationProps,
+} from '../utils/types';
 import {MediaStream, RTCPeerConnection} from 'react-native-webrtc';
 import {RTCSessionDescriptionInit} from 'react-native-webrtc/lib/typescript/RTCSessionDescription';
 
@@ -36,7 +42,6 @@ type ChatSlice = {
   selectedChatData: Contact | null;
   conversations: Conversation[];
   friends: Contact[];
-  calls: Contact[];
   selectedChatMessages: Message[];
   selectedMessageToDelete: Message | null;
   updateFuncChat: (data: Partial<ChatSlice>) => void;
@@ -53,8 +58,6 @@ type ChatSlice = {
     updateFunction: (currentFriends: Contact[]) => Contact[],
   ) => void;
 
-  updateCalls: (updateFunction: (currentCalls: Contact[]) => Contact[]) => void;
-
   // sortConversations: (message: Message) => void;
   sortConversations: () => void;
 };
@@ -62,33 +65,47 @@ type ChatSlice = {
 type CallState = 'idle' | 'outgoing' | 'incoming' | 'active';
 
 type WebRTCSlice = {
+  calls: Call[];
   localStream: MediaStream | null;
   remoteStream: MediaStream | null;
   peerConnection: RTCPeerConnection | null;
+  candidates: RTCIceCandidate[];
   callState: CallState;
   callType: 'video' | 'audio' | null;
   caller: Contact | null;
-  updateWebRTCState: (
-    data: Partial<Omit<WebRTCSlice, 'updateWebRTCState'>>,
-  ) => void;
-
-  resetCallState: () => void;
+  callTimer: number;
 
   isMuted: boolean;
   isVideoEnabled: boolean;
   isFrontCamera: boolean;
   offer: RTCSessionDescriptionInit | null;
   answer: RTCSessionDescriptionInit | null;
+
+  updateWebRTCState: (
+    data: Partial<Omit<WebRTCSlice, 'updateWebRTCState'>>,
+  ) => void;
+
+  resetCallState: () => void;
+  updateCalls: (updateFunction: (currentCalls: Call[]) => Call[]) => void;
+
+  updateCandidates: (
+    updateFunction: (currentCandidates: RTCIceCandidate[]) => RTCIceCandidate[],
+  ) => void;
+
+  sortCalls: () => void;
 };
 
-const webRTCSlice: StateCreator<WebRTCSlice> = set => ({
+const webRTCSlice: StateCreator<WebRTCSlice> = (set, get) => ({
   // Initial state
+  calls: [],
   localStream: null,
   remoteStream: null,
   peerConnection: null,
+  candidates: [],
   callState: 'idle',
   callType: null,
   caller: null,
+  callTimer: 0,
 
   isMuted: false,
   isVideoEnabled: true,
@@ -107,12 +124,41 @@ const webRTCSlice: StateCreator<WebRTCSlice> = set => ({
       localStream: null,
       remoteStream: null,
       peerConnection: null,
+      candidates: [],
       callState: 'idle',
       callType: null,
       caller: null,
       offer: null,
       answer: null,
     }),
+
+  updateCalls: (updateFunction: (currentCalls: Call[]) => Call[]) => {
+    const currentCalls = get().calls;
+    const updatedCalls = updateFunction(currentCalls);
+    set({calls: updatedCalls});
+  },
+
+  updateCandidates: (
+    updateFunction: (currentCandidates: RTCIceCandidate[]) => RTCIceCandidate[],
+  ) => {
+    const currentCandidates = get().candidates;
+    const updatedCandidates = updateFunction(currentCandidates);
+    set({candidates: updatedCandidates});
+  },
+
+  sortCalls: () => {
+    const {calls} = get();
+
+    const sortedCalls = calls.sort((a, b) => {
+      const dateA = +Date.parse(a?.startTime ?? '');
+      const dateB = +Date.parse(b?.startTime ?? '');
+
+      // return dateA - dateB;
+      return dateB - dateA;
+    });
+
+    set({calls: sortedCalls});
+  },
 });
 
 type SocketSlice = {
@@ -149,7 +195,6 @@ const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
   selectedChatMessages: [],
   conversations: [],
   friends: [],
-  calls: [],
   selectedMessageToDelete: null,
   updateFuncChat: set,
 
@@ -171,12 +216,6 @@ const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
     const currentFriends = get().friends;
     const updatedFriends = updateFunction(currentFriends);
     set({friends: updatedFriends});
-  },
-
-  updateCalls: (updateFunction: (currentCalls: Contact[]) => Contact[]) => {
-    const currentCalls = get().calls;
-    const updatedCalls = updateFunction(currentCalls);
-    set({calls: updatedCalls});
   },
 
   sortConversations: () => {
@@ -211,34 +250,57 @@ const socketSlice: StateCreator<SocketSlice> = (set, get) => ({
   socket: null,
   initializeSocket: () => {
     const {id} = get() as CreateSlice;
-    if (id && !get().socket) {
-      const socketInstance = io(HOST, {
-        query: {userId: id},
-        reconnection: true,
-        reconnectionAttempts: Infinity,
-        // reconnectionAttempts: 5,
-        reconnectionDelay: 3000,
-        transports: ['websocket'],
-      });
 
-      set({socket: socketInstance});
+    if (!id) {
+      return null;
+    }
 
-      socketInstance.on('connect', () => {
-        console.log('Connected to socket server');
-      });
+    let socketInstance = get().socket;
 
-      socketInstance.on('connect_error', error => {
-        console.error('Socket connection error:', error);
-      });
-
+    if (socketInstance && socketInstance.connected) {
+      console.log('Socket already connected, skipping initialization.');
       return socketInstance;
     }
+    //  else {
+    console.log('Initializing new socket connection...');
+    socketInstance = io(HOST, {
+      query: {userId: id},
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 3000,
+      transports: ['websocket'],
+      forceNew: true,
+      timeout: 20000,
+      autoConnect: true,
+    });
+
+    set({socket: socketInstance});
+    // }
+
+    socketInstance.on('connect', () => {
+      console.log('Connected to socket server.');
+    });
+
+    socketInstance.on('disconnect', (reason: string) => {
+      console.warn(`Socket disconnected: ${reason}`);
+    });
+
+    socketInstance.on('connect_error', (error: any) => {
+      console.error('Socket connection error:', error);
+    });
+
+    return socketInstance;
   },
 
   disconnectSocket: () => {
     const {socket} = get();
     if (socket) {
-      socket.disconnect();
+      console.log('Disconnecting and removing listeners...');
+
+      socket?.off('connect');
+      socket?.off('disconnect');
+      socket?.off('connect_error');
+      socket?.disconnect();
       set({socket: null});
     }
   },

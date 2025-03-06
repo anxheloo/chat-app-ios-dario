@@ -10,12 +10,12 @@ const LocalStream = () => {
   const localStream = useAppStore(state => state.localStream);
   const callType = useAppStore(state => state.callType);
 
-  console.log('This is localStream: ', localStream?.toURL());
-
+  if (callType !== 'video') {
+    return null;
+  }
   return (
     <Pressable onPress={switchSources} style={styles.localStream}>
-      {/* <View style={styles.localStream}> */}
-      {callType === 'video' && localStream ? (
+      {localStream ? (
         <RTCView
           style={styles.rtcView}
           mirror={true}
@@ -25,19 +25,19 @@ const LocalStream = () => {
       ) : (
         <ActivityIndicator size="small" color="#fff" />
       )}
-      {/* </View> */}
     </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
   localStream: {
-    position: 'absolute',
-    top: 160,
-    right: 20,
-    width: 100,
-    height: 140,
-    backgroundColor: 'rgba( 0, 0, 0, 0.5)',
+    flex: 1,
+    // position: 'absolute',
+    // top: 160,
+    // right: 20,
+    // width: 100,
+    // height: 140,
+    backgroundColor: 'rgba( 0, 0, 0, 0.8)',
     borderRadius: 14,
     borderWidth: 1,
     borderColor: 'white',
@@ -47,8 +47,8 @@ const styles = StyleSheet.create({
   },
 
   rtcView: {
-    flex: 1,
     width: '100%',
+    height: '100%',
   },
 });
 

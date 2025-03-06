@@ -5,19 +5,27 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
 } from 'react-native';
+
 import {useAppStore} from '../../../store';
+
 import MessageItem from './MessageComponent/MessageItem';
-import {preprocessMessages} from '../../../utils/helpers';
 import ScrollToBottom from './ScrollToBottom';
+
+import {preprocessMessages} from '../../../utils/helpers';
+
 import useMessages from '../../../utils/hooks/useMessages';
+import useAppState from '../../../utils/hooks/useAppState';
 
 const ChatContainer = () => {
   const selectedChatMessages = useAppStore(state => state.selectedChatMessages);
   const flatListRef = useRef<FlatList>(null);
   const [isNearBottom, setIsNearBottom] = useState(true);
-  const {loadMoreItem, isLoading, scrollToBottom} = useMessages(
+  const {loadMoreItem, isLoading, scrollToBottom, refetch} = useMessages(
     flatListRef?.current,
   );
+
+  // Listen for app state changes to check if app has come to foreground and fetch new messages (temporary solution)
+  useAppState(refetch);
 
   //  Messages to render
   const messagesData = useMemo(

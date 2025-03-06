@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {useCallback} from 'react';
 import {useAppStore} from '../../store';
 import {Alert} from 'react-native';
 import {ObjectId} from 'bson';
 // import {createThumbnail} from 'react-native-create-thumbnail';
 import {apiClient} from '../../api/apiClient';
-import {HOST, SEND_MESSAGE, UPLOAD_FILE} from '../../api/apis';
+import {HOST, UPLOAD_FILE} from '../../api/apis';
 import {Message} from '../types';
 import {Image, Video} from 'react-native-compressor';
 
@@ -15,13 +14,11 @@ const useSend = (
   setCameraOptions: (data: boolean) => void,
 ) => {
   const socket = useAppStore(state => state.socket);
-  const selectedChatData = useAppStore(state => state.selectedChatData);
-  const updateKeys = useAppStore(state => state.updateKeys);
+  const {selectedChatData, updateKeys, disappearingMessages, id} =
+    useAppStore.getState();
   const updateSelectedChatMessages = useAppStore(
     state => state.updateSelectedChatMessages,
   );
-  const disappearingMessages = useAppStore(state => state.disappearingMessages);
-  const id = useAppStore(state => state.id);
 
   const compressImage = async (uri: string) => {
     try {
@@ -134,8 +131,6 @@ const useSend = (
             };
           }),
         );
-
-        // console.log('These are tempMsgs:', tempMsgs)
 
         updateSelectedChatMessages(current => [...current, ...tempMsgs]);
 

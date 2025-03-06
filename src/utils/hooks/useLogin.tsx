@@ -33,6 +33,8 @@ const useLogin = (
   };
 
   const handleLogin = async () => {
+    console.log('Inside login');
+
     updateKeys({loading: true});
     try {
       const response = await apiClient.post(LOGIN_ROUTE, {username, pin});
@@ -47,6 +49,7 @@ const useLogin = (
       }
     } catch (error: any) {
       console.log('This is error:', error);
+      console.log('This is error.response.data:', error.response.data);
       Alert.alert('Login Error', error?.response.data.message);
       setUsername('');
       setPin('');

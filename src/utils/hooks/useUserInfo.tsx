@@ -53,7 +53,6 @@ const useUserInfo = () => {
       updateKeys({loading: false});
     }
   };
-
   //Get user info
   useEffect(() => {
     console.log('This is getUserInfo step 2');

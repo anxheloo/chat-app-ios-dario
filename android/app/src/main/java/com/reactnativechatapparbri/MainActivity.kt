@@ -11,8 +11,7 @@ class MainActivity : ReactActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(null)
-
-      // Initialize the WebRTC module options.
+    
      val options = WebRTCModuleOptions.getInstance()
         options.enableMediaProjectionService = true
   }

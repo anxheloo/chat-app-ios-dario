@@ -1,10 +1,10 @@
 import React from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import CheckInternet from '../../utils/hooks/CheckInternet';
 import {BORDERRADIUS, COLORS, FONTSIZE} from '../../theme/theme';
+import useInternet from '../../utils/hooks/useInternet';
 
 const InternetPopup = () => {
-  const {hasInternet, handleTryAgain} = CheckInternet();
+  const {hasInternet, handleTryAgain} = useInternet();
 
   if (hasInternet) {
     return null;

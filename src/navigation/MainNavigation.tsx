@@ -21,8 +21,6 @@ const MainNavigation = () => {
   const Stack = createNativeStackNavigator<RootStackParamList>();
   useSocket();
 
-  console.log('Inside MainNavigation');
-
   return (
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator

@@ -16,6 +16,8 @@ const Header = memo(() => {
   const username = useAppStore(state => state.username);
   const navigation = useNavigation<NavigationProps>();
 
+  console.log('This is header');
+
   // Get user info, user conversations, calls and friends
   useUserInfo();
 

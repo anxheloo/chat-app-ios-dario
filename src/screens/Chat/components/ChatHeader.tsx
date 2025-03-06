@@ -13,6 +13,7 @@ import CallIcon from '../../../assets/icons/BottomTabIcons/Call-Icon';
 import VideoIcon from '../../../assets/icons/Chat/VideoIcon';
 
 import {NavigationProps} from '../../../utils/types';
+
 import {handleCall} from '../../../utils/webrtc';
 
 const ChatHeader = memo(() => {

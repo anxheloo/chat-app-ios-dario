@@ -1,9 +1,15 @@
 import moment from 'moment';
 import {Alert, Linking} from 'react-native';
 
+import {useAppStore} from '../store';
+
 import {Message} from './types';
 
 import {request, check, RESULTS} from 'react-native-permissions';
+
+import {removeToken} from './TokenStorage';
+
+import {reset} from '../navigation/navigationRef';
 
 // Check if a message is image
 export const checkIfImage = (fileUrl: string): boolean => {
@@ -85,4 +91,33 @@ export const checkPermissionStatus = async (permissionType: any) => {
     console.error('Error checking permission:', error);
     return false;
   }
+};
+
+export const logout = async () => {
+  const {
+    updateFuncChat,
+    setUserInfoStatus,
+    setToken,
+    setUserPersona,
+    updateCalls,
+  } = useAppStore.getState();
+
+  await removeToken();
+
+  setToken(null);
+
+  setUserPersona({
+    username: '',
+    pin: '',
+    avatar: 0,
+    id: '',
+  });
+
+  setUserInfoStatus(false);
+
+  updateFuncChat({conversations: [], friends: []});
+
+  updateCalls(() => []);
+
+  reset('Login');
 };

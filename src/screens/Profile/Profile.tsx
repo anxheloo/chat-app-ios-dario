@@ -1,47 +1,22 @@
 import React, {useMemo} from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
+
 import ReusableText from '../../components/ReusableText';
-import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import Avatar from '../../components/Persona/Avatar';
 import SettingElement from './SettingElement';
-import {NavigationProps, SettingType} from '../../utils/types';
+
+import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
+
 import {useAppStore} from '../../store';
-import {removeToken} from '../../utils/TokenStorage';
+import {NavigationProps, SettingType} from '../../utils/types';
+import {logout} from '../../utils/helpers';
 
 type ProfileProps = {
   navigation: NavigationProps;
 };
 
-const Profile: React.FC<ProfileProps> = ({navigation}) => {
-  const {
-    updateKeys,
-    updateFuncChat,
-    setUserInfoStatus,
-    setToken,
-    setUserPersona,
-  } = useAppStore.getState();
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleLogout = async () => {
-    await removeToken();
-
-    setToken(null);
-
-    setUserPersona({
-      username: '',
-      pin: '',
-      avatar: 0,
-    });
-
-    setUserInfoStatus(false);
-
-    updateFuncChat({conversations: [], friends: [], calls: []});
-
-    navigation.reset({
-      index: 0, // The index of the current active route
-      routes: [{name: 'Login'}], // Replace the stack with the Login screen
-    });
-  };
+const Profile: React.FC<ProfileProps> = () => {
+  const {updateKeys} = useAppStore.getState();
 
   const settings = useMemo(
     () =>
@@ -50,13 +25,11 @@ const Profile: React.FC<ProfileProps> = ({navigation}) => {
           key={type}
           type={type as SettingType}
           onPress={() =>
-            type === 'logout'
-              ? handleLogout()
-              : updateKeys({bottomSheetType: type})
+            type === 'logout' ? logout() : updateKeys({bottomSheetType: type})
           }
         />
       )),
-    [handleLogout, updateKeys],
+    [updateKeys],
   );
 
   return (

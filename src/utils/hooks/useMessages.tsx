@@ -71,6 +71,9 @@ const useMessages = (flatListRef: any) => {
   };
 
   const refetch = useCallback(() => {
+    if (!selectedChatData?._id) {
+      return;
+    }
     setPagination(prev => ({...prev, page: 0, isLoading: false}));
     updateSelectedChatMessages(() => []);
     getAllMessages();
@@ -99,7 +102,12 @@ const useMessages = (flatListRef: any) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedChatData]);
 
-  return {loadMoreItem, isLoading: pagination.isLoading, scrollToBottom};
+  return {
+    loadMoreItem,
+    isLoading: pagination.isLoading,
+    scrollToBottom,
+    refetch,
+  };
 };
 
 export default useMessages;

@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import {
   FlatList,
   Keyboard,
@@ -7,15 +7,19 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import ReusableText from '../ReusableText';
-import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
-import ReusableInput from '../ReusableInput';
-import SearchIcon from '../../assets/icons/messages/SearchIcon';
-import CloseIcon from '../../assets/icons/messages/CloseIcon';
-import Persona from '../Persona/Persona';
-import AddIcon from '../../assets/icons/AddIcon';
+
 import {useAppStore} from '../../store';
 import {navigate} from '../../navigation/navigationRef';
+import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
+
+import Persona from '../Persona/Persona';
+import ReusableText from '../ReusableText';
+import ReusableInput from '../ReusableInput';
+
+import SearchIcon from '../../assets/icons/messages/SearchIcon';
+import CloseIcon from '../../assets/icons/messages/CloseIcon';
+import AddIcon from '../../assets/icons/AddIcon';
+import useSearch from '../../utils/hooks/useSearch';
 
 type PersonasListProps = {
   cancel: () => void;
@@ -23,8 +27,7 @@ type PersonasListProps = {
 
 const PersonasList: React.FC<PersonasListProps> = ({cancel}) => {
   const friends = useAppStore(state => state.friends);
-  const [search, setSearch] = useState<string>('');
-  const [debouncedSearch, setDebounceSearch] = useState<string>('');
+  const {search, debouncedSearch, clearSearch, updateSearch} = useSearch();
 
   const searchedFriends = useMemo(
     () =>
@@ -34,26 +37,10 @@ const PersonasList: React.FC<PersonasListProps> = ({cancel}) => {
     [debouncedSearch, friends],
   );
 
-  const updateSearch = (searchTerm: string) => {
-    setSearch(searchTerm);
-
-    const t = setTimeout(() => {
-      setDebounceSearch(searchTerm);
-    }, 300);
-
-    return () => clearTimeout(t);
-  };
-
-  const clearSearch = useCallback((): void => {
-    setSearch('');
-    Keyboard.dismiss();
-  }, []);
-
   const addNew = useCallback(() => {
     cancel();
 
     setTimeout(() => {
-      // navigation?.navigate('Scanner');
       navigate('Scanner');
     }, 300);
   }, [cancel]);

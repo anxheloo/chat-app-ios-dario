@@ -1243,6 +1243,8 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - react-native-background-timer (2.4.1):
+    - React-Core
   - react-native-blur (4.4.1):
     - DoubleConversion
     - glog
@@ -2021,6 +2023,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
+  - react-native-background-timer (from `../node_modules/react-native-background-timer`)
   - "react-native-blur (from `../node_modules/@react-native-community/blur`)"
   - react-native-compressor (from `../node_modules/react-native-compressor`)
   - react-native-create-thumbnail (from `../node_modules/react-native-create-thumbnail`)
@@ -2145,6 +2148,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   React-microtasksnativemodule:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
+  react-native-background-timer:
+    :path: "../node_modules/react-native-background-timer"
   react-native-blur:
     :path: "../node_modules/@react-native-community/blur"
   react-native-compressor:
@@ -2275,6 +2280,7 @@ SPEC CHECKSUMS:
   React-logger: 26155dc23db5c9038794db915f80bd2044512c2e
   React-Mapbuffer: ad1ba0205205a16dbff11b8ade6d1b3959451658
   React-microtasksnativemodule: e771eb9eb6ace5884ee40a293a0e14a9d7a4343c
+  react-native-background-timer: 17ea5e06803401a379ebf1f20505b793ac44d0fe
   react-native-blur: 28b0a731ed804bed3e88757c2414305896e6b47e
   react-native-compressor: fca3e41e7c77aab95011b5987bcee9016c96407a
   react-native-create-thumbnail: 4ffd51a6c02a9313edc74e2460cd07264221f554
@@ -2313,7 +2319,7 @@ SPEC CHECKSUMS:
   ReactNativeIncallManager: bfc9c67358cd524882a7c4116dcb311ac2293d4b
   RNCAsyncStorage: fe98f1b459a87b80f12207da80c50b3a3abb6081
   RNGestureHandler: 0e5ae8d72ef4afb855e98dcdbe60f27d938abe13
-  RNPermissions: 60516f0e44ecd7e9e58cc1953180424f7aa14c58
+  RNPermissions: ba01787562a91500b6ce26278eb71a534b4862a5
   RNReanimated: 006a5d3961bf09c1e96d62ed436e02b2e43b89bb
   RNScreens: 44a3e358d5ccd7815c5ae9148988c562826992b2
   RNStaticSafeAreaInsets: 055ddbf5e476321720457cdaeec0ff2ba40ec1b8
@@ -2323,6 +2329,6 @@ SPEC CHECKSUMS:
   VisionCamera: 598ab83c6bf4d65f5c32ec54361eed866505d388
   Yoga: 3deb2471faa9916c8a82dda2a22d3fba2620ad37
 
-PODFILE CHECKSUM: 2a8a85465ce0e603c29ecff1550baf60af36f07f
+PODFILE CHECKSUM: 8ff84371992044bfd39cfc889fb807db531706d7
 
 COCOAPODS: 1.16.2

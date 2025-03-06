@@ -73,6 +73,16 @@ export type Conversation = {
   lastMessageFileUrl?: string | null;
 };
 
+export type Call = {
+  _id: string;
+  caller: Contact;
+  participants: Contact[];
+  callType: 'audio' | 'video';
+  answeredBy: Contact;
+  declinedBy: Contact;
+  startTime: string;
+};
+
 export type SettingType = 'username' | 'qr-code' | 'pin' | 'clock' | 'logout';
 
 declare module 'react-native-webrtc' {

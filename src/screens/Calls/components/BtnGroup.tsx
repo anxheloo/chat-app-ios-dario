@@ -9,6 +9,8 @@ import {
   toggleMic,
 } from '../../../utils/webrtc';
 
+import useCallTimer from '../../../utils/hooks/useCallTimer';
+
 import {useAppStore} from '../../../store';
 import {COLORS} from '../../../theme/theme';
 
@@ -22,8 +24,11 @@ import EndCallIcon from '../../../assets/icons/Calls/EndCall.svg';
 import CallIcon from '../../../assets/icons/BottomTabIcons/Call-Icon';
 
 const BtnGroup = () => {
-  const callType = useAppStore(state => state.callType);
   const callState = useAppStore(state => state.callState);
+  const isVideoEnabled = useAppStore(state => state.isVideoEnabled);
+
+  // Count down for the call timer
+  const timer = useCallTimer();
 
   const [localMicOn, setlocalMicOn] = useState(true);
   const isIncoming = callState === 'incoming';
@@ -89,7 +94,7 @@ const BtnGroup = () => {
   //     pc.onicecandidate = (event: any) => {
   //       if (event.candidate) {
   //         console.log('Sending ICE candidate:', event.candidate);
-  //         socket?.emit('ice-candidate', {
+  //         socket?.emit('ICEcandidate', {
   //           to: caller?._id,
   //           candidate: event.candidate,
   //         });
@@ -137,11 +142,10 @@ const BtnGroup = () => {
   return (
     <View style={styles.container}>
       <ReusableText fontSize={14} fontWeight={400} color="white">
-        {isActive ? '00:00' : isIncoming ? 'Is Calling...' : 'Calling...'}
+        {isActive ? timer : isIncoming ? 'Is Calling...' : 'Calling...'}
       </ReusableText>
 
-      <View
-        style={[styles.btnContainer, {gap: !isActive && isIncoming ? 70 : 30}]}>
+      <View style={[styles.btnContainer, {gap: isIncoming ? 70 : 30}]}>
         {!isIncoming && (
           <TouchableOpacity
             style={styles.sideBtn}
@@ -170,7 +174,7 @@ const BtnGroup = () => {
 
         {!isIncoming && (
           <TouchableOpacity style={styles.sideBtn} onPress={toggleCamera}>
-            {callType === 'video' ? <VideoOff /> : <VideoOn />}
+            {isVideoEnabled ? <VideoOff /> : <VideoOn />}
           </TouchableOpacity>
         )}
       </View>

@@ -16,3 +16,14 @@ export function goBack() {
     navigationRef.dispatch(CommonActions.goBack());
   }
 }
+
+export function reset(screenName: string) {
+  if (navigationRef.isReady()) {
+    navigationRef.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{name: screenName}],
+      }),
+    );
+  }
+}

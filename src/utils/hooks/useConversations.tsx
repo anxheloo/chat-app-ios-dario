@@ -14,6 +14,7 @@ const useConversations = () => {
 
       if (res.status === 200) {
         updateFuncChat({conversations: res.data.conversations});
+        console.log('Inside conversationss:', res.data.conversations);
       }
     } catch (error) {
       Alert.alert('Error', 'Failed to get conversations');

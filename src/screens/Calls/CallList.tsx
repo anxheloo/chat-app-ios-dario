@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React from 'react';
 import {FlatList, StyleSheet, View} from 'react-native';
 
 import {useAppStore} from '../../store';
@@ -8,14 +8,14 @@ import EmptyCall from './EmptyCall';
 import ReusableInput from '../../components/ReusableInput';
 import SearchIcon from '../../assets/icons/messages/SearchIcon';
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
-import Persona from '../../components/Persona/Persona';
+// import Persona from '../../components/Persona/Persona';
 
 import {COLORS} from '../../theme/theme';
+import useSearch from '../../utils/hooks/useSearch';
 
 const CallList = () => {
   const calls = useAppStore(state => state.calls);
-  const [search, setSearch] = useState<string>('');
-  const clearSearch = useCallback(() => setSearch(''), []);
+  const {search, updateSearch, clearSearch, debouncedSearch} = useSearch();
 
   if (!calls.length) {
     return <EmptyCall />;
@@ -26,19 +26,19 @@ const CallList = () => {
       <ReusableInput
         placeholder="Search"
         value={search}
-        onChange={setSearch}
+        onChange={updateSearch}
         onPress={clearSearch}
         icon1={<SearchIcon width={15} height={15} fill={'#000'} />}
         icon2={<CloseIcon width={15} height={15} fill={'#000'} />}
       />
-      <FlatList
+      {/* <FlatList
         contentContainerStyle={styles.content}
         data={calls}
-        renderItem={({item}) => <Persona contact={item} />}
+        renderItem={({item}) => }
         keyExtractor={item => item._id}
         initialNumToRender={10}
-      />
-      <FullScreenLoader version={'flex'} />;
+      /> */}
+      <FullScreenLoader version={'absolute'} />;
     </View>
   );
 };

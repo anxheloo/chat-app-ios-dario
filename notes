@@ -1,0 +1,26 @@
+// Example: if voice-only mode, you could disable the video tracks
+// mediaStream.getVideoTracks()[0].enabled = false;
+
+
+
+import InCallManager from 'react-native-incall-manager';
+// e.g., when call starts:
+InCallManager.start({ media: 'video' });
+// Now by default, on iOS it may route to speaker for 'video'. On Android, you might need to force.
+InCallManager.setForceSpeakerphoneOn(true);  // route audio to speaker
+// or
+InCallManager.setForceSpeakerphoneOn(false); // route audio to earpiece
+
+
+Also consider using InCallManager.setKeepScreenOn(true) 
+to prevent the screen from locking during a call (since in video calls the user might not touch the screen for a while).
+
+
+
+On Android, you might also need the app to have MODIFY_AUDIO_SETTINGS permissio
+
+
+where do you suggest me to put this code : peerConnection.oniceconnectionstatechange or onconnectionstatechange
+
+
+iceConnectionState

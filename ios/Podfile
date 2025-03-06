@@ -23,7 +23,7 @@ prepare_react_native_project!
 # ⬇️ uncomment the permissions you need
 setup_permissions([
   # 'AppTrackingTransparency',
-  # 'Bluetooth',
+  'Bluetooth',
   # 'Calendars',
   # 'CalendarsWriteOnly',
   'Camera',

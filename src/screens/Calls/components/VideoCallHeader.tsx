@@ -36,6 +36,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     height: 90,
     backgroundColor: 'rgba(0,0,0,0.3)',
+    // backgroundColor: 'red',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
