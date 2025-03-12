@@ -9,25 +9,15 @@ import ReusableText from '../ReusableText';
 
 import {NavigationProps} from '../../utils/types';
 import useUserInfo from '../../utils/hooks/useUserInfo';
-import {permission} from '../../utils/permissions';
-import {checkPermissionStatus} from '../../utils/helpers';
+
+import {openScanner} from '../../utils/helpers';
 
 const Header = memo(() => {
   const username = useAppStore(state => state.username);
   const navigation = useNavigation<NavigationProps>();
 
-  console.log('This is header');
-
   // Get user info, user conversations, calls and friends
   useUserInfo();
-
-  //Open Scanner
-  const openScanner = useCallback(async () => {
-    const status = await checkPermissionStatus(permission.camera);
-    if (status) {
-      navigation.navigate('Scanner');
-    }
-  }, [navigation]);
 
   const navigateToHomePage = useCallback(() => {
     navigation?.replace('BottomTabNavigation', {screen: 'Messages'});

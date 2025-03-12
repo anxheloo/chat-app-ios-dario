@@ -45,7 +45,7 @@ const DeleteMsg = React.memo(() => {
           }),
         );
 
-        socket?.emit('deleteSpecificMessage', {
+        await socket?.emit('deleteSpecificMessage', {
           messageId: msgId,
           senderId: id,
           recipientId: res.data.recipientId,

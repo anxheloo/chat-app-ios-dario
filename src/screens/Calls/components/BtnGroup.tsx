@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
+import React, {memo, useState} from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
 
 import {
@@ -23,8 +23,9 @@ import MicOn from '../../../assets/icons/Calls/MicOn.svg';
 import EndCallIcon from '../../../assets/icons/Calls/EndCall.svg';
 import CallIcon from '../../../assets/icons/BottomTabIcons/Call-Icon';
 
-const BtnGroup = () => {
+const BtnGroup = memo(() => {
   const callState = useAppStore(state => state.callState);
+  const callType = useAppStore(state => state.callType);
   const isVideoEnabled = useAppStore(state => state.isVideoEnabled);
 
   // Count down for the call timer
@@ -34,120 +35,20 @@ const BtnGroup = () => {
   const isIncoming = callState === 'incoming';
   const isActive = callState === 'active';
 
-  // const toggleCamera = () => {
-  //   const {
-  //     localStream,
-  //     peerConnection,
-  //     selectedChatData,
-  //     updateWebRTCState,
-  //     caller,
-  //     socket,
-  //   } = useAppStore.getState();
-
-  //   const to = caller?._id ?? selectedChatData?._id;
-
-  //   if (!localStream || !peerConnection) {
-  //     return;
-  //   }
-
-  //   callType === 'video'
-  //     ? updateWebRTCState({callType: 'audio'})
-  //     : updateWebRTCState({callType: 'video'});
-
-  //   // localStream?.getVideoTracks().forEach(track => {
-  //   //   callType === 'video' ? (track.enabled = false) : (track.enabled = true);
-  //   // });
-  //   localStream?.getVideoTracks().forEach(track => {
-  //     track.enabled = !track.enabled;
-  //   });
-
-  //   socket?.emit('toggle-camera', {to});
-  // };
-
-  // const toggleMic = () => {
-  //   const {localStream} = useAppStore.getState();
-
-  //   localMicOn ? setlocalMicOn(false) : setlocalMicOn(true);
-  //   localStream?.getAudioTracks().forEach(track => {
-  //     localMicOn ? (track.enabled = false) : (track.enabled = true);
-  //   });
-  // };
-
-  // const acceptCall = async () => {
-  //   console.log('THis is socket inside acceptCall:', socket);
-
-  //   if (!offer || !caller) {
-  //     return;
-  //   }
-
-  //   try {
-  //     // Step 1: Create a Peer Connection
-  //     const pc = new RTCPeerConnection(servers);
-
-  //     // Step 2: Handle Remote Stream
-  //     pc.ontrack = (event: any) => {
-  //       console.log('Receiving remote stream:', event.streams[0]);
-  //       updateWebRTCState({remoteStream: event.streams[0]});
-  //     };
-
-  //     // Step 3: Handle ICE Candidates
-  //     pc.onicecandidate = (event: any) => {
-  //       if (event.candidate) {
-  //         console.log('Sending ICE candidate:', event.candidate);
-  //         socket?.emit('ICEcandidate', {
-  //           to: caller?._id,
-  //           candidate: event.candidate,
-  //         });
-  //       }
-  //     };
-
-  //     // Step 4: Get local stream (microphone/video)
-  //     const ls = await mediaDevices.getUserMedia({
-  //       audio: true,
-  //       video:
-  //         callType === 'video'
-  //           ? {width: 500, height: 300, frameRate: 30, facingMode: 'user'}
-  //           : false,
-  //     });
-
-  //     ls.getTracks().forEach(track => pc.addTrack(track, ls));
-
-  //     // Step 5: Set the Remote Description
-  //     if (offer) {
-  //       await pc.setRemoteDescription(new RTCSessionDescription(offer));
-  //     }
-
-  //     // Step 6: Create an Answer
-  //     const a = await pc.createAnswer();
-  //     await pc.setLocalDescription(a);
-
-  //     // Step 7: Send the Answer back
-  //     socket?.emit('answer', {
-  //       to: caller?._id,
-  //       answer: a,
-  //     });
-
-  //     // Step 8: Update State
-  //     updateWebRTCState({
-  //       localStream: ls,
-  //       peerConnection: pc,
-  //       callState: 'active',
-  //     });
-  //   } catch (error) {
-  //     console.log('This is error: ', error);
-  //     Alert.alert('Error', 'Incoming call Failed');
-  //   }
-  // };
-
   return (
     <View style={styles.container}>
       <ReusableText fontSize={14} fontWeight={400} color="white">
-        {isActive ? timer : isIncoming ? 'Is Calling...' : 'Calling...'}
+        {isActive
+          ? timer
+          : isIncoming
+          ? `Incoming ${callType} call...`
+          : 'Calling...'}
       </ReusableText>
 
       <View style={[styles.btnContainer, {gap: isIncoming ? 70 : 30}]}>
         {!isIncoming && (
           <TouchableOpacity
+            disabled={callType === null}
             style={styles.sideBtn}
             onPress={() => toggleMic(localMicOn, setlocalMicOn)}>
             {localMicOn ? <MicOff /> : <MicOn />}
@@ -156,6 +57,7 @@ const BtnGroup = () => {
 
         <View style={[styles.middleBtnContainer, {borderColor: '#FF675C'}]}>
           <TouchableOpacity
+            disabled={callType === null}
             style={[styles.middleBtn, {backgroundColor: '#FF675C'}]}
             onPress={endCall}>
             <EndCallIcon />
@@ -165,6 +67,7 @@ const BtnGroup = () => {
         {isIncoming && (
           <View style={[styles.middleBtnContainer, {borderColor: '#98FB98'}]}>
             <TouchableOpacity
+              disabled={callType === null}
               style={[styles.middleBtn, {backgroundColor: '#98FB98'}]}
               onPress={acceptCall}>
               <CallIcon width={24} height={24} fill={'white'} />
@@ -173,14 +76,17 @@ const BtnGroup = () => {
         )}
 
         {!isIncoming && (
-          <TouchableOpacity style={styles.sideBtn} onPress={toggleCamera}>
+          <TouchableOpacity
+            style={styles.sideBtn}
+            onPress={toggleCamera}
+            disabled={callType === 'audio' || callType === null}>
             {isVideoEnabled ? <VideoOff /> : <VideoOn />}
           </TouchableOpacity>
         )}
       </View>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

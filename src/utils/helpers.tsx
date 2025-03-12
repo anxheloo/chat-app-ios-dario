@@ -9,7 +9,12 @@ import {request, check, RESULTS} from 'react-native-permissions';
 
 import {removeToken} from './TokenStorage';
 
-import {reset} from '../navigation/navigationRef';
+import {navigate, reset} from '../navigation/navigationRef';
+import {permission} from './permissions';
+
+// ====================================================================
+// Helper functions related to MESSAGES
+// ====================================================================
 
 // Check if a message is image
 export const checkIfImage = (fileUrl: string): boolean => {
@@ -41,9 +46,9 @@ export const preprocessMessages = (messages: Message[]) => {
 };
 
 // Format the duration number of a message
-export const formatDuration = (messageDuration: number) => {
-  if (messageDuration) {
-    let duration: any = Math.floor(messageDuration ?? 0);
+export const formatDuration = (durationValue: number) => {
+  if (durationValue) {
+    let duration: any = Math.floor(durationValue ?? 0);
     let m: string | number = Math.floor(duration / 60);
     m = m >= 10 ? m : '0' + m;
     duration = Math.floor(duration % 60);
@@ -51,6 +56,21 @@ export const formatDuration = (messageDuration: number) => {
     return m + ':' + duration;
   }
 };
+
+export const timeCalendarFormat = (time: string) => {
+  return moment(time).calendar(null, {
+    sameDay: moment(time).format('HH:mm'),
+    nextDay: '[Tomorrow]',
+    nextWeek: 'dddd',
+    lastDay: '[Yesterday]',
+    lastWeek: '[Last] dddd',
+    sameElse: 'MMM Do, YYYY',
+  });
+};
+
+// ====================================================================
+// Helper functions related to PERMISSIONS
+// ====================================================================
 
 // Handle blocked permission
 const handleBlockedPermission = () => {
@@ -93,6 +113,10 @@ export const checkPermissionStatus = async (permissionType: any) => {
   }
 };
 
+// ====================================================================
+// Helper function related to LOGOUT
+// ====================================================================
+
 export const logout = async () => {
   const {
     updateFuncChat,
@@ -100,6 +124,7 @@ export const logout = async () => {
     setToken,
     setUserPersona,
     updateCalls,
+    setCallsPagination,
   } = useAppStore.getState();
 
   await removeToken();
@@ -115,9 +140,35 @@ export const logout = async () => {
 
   setUserInfoStatus(false);
 
-  updateFuncChat({conversations: [], friends: []});
+  updateFuncChat({
+    conversations: [],
+    friends: [],
+    conversationPagination: {page: 0, hasMore: true, isLoading: false},
+    friendsPagination: {page: 0, hasMore: true, isLoading: false},
+  });
 
   updateCalls(() => []);
+  setCallsPagination({
+    page: 0,
+    hasMore: true,
+    isLoading: false,
+  });
 
   reset('Login');
 };
+
+// ====================================================================
+// Helper functions related to SCANNER SCREEN
+// ====================================================================
+
+// Navigate to Scanner Screen
+export const openScanner = async () => {
+  const status = await checkPermissionStatus(permission.camera);
+  if (status) {
+    navigate('Scanner');
+  }
+};
+
+// ====================================================================
+// Helper functions related to Conversations, calls, contacts
+// ====================================================================

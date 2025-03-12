@@ -1,54 +1,65 @@
-import React from 'react';
-import {ActivityIndicator, Pressable, StyleSheet} from 'react-native';
+import React, {memo, useEffect} from 'react';
+import {Pressable, StyleSheet} from 'react-native';
 
 import {useAppStore} from '../../../store';
 
 import {RTCView} from 'react-native-webrtc';
 import {switchSources} from '../../../utils/webrtc';
 
-const LocalStream = () => {
+const LocalStream = memo(() => {
   const localStream = useAppStore(state => state.localStream);
   const callType = useAppStore(state => state.callType);
+  const updateWebRTCState = useAppStore(state => state.updateWebRTCState);
 
-  if (callType !== 'video') {
-    return null;
-  }
-  return (
-    <Pressable onPress={switchSources} style={styles.localStream}>
-      {localStream ? (
+  useEffect(() => {
+    if (localStream) {
+      updateWebRTCState({localStream2: localStream});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (localStream && callType === 'video') {
+    return (
+      <Pressable onPress={switchSources} style={styles.localStream}>
         <RTCView
           style={styles.rtcView}
           mirror={true}
           streamURL={localStream?.toURL()}
           objectFit="cover"
         />
-      ) : (
-        <ActivityIndicator size="small" color="#fff" />
-      )}
-    </Pressable>
-  );
-};
+      </Pressable>
+    );
+  } else {
+    return null;
+  }
+});
 
 const styles = StyleSheet.create({
   localStream: {
-    flex: 1,
-    // position: 'absolute',
-    // top: 160,
-    // right: 20,
-    // width: 100,
-    // height: 140,
-    backgroundColor: 'rgba( 0, 0, 0, 0.8)',
+    position: 'absolute',
+    top: 160,
+    right: 20,
+    width: 100,
+    height: 140,
+    // flex: 1,
+    // backgroundColor: 'rgba( 0, 0, 0, 0.8)',
     borderRadius: 14,
     borderWidth: 1,
     borderColor: 'white',
     overflow: 'hidden',
-    justifyContent: 'center',
-    alignItems: 'center',
+    // justifyContent: 'center',
+    // alignItems: 'center',
   },
 
   rtcView: {
     width: '100%',
+    minWidth: 100,
     height: '100%',
+    minHeight: 140,
+    borderRadius: 14,
+    overflow: 'hidden',
+    // width: 100,
+    // height: 140,
   },
 });
 

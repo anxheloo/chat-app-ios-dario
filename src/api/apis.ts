@@ -1,7 +1,6 @@
 export const HOST = 'https://chat-app-main-server.onrender.com';
-// export const HOST = 'http://192.168.1.66:8000';
-// export const HOST = 'http://192.168.0.112:8000';
-// export const HOST = 'http://169.254.25.33:8000';
+// export const HOST = 'http://192.168.1.6:8000';
+// export const HOST = 'http://192.168.0.105:8000';
 
 export const AUTH_ROUTES = 'api/auth';
 export const SIGNUP_ROUTES = `${AUTH_ROUTES}/signup`;
@@ -27,3 +26,10 @@ export const GET_ALL_MESSAGES = `${MESSAGES_ROUTES}/get-messages`;
 export const DELETE_MESSAGE = `${MESSAGES_ROUTES}/delete-message`;
 export const UPLOAD_FILE = `${MESSAGES_ROUTES}/upload-files`;
 export const SEND_MESSAGE = `${MESSAGES_ROUTES}/send-message`;
+
+export const CALLS_ROUTES = 'api/calls';
+export const GET_ALL_CALLS = `${CALLS_ROUTES}/get-all-calls`;
+export const START_CALL = `${CALLS_ROUTES}/start-call`;
+export const DELETE_CALL = `${CALLS_ROUTES}/delete-call`;
+export const UPDATE_CALL = `${CALLS_ROUTES}/update-call`;
+export const DECLINE_CALL = `${CALLS_ROUTES}/decline-call`;

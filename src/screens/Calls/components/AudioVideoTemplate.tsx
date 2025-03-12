@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {memo} from 'react';
 
 import {View, StyleSheet} from 'react-native';
 
@@ -7,22 +7,34 @@ import {useAppStore} from '../../../store';
 import AudioUserDetails from './AudioUserDetails';
 
 import RemoteStream from './RemoteStream';
+import LocalStream from './LocalStream';
 
-const AudioVideoTemplate = () => {
+const AudioVideoTemplate = memo(() => {
   const callType = useAppStore(state => state.callType);
   const callState = useAppStore(state => state.callState);
-  const isVideoEnabled = useAppStore(state => state.isVideoEnabled);
 
   if (callType === 'video' && callState === 'active') {
-    return <RemoteStream />;
+    return (
+      <View style={styles.container}>
+        <RemoteStream />
+        <LocalStream />
+      </View>
+    );
   }
 
   return (
     <View style={styles.container}>
-      <AudioUserDetails />
+      {callType === 'video' && callState === 'active' ? (
+        <>
+          <RemoteStream />
+          <LocalStream />
+        </>
+      ) : (
+        <AudioUserDetails />
+      )}
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

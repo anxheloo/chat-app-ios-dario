@@ -71,6 +71,8 @@ const CustomBottomSheetModal = () => {
         );
       case 'start-conversation':
         return <PersonasList cancel={closeBottomSheet} />;
+      case 'start-call':
+        return <PersonasList cancel={closeBottomSheet} type={'call'} />;
       default:
         return null;
     }

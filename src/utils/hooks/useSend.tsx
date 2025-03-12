@@ -56,7 +56,7 @@ const useSend = (
     }
 
     // Emit the single text message wrapped in an array
-    socket?.emit('sendMessage', {
+    await socket?.emit('sendMessage', {
       messages: [
         {
           sender: id,
@@ -189,7 +189,7 @@ const useSend = (
               ),
             );
 
-            socket?.emit('sendMessage', {messages: uploadedMessages});
+            await socket?.emit('sendMessage', {messages: uploadedMessages});
           }
         } catch (error: any) {
           updateSelectedChatMessages(currentMessages =>

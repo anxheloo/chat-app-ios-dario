@@ -61,10 +61,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5E5',
     paddingHorizontal: 20,
-    paddingBottom: 10,
     alignItems: 'center',
-    paddingTop: 10,
-    maxHeight: 60,
+    paddingVertical: 10,
+    height: 60,
   },
 
   middleContent: {

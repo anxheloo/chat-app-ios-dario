@@ -39,7 +39,7 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
     const conversations = useAppStore(state => state.conversations);
     const [loading, setLoading] = useState(false);
 
-    const participant = useMemo(() => {
+    const recipient = useMemo(() => {
       return conversation.participants.find(
         user => user._id !== loggedInUserId,
       );
@@ -47,19 +47,19 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
 
     // Select contact to update chat
     const selectContact = useCallback(() => {
-      if (!participant) {
+      if (!recipient) {
         return;
       }
 
       updateFuncChat({
         selectedChatData: {
-          ...participant,
+          ...recipient,
           conversationId: conversation._id,
         },
       });
       navigation?.navigate('Chat');
       cancel?.();
-    }, [conversation._id, participant, updateFuncChat, navigation, cancel]);
+    }, [conversation._id, recipient, updateFuncChat, navigation, cancel]);
 
     const renderLastMessage = useMemo(() => {
       if (!conversation.lastMessage) {
@@ -140,7 +140,7 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
       );
     }, [deleteConversation, loading]);
 
-    if (!participant) {
+    if (!recipient) {
       return null;
     }
 
@@ -165,10 +165,10 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
               avatarWidth={34}
               avatarHeight={34}
               backgroundColor={COLORS.LightGray2}
-              src={participant?.avatar}
+              src={recipient?.avatar}
             />
             <View style={styles.secondContainer}>
-              <Text style={styles.username}>@{participant?.username}</Text>
+              <Text style={styles.username}>@{recipient?.username}</Text>
               <View>{renderLastMessage}</View>
             </View>
 

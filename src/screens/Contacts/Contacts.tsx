@@ -1,14 +1,20 @@
 import React from 'react';
 import {NavigationProps} from '../../utils/types';
+
 import ContactsList from './ContactsList';
-// import useFriend from '../../utils/hooks/useFriend';
+import FullScreenLoader from '../../components/Loading/FullScreenLoader';
 
 type Props = {
   navigation: NavigationProps;
 };
 
 const Contacts: React.FC<Props> = ({navigation}) => {
-  return <ContactsList navigation={navigation} />;
+  return (
+    <>
+      <ContactsList navigation={navigation} />
+      <FullScreenLoader version={'absolute'} type="friendsPagination" />
+    </>
+  );
 };
 
 export default Contacts;

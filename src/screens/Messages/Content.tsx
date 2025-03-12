@@ -1,9 +1,13 @@
-import React, {memo, useMemo} from 'react';
-import {FlatList, StyleSheet, View} from 'react-native';
+import React, {memo, useMemo, useRef} from 'react';
+import {ActivityIndicator, FlatList, StyleSheet, View} from 'react-native';
 
 import {useAppStore} from '../../store';
+
 import {NavigationProps} from '../../utils/types';
 import {useNavigation} from '@react-navigation/native';
+
+// import useConversations from '../../utils/hooks/useConversations';
+import useAppState from '../../utils/hooks/useAppState';
 import useSearch from '../../utils/hooks/useSearch';
 
 import EmptyChat from './EmptyChat';
@@ -15,10 +19,21 @@ import SearchIcon from '../../assets/icons/messages/SearchIcon';
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
 import {COLORS} from '../../theme/theme';
 
+import {
+  loadMoreConversations,
+  refetchConversations,
+} from '../../utils/DataFetching';
+
 const Content = memo(() => {
+  const flatListRef = useRef<FlatList>(null);
   const navigation = useNavigation<NavigationProps>();
   const conversations = useAppStore(state => state.conversations);
+  const isLoading = useAppStore(
+    state => state.conversationPagination.isLoading,
+  );
   const {search, updateSearch, clearSearch, debouncedSearch} = useSearch();
+  // Fetch conversations on app state change from inactive, background to active
+  useAppState(refetchConversations);
 
   const searchedConversations = useMemo(
     () =>
@@ -53,6 +68,15 @@ const Content = memo(() => {
         icon2={<CloseIcon width={15} height={15} fill={'#000'} />}
       />
       <FlatList
+        ref={flatListRef}
+        // onScroll={handleScroll}
+        scrollEventThrottle={16}
+        onEndReached={loadMoreConversations}
+        onEndReachedThreshold={0.1}
+        ListFooterComponent={
+          isLoading ? <ActivityIndicator size="small" color={'#000'} /> : null
+        }
+        // removeClippedSubviews
         contentContainerStyle={styles.content}
         data={searchedConversations}
         renderItem={({item}) => (
@@ -74,8 +98,9 @@ const Content = memo(() => {
 
 const styles = StyleSheet.create({
   content: {
-    flex: 1,
     backgroundColor: COLORS.White,
+    flexGrow: 1,
+    paddingBottom: 80,
   },
 });
 

@@ -75,12 +75,10 @@ export type Conversation = {
 
 export type Call = {
   _id: string;
-  caller: Contact;
   participants: Contact[];
   callType: 'audio' | 'video';
-  answeredBy: Contact;
-  declinedBy: Contact;
-  startTime: string;
+  callStatus: 'missed' | 'answered' | 'pending' | 'ended';
+  createdAt: string;
 };
 
 export type SettingType = 'username' | 'qr-code' | 'pin' | 'clock' | 'logout';

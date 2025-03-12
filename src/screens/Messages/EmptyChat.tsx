@@ -14,7 +14,7 @@ type EmptyChatProps = {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const EmptyChat: React.FC<EmptyChatProps> = ({navigation}) => {
-  const {updateKeys} = useAppStore();
+  const {updateKeys} = useAppStore.getState();
 
   return (
     <View style={styles.emptyChat}>

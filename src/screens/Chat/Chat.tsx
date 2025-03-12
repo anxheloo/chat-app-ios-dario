@@ -17,7 +17,7 @@ const Chat = () => {
 
   useEffect(() => {
     return () => {
-      updateFuncChat({selectedChatMessages: []});
+      updateFuncChat({selectedChatMessages: [], selectedChatData: null});
     };
   }, [updateFuncChat]);
 

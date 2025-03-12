@@ -1,5 +1,5 @@
 import React, {useCallback, useState} from 'react';
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import {Alert, StyleSheet, TouchableOpacity, View} from 'react-native';
 
 import * as ImagePicker from 'react-native-image-picker';
 
@@ -8,13 +8,14 @@ import {useAppStore} from '../../../store';
 import ReusableInput from '../../../components/ReusableInput';
 import CameraOptions from './CameraOptions';
 
-import useSend from '../../../utils/hooks/useSend';
+// import useSend from '../../../utils/hooks/useSend';
 
 import {permission} from '../../../utils/permissions';
 import {checkPermissionStatus} from '../../../utils/helpers';
 
 import MicrophoneIcon from '../../../assets/icons/Chat/MicrophoneIcon';
 import CameraIcon from '../../../assets/icons/Chat/CameraIcon';
+import {handleCameraUpload, sendMessage} from '../../../utils/message';
 
 type ImagePickerType = 'capture' | 'library';
 
@@ -22,12 +23,6 @@ const ChatFooter = () => {
   const updateKeys = useAppStore(state => state.updateKeys);
   const [message, setMessage] = useState('');
   const [cameraOptions, setCameraOptions] = useState(false);
-
-  const {sendMessage, handleCameraUpload} = useSend(
-    message,
-    setMessage,
-    setCameraOptions,
-  );
 
   const onButtonPress = useCallback(
     async (type: ImagePickerType, options: any) => {
@@ -38,11 +33,12 @@ const ChatFooter = () => {
           updateKeys({loading: true});
           ImagePicker.launchCamera(options, async (res: any) => {
             if (!res.didCancel && !res.error) {
-              await handleCameraUpload(res);
-            } else {
-              setCameraOptions(false);
               updateKeys({loading: false});
-              console.error(
+              await handleCameraUpload(res, setCameraOptions);
+            } else {
+              updateKeys({loading: true});
+              setCameraOptions(false);
+              Alert.alert(
                 'Camera error or cancelled:',
                 res.error || 'Cancelled',
               );
@@ -57,7 +53,9 @@ const ChatFooter = () => {
           ImagePicker.launchImageLibrary(options, async (res: any) => {
             console.log('res', res);
             if (!res.didCancel && !res.error) {
-              await handleCameraUpload(res);
+              updateKeys({loading: false});
+              // await handleCameraUpload(res);
+              await handleCameraUpload(res, setCameraOptions);
             } else {
               setCameraOptions(false);
               updateKeys({loading: false});
@@ -70,7 +68,7 @@ const ChatFooter = () => {
         }
       }
     },
-    [handleCameraUpload, updateKeys],
+    [updateKeys],
   );
 
   const onMicPress = async () => {
@@ -90,7 +88,7 @@ const ChatFooter = () => {
           placeholder="Write"
           value={message}
           onChange={setMessage}
-          onSubmitEditing={sendMessage}
+          onSubmitEditing={() => sendMessage(message, setMessage)}
         />
       </View>
 

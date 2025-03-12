@@ -1,14 +1,15 @@
 import React from 'react';
+
 import Content from './Content';
-import useAppState from '../../utils/hooks/useAppState';
-import useConversations from '../../utils/hooks/useConversations';
+import FullScreenLoader from '../../components/Loading/FullScreenLoader';
 
 const Messages: React.FC = () => {
-  // Get conversations when app changes from inactive to active (temporary solution)
-  const conversations = useConversations();
-  useAppState(conversations);
-
-  return <Content />;
+  return (
+    <>
+      <Content />
+      <FullScreenLoader version={'absolute'} type="conversationPagination" />
+    </>
+  );
 };
 
 export default Messages;

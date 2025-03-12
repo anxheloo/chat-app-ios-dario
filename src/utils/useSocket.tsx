@@ -2,7 +2,12 @@ import {useEffect} from 'react';
 
 import {useAppStore} from '../store';
 
-import {answer, iceCandidate, incomingCall, notifyEndCall} from './webrtc';
+import {
+  answer,
+  handleRemoteCandidate,
+  incomingCall,
+  notifyEndCall,
+} from './webrtc';
 
 import {
   friendDeleted,
@@ -53,8 +58,8 @@ export const useSocket = () => {
       // Call event listeners
       socket.on('incomingCall', incomingCall);
       socket.on('answer', answer);
-      socket.on('ICEcandidate', iceCandidate);
-      socket.on('endCall', notifyEndCall);
+      socket.on('ICEcandidate', handleRemoteCandidate);
+      socket.on('notifyEndCall', notifyEndCall);
       // socket.on('toggle-camera', toggleCamera);
     }
 

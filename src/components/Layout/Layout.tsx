@@ -11,6 +11,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import Header from '../Header/Header';
 import {COLORS} from '../../theme/theme';
+import FullScreenLoader from '../Loading/FullScreenLoader';
 
 type Props = {
   children: React.ReactNode;
@@ -24,6 +25,7 @@ const Layout: React.FC<Props> = memo(({children}) => {
       <View style={[styles.safeAreaStyles, {paddingTop: insets.top}]}>
         <Header />
         {children}
+        <FullScreenLoader version={'absolute'} />
       </View>
     </TouchableWithoutFeedback>
   );

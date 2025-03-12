@@ -19,8 +19,6 @@ const AudioUserDetails: React.FC<Props> = ({version = 'default'}) => {
   const avatarSrc = caller ? caller?.avatar : selectedChatData?.avatar;
   const isDefaultVersion = version === 'default';
 
-  console.log('This is isDefaultVersion:', isDefaultVersion);
-
   return (
     <View style={isDefaultVersion ? styles.container : styles.versionStyles}>
       <Avatar

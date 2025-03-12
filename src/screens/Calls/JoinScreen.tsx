@@ -1,51 +1,129 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {useEffect} from 'react';
-import {Platform, StatusBar, StyleSheet} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {Platform, StatusBar, StyleSheet, View} from 'react-native';
 
 import {useAppStore} from '../../store';
-import {startCall} from '../../utils/webrtc';
 
-import LocalStream from './components/LocalStream';
 import VideoCallHeader from './components/VideoCallHeader';
 import BtnGroup from './components/BtnGroup';
 import AudioVideoTemplate from './components/AudioVideoTemplate';
 
-import {goBack} from '../../navigation/navigationRef';
-
-// import InCallManager from 'react-native-incall-manager';
-
 const JoinScreen = () => {
+  const resetCallState = useAppStore(state => state.resetCallState);
+  const peerConnection = useAppStore(state => state.peerConnection);
+  const updateWebRTCState = useAppStore(state => state.updateWebRTCState);
   const callState = useAppStore(state => state.callState);
-  const callType = useAppStore(state => state.callType);
-  // const resetCallState = useAppStore(state => state.resetCallState);
-  const isVideoEnabled = useAppStore(state => state.isVideoEnabled);
+  const socket = useAppStore(state => state.socket);
+  const caller = useAppStore(state => state.caller);
+  const selectedChatData = useAppStore(state => state.selectedChatData);
 
   useEffect(() => {
-    if (callState === 'outgoing') {
-      startCall(callType === 'video');
-    } else if (callState === 'idle') {
-      goBack();
-    } else if (callState === 'active') {
-      // InCallManager.setKeepScreenOn(true);
+    return () => {
+      resetCallState();
+    };
+  }, [resetCallState]);
+
+  useEffect(() => {
+    if (!peerConnection || !socket) {
+      return;
     }
 
-    // return () => {
-    //   resetCallState();
-    // };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [callState]);
+    peerConnection.ontrack = event => {
+      if (event.streams?.[0]) {
+        console.log('Got remote track');
+        updateWebRTCState({remoteStream: event.streams[0]});
+      }
+    };
+
+    peerConnection.onicecandidate = ({
+      candidate,
+    }: {
+      candidate: RTCIceCandidate;
+    }) => {
+      if (candidate) {
+        let receiverId;
+
+        if (callState === 'incoming') {
+          // The current user is the receiver (send ICE to the caller)
+          receiverId = caller?._id;
+        } else {
+          // The current user is the caller (send ICE to the selected chat)
+          receiverId = selectedChatData?._id;
+        }
+
+        if (!receiverId) {
+          console.warn('⚠️ No valid receiver found for ICE Candidate.');
+          return;
+        }
+
+        console.log(`🔵 Sending ICE Candidate to: ${receiverId}`);
+        socket.emit('ICEcandidate', {
+          to: receiverId,
+          candidate,
+        });
+      }
+    };
+
+    peerConnection.addEventListener('icecandidateerror', event => {
+      // You can ignore some candidate errors.
+      // Connections can still be made even when errors occur.
+      console.log('ice candidate error');
+    });
+
+    peerConnection.onsignalingstatechange = ev => {
+      switch (peerConnection.signalingState) {
+        case 'stable':
+          console.log('ICE negotiation complete');
+          break;
+      }
+    };
+
+    peerConnection.oniceconnectionstatechange = ev => {
+      switch (peerConnection.iceConnectionState) {
+        case 'connected':
+        case 'completed':
+          // You can handle the call being connected here.
+          // Like setting the video streams to visible.
+          console.log('call completed');
+          console.log('call connected');
+          break;
+      }
+    };
+
+    peerConnection.onconnectionstatechange = ev => {
+      switch (peerConnection.connectionState) {
+        case 'new':
+        case 'connecting':
+          console.log('Connecting…');
+          break;
+        case 'connected':
+          console.log('Online');
+          break;
+        case 'disconnected':
+          console.log('Disconnecting…');
+          break;
+        case 'closed':
+          // You can handle the call being disconnected here.
+          console.log('call disconnected');
+          break;
+        case 'failed':
+          console.log('Error');
+          break;
+      }
+    };
+  }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar
         backgroundColor={Platform.OS === 'ios' ? 'transparent' : 'black'}
         barStyle={'light-content'}
       />
       <AudioVideoTemplate />
-      <LocalStream />
+      {/* <LocalStream /> */}
       <VideoCallHeader />
       <BtnGroup />
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -54,21 +132,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'black',
     justifyContent: 'center',
-  },
-
-  localStream: {
-    position: 'absolute',
-    top: 160,
-    right: 20,
-    width: 100,
-    height: 140,
-    backgroundColor: 'rgba( 0, 0, 0, 0.5)',
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'white',
-    overflow: 'hidden',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });
 

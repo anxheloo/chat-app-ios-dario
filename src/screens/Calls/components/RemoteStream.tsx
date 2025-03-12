@@ -1,36 +1,33 @@
-import React from 'react';
+import React, {memo} from 'react';
 import {ActivityIndicator, StyleSheet} from 'react-native';
 
 import {useAppStore} from '../../../store';
 
 import {RTCView} from 'react-native-webrtc';
 
-const RemoteStream = () => {
+const RemoteStream = memo(() => {
   const remoteStream = useAppStore(state => state.remoteStream);
 
-  console.log('This is remote stream inside REMOTE STREAM', remoteStream);
+  console.log('This is the remote stream', remoteStream);
 
-  if (remoteStream) {
-    return (
-      <RTCView
-        mirror={true}
-        streamURL={remoteStream?.toURL()}
-        objectFit="cover"
-        style={styles.remoteStream}
-      />
-    );
-  }
-
-  return <ActivityIndicator size="large" color="#fff" />;
-};
+  return remoteStream ? (
+    <RTCView
+      mirror={true}
+      streamURL={remoteStream?.toURL()}
+      objectFit="cover"
+      style={styles.remoteStream}
+    />
+  ) : (
+    <ActivityIndicator size="large" color="#fff" />
+  );
+});
 
 const styles = StyleSheet.create({
   remoteStream: {
+    width: '100%',
+    height: '100%',
     flex: 1,
-
     borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'white',
     overflow: 'hidden',
   },
 });

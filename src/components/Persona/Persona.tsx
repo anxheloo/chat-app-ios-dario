@@ -22,16 +22,18 @@ import {apiClient} from '../../api/apiClient';
 import {navigate} from '../../navigation/navigationRef';
 
 import DeleteIcon from '../../assets/icons/Chat/DeleteIcon';
+import {handleCall} from '../../utils/webrtc';
 
 type PersonaProps = {
   contact: Contact;
   backgroundColor?: string;
   cancel?: () => void;
   version?: string;
+  type?: 'call' | 'message';
 };
 
 const Persona: React.FC<PersonaProps> = memo(
-  ({contact, backgroundColor, cancel, version}) => {
+  ({contact, backgroundColor, cancel, version, type}) => {
     const socket = useAppStore(state => state.socket);
     const [loading, setLoading] = useState(false);
 
@@ -42,8 +44,8 @@ const Persona: React.FC<PersonaProps> = memo(
       updateKeys({bottomSheetType: null});
       cancel?.();
       updateFuncChat({selectedChatData: contact});
-      navigate('Chat');
-    }, [cancel, contact]);
+      type === 'call' ? handleCall() : navigate('Chat');
+    }, [cancel, contact, type]);
 
     const deleteContact = useCallback(async () => {
       console.log('Inside delete contanct');
@@ -66,7 +68,7 @@ const Persona: React.FC<PersonaProps> = memo(
             current.filter(item => item._id !== contact._id),
           );
 
-          socket?.emit('deleteFriend', {
+          await socket?.emit('deleteFriend', {
             senderId,
             friendId: contact?._id,
             senderUsername,

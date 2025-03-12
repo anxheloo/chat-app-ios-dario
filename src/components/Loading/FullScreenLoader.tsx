@@ -4,11 +4,15 @@ import {useAppStore} from '../../store';
 
 type Props = {
   version: 'absolute' | 'flex';
+  type?: 'conversationPagination' | 'friendsPagination' | 'callsPagination';
 };
 
-const FullScreenLoader: React.FC<Props> = ({version}) => {
-  const loading = useAppStore(state => state.loading);
-  const color = version === 'absolute' ? 'white' : 'black';
+const FullScreenLoader: React.FC<Props> = ({version, type}) => {
+  const loading = useAppStore(state =>
+    type ? state[type].isLoading : state.loading,
+  );
+  // const color = version === 'absolute' ? 'white' : 'black';
+  const color = 'black';
 
   if (!loading) {
     return null;
@@ -32,14 +36,16 @@ const styles = StyleSheet.create({
     inset: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    // backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: 'white',
   },
 
   loadingContainer2: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    // backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'white',
   },
 });
 

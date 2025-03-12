@@ -1,8 +1,9 @@
 import React, {useMemo} from 'react';
-import {FlatList, StyleSheet, View} from 'react-native';
+import {ActivityIndicator, FlatList, StyleSheet, View} from 'react-native';
 
 import {useAppStore} from '../../store';
 import {NavigationProps} from '../../utils/types';
+import {loadMoreFriends, refetchFriends} from '../../utils/DataFetching';
 
 import EmptyContacts from './EmptyContacts';
 import Persona from '../../components/Persona/Persona';
@@ -13,6 +14,9 @@ import SearchIcon from '../../assets/icons/messages/SearchIcon';
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
 
 import useSearch from '../../utils/hooks/useSearch';
+import useAppState from '../../utils/hooks/useAppState';
+
+import {COLORS} from '../../theme/theme';
 
 type ContentProps = {
   navigation: NavigationProps;
@@ -20,7 +24,11 @@ type ContentProps = {
 
 const ContactsList: React.FC<ContentProps> = ({navigation}) => {
   const friends = useAppStore(state => state.friends);
+  const isLoading = useAppStore(state => state.friendsPagination.isLoading);
   const {search, updateSearch, clearSearch, debouncedSearch} = useSearch();
+
+  // Fetch friends on app state change from inactive, background to active
+  useAppState(refetchFriends);
 
   const searchedFriends = useMemo(
     () =>
@@ -46,13 +54,21 @@ const ContactsList: React.FC<ContentProps> = ({navigation}) => {
         icon2={<CloseIcon width={15} height={15} fill={'#000'} />}
       />
       <FlatList
+        scrollEventThrottle={16}
+        onEndReached={loadMoreFriends}
+        onEndReachedThreshold={0.1}
+        ListFooterComponent={
+          isLoading ? <ActivityIndicator size="small" color={'#000'} /> : null
+        }
         contentContainerStyle={styles.content}
         data={searchedFriends}
         renderItem={({item}) => (
           <Persona contact={item} backgroundColor="white" />
         )}
         keyExtractor={item => item._id}
-        initialNumToRender={10}
+        initialNumToRender={20}
+        maxToRenderPerBatch={20}
+        scrollEnabled={true}
       />
       <FullScreenLoader version={'absolute'} />
     </View>
@@ -61,8 +77,9 @@ const ContactsList: React.FC<ContentProps> = ({navigation}) => {
 
 const styles = StyleSheet.create({
   content: {
-    flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: COLORS.White,
+    flexGrow: 1,
+    paddingBottom: 80,
   },
 });
 

@@ -1,4 +1,5 @@
 import React, {useCallback, useMemo} from 'react';
+
 import {
   FlatList,
   Keyboard,
@@ -23,9 +24,13 @@ import useSearch from '../../utils/hooks/useSearch';
 
 type PersonasListProps = {
   cancel: () => void;
+  type?: 'call' | 'message';
 };
 
-const PersonasList: React.FC<PersonasListProps> = ({cancel}) => {
+const PersonasList: React.FC<PersonasListProps> = ({
+  cancel,
+  type = 'message',
+}) => {
   const friends = useAppStore(state => state.friends);
   const {search, debouncedSearch, clearSearch, updateSearch} = useSearch();
 
@@ -87,8 +92,14 @@ const PersonasList: React.FC<PersonasListProps> = ({cancel}) => {
           contentContainerStyle={styles.list}
           data={searchedFriends}
           renderItem={({item}) => (
-            <Persona contact={item} cancel={cancel} version="search" />
+            <Persona
+              contact={item}
+              cancel={cancel}
+              version="search"
+              type={type}
+            />
           )}
+          // renderItem={renderItem}
           keyExtractor={item => item._id}
           // ListEmptyComponent={<Text>ska kontakte</Text>}
           initialNumToRender={10}

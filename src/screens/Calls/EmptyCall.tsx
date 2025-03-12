@@ -1,12 +1,15 @@
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 
 import ReusableText from '../../components/ReusableText';
 import CallIcon from '../../assets/icons/Calls/Call';
 
 import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
+import {useAppStore} from '../../store';
 
 const EmptyCall = () => {
+  const {updateKeys} = useAppStore.getState();
+
   return (
     <View style={styles.emptyChat}>
       <View style={styles.container1}>
@@ -24,14 +27,16 @@ const EmptyCall = () => {
         </ReusableText>
       </View>
 
-      <ReusableText
-        fontSize={16}
-        fontWeight={FONTWEIGHT[400]}
-        textAlign="center"
-        textDecorationLine="underline"
-        onPress={() => {}}>
-        Start Call
-      </ReusableText>
+      <TouchableOpacity
+        onPress={() => updateKeys({bottomSheetType: 'start-call'})}>
+        <ReusableText
+          fontSize={16}
+          fontWeight={FONTWEIGHT[400]}
+          textAlign="center"
+          textDecorationLine="underline">
+          Start Call
+        </ReusableText>
+      </TouchableOpacity>
     </View>
   );
 };
