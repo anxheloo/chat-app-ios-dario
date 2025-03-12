@@ -61,14 +61,18 @@ const MessageItem: React.FC<MessageItemProps> = React.memo(({message}) => {
           </TouchableOpacity>
         );
       case 'deleted':
-        return <TextMsg isSender={isSender}>Message deleted</TextMsg>;
+        return (
+          <TextMsg isSender={isSender} isDeleted={true}>
+            Message deleted
+          </TextMsg>
+        );
       default:
         return null;
     }
   }, [message, isSender]);
 
   // Render delete icon
-  const renderRightActions = useCallback(() => {
+  const renderRightActions = useMemo(() => {
     return (
       <TouchableOpacity
         onPress={handleShowModal}
@@ -95,14 +99,17 @@ const MessageItem: React.FC<MessageItemProps> = React.memo(({message}) => {
 
       {isSender && message.messageType !== 'deleted' ? (
         <Swipeable
-          renderRightActions={renderRightActions}
+          renderRightActions={() => renderRightActions}
           overshootRight={false}>
           <MessageContent isSender={isSender} createdAt={message.createdAt}>
             {renderMessageContent}
           </MessageContent>
         </Swipeable>
       ) : (
-        <MessageContent isSender={isSender} createdAt={message.createdAt}>
+        <MessageContent
+          isSender={isSender}
+          createdAt={message.createdAt}
+          isDeleted={message.messageType === 'deleted'}>
           {renderMessageContent}
         </MessageContent>
       )}

@@ -125,9 +125,11 @@ export const logout = async () => {
     setUserPersona,
     updateCalls,
     setCallsPagination,
+    disconnectSocket,
   } = useAppStore.getState();
 
   await removeToken();
+  disconnectSocket();
 
   setToken(null);
 
@@ -168,7 +170,3 @@ export const openScanner = async () => {
     navigate('Scanner');
   }
 };
-
-// ====================================================================
-// Helper functions related to Conversations, calls, contacts
-// ====================================================================

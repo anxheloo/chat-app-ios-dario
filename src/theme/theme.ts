@@ -3,6 +3,7 @@ interface Color {
   LightGray: string;
   LightGray2: string;
   White: string;
+  IsDeleted: string;
 }
 
 export const COLORS: Color = {
@@ -10,6 +11,7 @@ export const COLORS: Color = {
   LightGray: '#ACB9C7',
   LightGray2: '#F9FAFC',
   White: '#FFFFFF',
+  IsDeleted: '#ACB9C7',
 };
 
 //   interface FontFamily {

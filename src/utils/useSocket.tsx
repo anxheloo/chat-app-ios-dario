@@ -21,25 +21,6 @@ export const useSocket = () => {
   const userId = useAppStore(state => state.id);
   const initializeSocket = useAppStore(state => state.initializeSocket);
 
-  // const toggleCamera = async () => {
-  //   const {peerConnection, remoteStream, callType} = useAppStore.getState();
-
-  //   if (!peerConnection) {
-  //     return;
-  //   }
-
-  //   callType === 'video'
-  //     ? updateWebRTCState({callType: 'audio'})
-  //     : updateWebRTCState({callType: 'video'});
-
-  //   // remoteStream?.getVideoTracks().forEach(track => {
-  //   //   callType === 'video' ? (track.enabled = false) : (track.enabled = true);
-  //   // });
-  //   remoteStream?.getVideoTracks().forEach(track => {
-  //     track.enabled = !track.enabled;
-  //   });
-  // };
-
   useEffect(() => {
     if (!userId) {
       console.log('No user ID found, disconnecting socket.');

@@ -1,7 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, {memo} from 'react';
+import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
+
 import * as ImagePicker from 'react-native-image-picker';
+
+import {onButtonPress} from '../../../utils/message';
 
 interface Action {
   title: string;
@@ -39,20 +41,17 @@ const actions: Action[] = [
 ];
 
 type Props = {
-  onButtonPress: (
-    type: 'capture' | 'library',
-    options: ImagePicker.CameraOptions | ImagePicker.ImageLibraryOptions,
-  ) => void;
+  setCameraOptions: (data: boolean) => void;
 };
 
-const CameraOptions: React.FC<Props> = ({onButtonPress}) => {
+const CameraOptions: React.FC<Props> = ({setCameraOptions}) => {
   return (
     <View style={styles.container}>
       {actions.map(({title, type, options}) => {
         return (
           <Text
             key={title}
-            onPress={() => onButtonPress(type, options)}
+            onPress={() => onButtonPress(type, options, setCameraOptions)}
             style={styles.text}>
             {title}
           </Text>
@@ -81,10 +80,6 @@ const styles = StyleSheet.create({
     },
     gap: 10,
   },
-  // text: {
-  //   textAlign: 'center',
-  //   color: 'white',
-  // },
 
   text: {fontSize: 14, fontWeight: '400', paddingRight: 10},
 });

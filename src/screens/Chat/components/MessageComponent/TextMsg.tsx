@@ -1,20 +1,22 @@
 import React from 'react';
 import {StyleSheet, Text} from 'react-native';
+
 import {COLORS, FONTSIZE} from '../../../../theme/theme';
 
 type TextMsgProps = {
   isSender: boolean;
   children: React.ReactNode;
+  isDeleted?: boolean;
 };
 
-const TextMsg: React.FC<TextMsgProps> = ({isSender, children}) => {
+const TextMsg: React.FC<TextMsgProps> = ({isSender, children, isDeleted}) => {
   return (
     <Text
       style={[
         styles.messageText,
         // eslint-disable-next-line react-native/no-inline-styles
         {
-          color: isSender ? 'white' : COLORS.Black,
+          color: isDeleted || isSender ? 'white' : COLORS.Black,
         },
       ]}>
       {children}

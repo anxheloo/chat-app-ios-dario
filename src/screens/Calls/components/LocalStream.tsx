@@ -1,5 +1,5 @@
 import React, {memo, useEffect} from 'react';
-import {Pressable, StyleSheet} from 'react-native';
+import {Platform, Pressable, StyleSheet} from 'react-native';
 
 import {useAppStore} from '../../../store';
 
@@ -41,14 +41,11 @@ const styles = StyleSheet.create({
     right: 20,
     width: 100,
     height: 140,
-    // flex: 1,
-    // backgroundColor: 'rgba( 0, 0, 0, 0.8)',
-    borderRadius: 14,
+    backgroundColor: 'transparent',
+    borderRadius: Platform.OS === 'ios' ? 14 : 0,
     borderWidth: 1,
     borderColor: 'white',
     overflow: 'hidden',
-    // justifyContent: 'center',
-    // alignItems: 'center',
   },
 
   rtcView: {
@@ -58,8 +55,6 @@ const styles = StyleSheet.create({
     minHeight: 140,
     borderRadius: 14,
     overflow: 'hidden',
-    // width: 100,
-    // height: 140,
   },
 });
 

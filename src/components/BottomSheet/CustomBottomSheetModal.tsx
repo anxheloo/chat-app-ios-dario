@@ -25,7 +25,7 @@ const CustomBottomSheetModal = () => {
   const updateKeys = useAppStore(state => state.updateKeys);
   const {updateProfilePic, selectAvatar} = useProfile();
 
-  const snapPoints = useMemo(() => ['25%', '50%', '75%'], []);
+  const snapPoints = useMemo(() => ['25%', '50%', '85%'], []);
 
   useEffect(() => {
     if (bottomSheetType && bottomSheetRef?.current) {

@@ -9,6 +9,11 @@ import {ObjectId} from 'bson';
 
 import {HOST, UPLOAD_FILE} from '../api/apis';
 import {apiClient} from '../api/apiClient';
+import {checkPermissionStatus} from './helpers';
+import {permission} from './permissions';
+
+import * as ImagePicker from 'react-native-image-picker';
+type ImagePickerType = 'capture' | 'library';
 
 // ====================================================
 // Message Socket handlers
@@ -139,6 +144,57 @@ export const friendDeleted = ({
 };
 
 // ====================================================
+// Media picker
+// ====================================================
+
+export const onButtonPress = async (
+  type: ImagePickerType,
+  options: any,
+  setCameraOptions: (data: boolean) => void,
+) => {
+  const {updateKeys} = useAppStore.getState();
+
+  if (type === 'capture') {
+    const status = await checkPermissionStatus(permission.camera);
+
+    if (status) {
+      updateKeys({loading: true});
+      ImagePicker.launchCamera(options, async (res: any) => {
+        if (!res.didCancel && !res.error) {
+          updateKeys({loading: false});
+          await handleCameraUpload(res, setCameraOptions);
+        } else {
+          updateKeys({loading: true});
+          setCameraOptions(false);
+          Alert.alert('Camera error or cancelled:', res.error || 'Cancelled');
+        }
+      });
+    }
+  } else {
+    const status = await checkPermissionStatus(permission.photoLibrary);
+
+    if (status) {
+      updateKeys({loading: true});
+      ImagePicker.launchImageLibrary(options, async (res: any) => {
+        console.log('res', res);
+        if (!res.didCancel && !res.error) {
+          updateKeys({loading: false});
+          // await handleCameraUpload(res);
+          await handleCameraUpload(res, setCameraOptions);
+        } else {
+          setCameraOptions(false);
+          updateKeys({loading: false});
+          console.error(
+            'Image library error or cancelled:',
+            res.error || 'Cancelled',
+          );
+        }
+      });
+    }
+  }
+};
+
+// ====================================================
 // Message send functions
 // ====================================================
 
@@ -229,7 +285,7 @@ export const handleCameraUpload = async (
       );
     }
 
-    // 4. Create Message objects from media selected
+    // 3. Create Message objects from media selected
     const tempMsgs = await Promise.all(
       res.assets.map(async (media: any) => {
         const tempId = new ObjectId().toString();
@@ -261,9 +317,10 @@ export const handleCameraUpload = async (
       }),
     );
 
+    // 4.Update created messages in UI
     updateSelectedChatMessages(current => [...current, ...tempMsgs]);
 
-    //6. Create a FormData object to send the compressed file
+    //5. Create a FormData object and compress files
     const formData = new FormData();
 
     await Promise.all(
@@ -282,6 +339,7 @@ export const handleCameraUpload = async (
       }),
     );
 
+    // 6. Send the compressed file
     await postMediaMessages(formData, tempMsgs, setCameraOptions);
   }
 };
@@ -294,8 +352,7 @@ export const postMediaMessages = async (
   tempMsgs: Message[],
   setCameraOptions: (data: boolean) => void,
 ) => {
-  const {updateSelectedChatMessages, socket, updateKeys} =
-    useAppStore.getState();
+  const {updateSelectedChatMessages, socket} = useAppStore.getState();
 
   try {
     //1. Post the compressed file to store on the server
@@ -310,7 +367,7 @@ export const postMediaMessages = async (
     if (uploadResponse.status === 200) {
       const uploadedFilePaths = uploadResponse.data.filePaths;
 
-      // 9. Construct the final message objects
+      // 3. Construct the final message objects
       const uploadedMessages = tempMsgs.map(
         (tempMsg: Message, index: number) => ({
           ...tempMsg,
@@ -319,7 +376,7 @@ export const postMediaMessages = async (
         }),
       );
 
-      // 3. Update UI with final URLs
+      // 4. Update UI with final URLs
       updateSelectedChatMessages(current =>
         current.map(
           msg =>
@@ -340,6 +397,5 @@ export const postMediaMessages = async (
     Alert.alert('Error', 'Failed to upload media');
   } finally {
     setCameraOptions(false);
-    updateKeys({loading: false});
   }
 };

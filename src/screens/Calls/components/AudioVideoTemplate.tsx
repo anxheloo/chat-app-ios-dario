@@ -13,15 +13,6 @@ const AudioVideoTemplate = memo(() => {
   const callType = useAppStore(state => state.callType);
   const callState = useAppStore(state => state.callState);
 
-  if (callType === 'video' && callState === 'active') {
-    return (
-      <View style={styles.container}>
-        <RemoteStream />
-        <LocalStream />
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       {callType === 'video' && callState === 'active' ? (

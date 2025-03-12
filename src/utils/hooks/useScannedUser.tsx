@@ -48,6 +48,9 @@ const useScannedUser = (scannedUserId: string, navigation: NavigationProps) => {
 
       if (res.status === 200) {
         updateFriends(current => [scannedUser, ...current]);
+
+        console.log('This is socket: ', socket);
+
         await socket?.emit('addFriend', {
           recipientId: scannedUserId,
           senderId: id,

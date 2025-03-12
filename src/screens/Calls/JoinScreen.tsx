@@ -4,9 +4,9 @@ import {Platform, StatusBar, StyleSheet, View} from 'react-native';
 
 import {useAppStore} from '../../store';
 
+import AudioVideoTemplate from './components/AudioVideoTemplate';
 import VideoCallHeader from './components/VideoCallHeader';
 import BtnGroup from './components/BtnGroup';
-import AudioVideoTemplate from './components/AudioVideoTemplate';
 
 const JoinScreen = () => {
   const resetCallState = useAppStore(state => state.resetCallState);
@@ -111,6 +111,7 @@ const JoinScreen = () => {
           break;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -120,7 +121,6 @@ const JoinScreen = () => {
         barStyle={'light-content'}
       />
       <AudioVideoTemplate />
-      {/* <LocalStream /> */}
       <VideoCallHeader />
       <BtnGroup />
     </View>

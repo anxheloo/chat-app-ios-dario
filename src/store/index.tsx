@@ -302,21 +302,16 @@ const socketSlice: StateCreator<SocketSlice> = (set, get) => ({
       console.log('Socket already connected, skipping initialization.');
       return socketInstance;
     }
-    //  else {
     console.log('Initializing new socket connection...');
     socketInstance = io(HOST, {
       query: {userId: id},
       reconnection: true,
       reconnectionAttempts: Infinity,
-      reconnectionDelay: 3000,
       transports: ['websocket'],
-      forceNew: true,
-      timeout: 20000,
       autoConnect: true,
     });
 
     set({socket: socketInstance});
-    // }
 
     socketInstance.on('connect', () => {
       console.log('Connected to socket server.');

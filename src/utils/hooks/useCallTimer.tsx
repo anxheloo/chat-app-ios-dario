@@ -3,6 +3,7 @@ import {useEffect, useState} from 'react';
 import {useAppStore} from '../../store';
 
 import {formatDuration} from '../helpers';
+
 import {endCall} from '../webrtc';
 
 const useCallTimer = () => {
