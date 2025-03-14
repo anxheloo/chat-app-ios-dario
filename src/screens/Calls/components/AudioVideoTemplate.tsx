@@ -1,6 +1,6 @@
 import React, {memo} from 'react';
 
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, Dimensions} from 'react-native';
 
 import {useAppStore} from '../../../store';
 
@@ -13,16 +13,18 @@ const AudioVideoTemplate = memo(() => {
   const callType = useAppStore(state => state.callType);
   const callState = useAppStore(state => state.callState);
 
+  if (callType === 'video' && callState === 'active') {
+    return (
+      <View style={styles.container}>
+        <RemoteStream />
+        <LocalStream />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      {callType === 'video' && callState === 'active' ? (
-        <>
-          <RemoteStream />
-          <LocalStream />
-        </>
-      ) : (
-        <AudioUserDetails />
-      )}
+      <AudioUserDetails />
     </View>
   );
 });
@@ -30,6 +32,8 @@ const AudioVideoTemplate = memo(() => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
     justifyContent: 'center',
     alignItems: 'center',
   },

@@ -8,21 +8,26 @@ import {
   TouchableWithoutFeedback,
   Platform,
 } from 'react-native';
-import ReusableText from '../../components/ReusableText';
-import {BORDERRADIUS, COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
+
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {NavigationProps} from '../../utils/types';
+
 import {useAppStore} from '../../store';
+
+import {BORDERRADIUS, COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
+
+import ReusableText from '../../components/ReusableText';
 import AvatarIcon from '../../assets/icons/avatar/Avatar0';
 import ReusableInput from '../../components/ReusableInput';
 import ReusableButton from '../../components/ReusableButton';
-import {NavigationProps} from '../../utils/types';
-import {SafeAreaView} from 'react-native-safe-area-context';
 
 type CreatePersonaScreenProps = {
   navigation: NavigationProps;
 };
 
 const CreatePersona: React.FC<CreatePersonaScreenProps> = ({navigation}) => {
-  const {username, setUserPersona, updateKeys} = useAppStore();
+  const {setUserPersona, updateKeys} = useAppStore.getState();
+  const username = useAppStore(state => state.username);
 
   const onChange = (text: string): void => {
     setUserPersona({username: text.trim()});
@@ -75,7 +80,6 @@ const CreatePersona: React.FC<CreatePersonaScreenProps> = ({navigation}) => {
                       source={require('../../assets/icons/info-icon.png')}
                     />
                   }
-                  // marginHorizontal={20}
                 />
 
                 <ReusableText

@@ -8,9 +8,8 @@ import {
 } from '@gorhom/bottom-sheet';
 
 import {COLORS} from '../../theme/theme';
-
+import {selectAvatar, updateProfilePic} from '../../utils/profile';
 import {useAppStore} from '../../store';
-import useProfile from '../../utils/hooks/useProfile';
 
 import PersonasList from './PersonasList';
 import QRCodeModal from './QRCodeModal';
@@ -23,7 +22,6 @@ const CustomBottomSheetModal = () => {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const bottomSheetType = useAppStore(state => state.bottomSheetType);
   const updateKeys = useAppStore(state => state.updateKeys);
-  const {updateProfilePic, selectAvatar} = useProfile();
 
   const snapPoints = useMemo(() => ['25%', '50%', '85%'], []);
 

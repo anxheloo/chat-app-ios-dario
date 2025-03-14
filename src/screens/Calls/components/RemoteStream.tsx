@@ -1,34 +1,58 @@
-import React, {memo} from 'react';
-import {ActivityIndicator, StyleSheet} from 'react-native';
+import React from 'react';
+import {Dimensions, StyleSheet, View} from 'react-native';
 
 import {useAppStore} from '../../../store';
 
 import {RTCView} from 'react-native-webrtc';
+import AudioUserDetails from './AudioUserDetails';
 
-const RemoteStream = memo(() => {
+const RemoteStream = () => {
   const remoteStream = useAppStore(state => state.remoteStream);
-
-  console.log('This is the remote stream', remoteStream);
+  const switchVideoSources = useAppStore(state => state.switchVideoSources);
+  const isVideoEnabled = useAppStore(state => state.isVideoEnabled);
+  const isRemoteVideoEnabled = useAppStore(state => state.isRemoteVideoEnabled);
 
   return remoteStream ? (
-    <RTCView
-      mirror={true}
-      streamURL={remoteStream?.toURL()}
-      objectFit="cover"
-      style={styles.remoteStream}
-    />
+    <>
+      <RTCView
+        mirror={true}
+        streamURL={remoteStream?.toURL()}
+        objectFit="cover"
+        style={styles.remoteStream}
+      />
+
+      {!switchVideoSources && !isRemoteVideoEnabled && (
+        <View style={styles.cameraDisable}>
+          <AudioUserDetails />
+        </View>
+      )}
+
+      {switchVideoSources && !isVideoEnabled && (
+        <View style={styles.cameraDisable}>
+          <AudioUserDetails />
+        </View>
+      )}
+    </>
   ) : (
-    <ActivityIndicator size="large" color="#fff" />
+    <AudioUserDetails />
   );
-});
+};
 
 const styles = StyleSheet.create({
   remoteStream: {
-    width: '100%',
-    height: '100%',
+    width: Dimensions.get('screen').width,
+    height: Dimensions.get('screen').height,
     flex: 1,
     borderRadius: 14,
-    overflow: 'hidden',
+  },
+
+  cameraDisable: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'black',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

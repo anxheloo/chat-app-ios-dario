@@ -28,7 +28,9 @@ const CreatePin: React.FC<CreatePinScreenProps> = ({navigation}) => {
 
   const onChange = (text: string): void => {
     setUserPersona({pin: text});
-    if (pinError) setPinError(false);
+    if (pinError) {
+      setPinError(false);
+    }
   };
 
   const isValidPin = () => {
@@ -76,6 +78,7 @@ const CreatePin: React.FC<CreatePinScreenProps> = ({navigation}) => {
               </View>
 
               <View
+                // eslint-disable-next-line react-native/no-inline-styles
                 style={{
                   justifyContent: 'center',
                   alignItems: 'center',

@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
   header: {
     width: '100%',
     position: 'absolute',
-    height: Platform.OS === 'ios' ? 110 : 95,
+    height: Platform.OS === 'ios' ? 110 : 75,
     backgroundColor: 'rgba(0,0,0,0.3)',
     flexDirection: 'row',
     justifyContent: 'space-between',

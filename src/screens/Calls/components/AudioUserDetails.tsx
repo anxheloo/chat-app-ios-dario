@@ -10,7 +10,7 @@ import Avatar from '../../../components/Persona/Avatar';
 // If no version is passed, the default version is used (JoinScreen.tsx)
 
 type Props = {
-  version?: 'header' | 'default';
+  version?: 'header' | 'default' | 'stream';
 };
 
 const AudioUserDetails: React.FC<Props> = ({version = 'default'}) => {
@@ -20,7 +20,15 @@ const AudioUserDetails: React.FC<Props> = ({version = 'default'}) => {
   const isDefaultVersion = version === 'default';
 
   return (
-    <View style={isDefaultVersion ? styles.container : styles.versionStyles}>
+    <View
+      style={[
+        isDefaultVersion || version === 'stream'
+          ? styles.container
+          : styles.versionStyles,
+        {
+          gap: isDefaultVersion ? 20 : 7,
+        },
+      ]}>
       <Avatar
         width={isDefaultVersion ? 70 : 26}
         height={isDefaultVersion ? 70 : 26}
@@ -46,14 +54,12 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 20,
   },
 
   versionStyles: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 7,
   },
 });
 

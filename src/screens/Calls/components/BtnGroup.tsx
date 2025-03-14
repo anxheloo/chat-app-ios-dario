@@ -26,6 +26,7 @@ import CallIcon from '../../../assets/icons/BottomTabIcons/Call-Icon';
 const BtnGroup = memo(() => {
   const callState = useAppStore(state => state.callState);
   const callType = useAppStore(state => state.callType);
+  const disabledButtons = useAppStore(state => state.disabledButtons);
   const isVideoEnabled = useAppStore(state => state.isVideoEnabled);
 
   // Count down for the call timer
@@ -48,8 +49,8 @@ const BtnGroup = memo(() => {
       <View style={[styles.btnContainer, {gap: isIncoming ? 70 : 30}]}>
         {!isIncoming && (
           <TouchableOpacity
-            disabled={callType === null}
-            style={styles.sideBtn}
+            disabled={disabledButtons}
+            style={[styles.sideBtn, {opacity: disabledButtons ? 0.3 : 1}]}
             onPress={() => toggleMic(localMicOn, setlocalMicOn)}>
             {localMicOn ? <MicOff /> : <MicOn />}
           </TouchableOpacity>
@@ -57,8 +58,11 @@ const BtnGroup = memo(() => {
 
         <View style={[styles.middleBtnContainer, {borderColor: '#FF675C'}]}>
           <TouchableOpacity
-            disabled={callType === null}
-            style={[styles.middleBtn, {backgroundColor: '#FF675C'}]}
+            disabled={disabledButtons}
+            style={[
+              styles.middleBtn,
+              {backgroundColor: '#FF675C', opacity: disabledButtons ? 0.3 : 1},
+            ]}
             onPress={endCall}>
             <EndCallIcon />
           </TouchableOpacity>
@@ -67,8 +71,14 @@ const BtnGroup = memo(() => {
         {isIncoming && (
           <View style={[styles.middleBtnContainer, {borderColor: '#98FB98'}]}>
             <TouchableOpacity
-              disabled={callType === null}
-              style={[styles.middleBtn, {backgroundColor: '#98FB98'}]}
+              disabled={disabledButtons}
+              style={[
+                styles.middleBtn,
+                {
+                  backgroundColor: '#98FB98',
+                  opacity: disabledButtons ? 0.5 : 1,
+                },
+              ]}
               onPress={acceptCall}>
               <CallIcon width={24} height={24} fill={'white'} />
             </TouchableOpacity>
@@ -77,9 +87,9 @@ const BtnGroup = memo(() => {
 
         {!isIncoming && (
           <TouchableOpacity
-            style={styles.sideBtn}
+            style={[styles.sideBtn, {opacity: disabledButtons ? 0.3 : 1}]}
             onPress={toggleCamera}
-            disabled={callType === 'audio' || callType === null}>
+            disabled={callType === 'audio' || disabledButtons}>
             {isVideoEnabled ? <VideoOff /> : <VideoOn />}
           </TouchableOpacity>
         )}

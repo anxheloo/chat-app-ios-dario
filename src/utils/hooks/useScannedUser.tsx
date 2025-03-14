@@ -2,14 +2,11 @@ import {useEffect, useState} from 'react';
 import {Alert} from 'react-native';
 
 import {apiClient} from '../../api/apiClient';
-import {ADD_FRIEND, GET_SCANNED_USER} from '../../api/apis';
+import {GET_SCANNED_USER} from '../../api/apis';
 
 import {useAppStore} from '../../store';
 
-import {NavigationProps} from '../types';
-
-const useScannedUser = (scannedUserId: string, navigation: NavigationProps) => {
-  const updateFriends = useAppStore(state => state.updateFriends);
+const useScannedUser = (scannedUserId: string) => {
   const updateKeys = useAppStore(state => state.updateKeys);
 
   const [scannedUser, setScannedUser] = useState({
@@ -38,41 +35,12 @@ const useScannedUser = (scannedUserId: string, navigation: NavigationProps) => {
     }
   };
 
-  const addFriend = async () => {
-    const {socket, id} = useAppStore.getState();
-
-    try {
-      const res = await apiClient.post(ADD_FRIEND, {
-        recipientId: scannedUserId,
-      });
-
-      if (res.status === 200) {
-        updateFriends(current => [scannedUser, ...current]);
-
-        console.log('This is socket: ', socket);
-
-        await socket?.emit('addFriend', {
-          recipientId: scannedUserId,
-          senderId: id,
-        });
-        Alert.alert('Success', 'Friend successfully added!');
-        // navigation?.navigate('BottomTabNavigation', {screen: 'Contacts'});
-        navigation?.reset({
-          index: 0,
-          routes: [{name: 'BottomTabNavigation', params: {screen: 'Contacts'}}],
-        });
-      }
-    } catch (error: any) {
-      Alert.alert('Error', error.response.data.message);
-    }
-  };
-
   useEffect(() => {
     getScannedUserDetails(scannedUserId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return {scannedUser, addFriend};
+  return {scannedUser};
 };
 
 export default useScannedUser;

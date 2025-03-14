@@ -7,6 +7,7 @@ import {
   handleRemoteCandidate,
   incomingCall,
   notifyEndCall,
+  toggleCameraEvent,
 } from './webrtc';
 
 import {
@@ -41,7 +42,7 @@ export const useSocket = () => {
       socket.on('answer', answer);
       socket.on('ICEcandidate', handleRemoteCandidate);
       socket.on('notifyEndCall', notifyEndCall);
-      // socket.on('toggle-camera', toggleCamera);
+      socket.on('toggle-camera', toggleCameraEvent);
     }
 
     return () => {

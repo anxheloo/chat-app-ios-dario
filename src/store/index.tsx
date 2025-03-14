@@ -1,6 +1,9 @@
 import {io} from 'socket.io-client';
+
 import {create, StateCreator} from 'zustand';
+
 import {HOST} from '../api/apis';
+
 import {
   Call,
   Contact,
@@ -8,9 +11,10 @@ import {
   Message,
   NavigationProps,
 } from '../utils/types';
+
 import {MediaStream} from 'react-native-webrtc';
 
-type CallState = 'missed' | 'pending' | 'incoming' | 'active' | 'ended';
+type CallState = 'pending' | 'incoming' | 'active';
 
 type WebRTCSlice = {
   calls: Call[];
@@ -18,41 +22,35 @@ type WebRTCSlice = {
   setCallsPagination: (
     pagination: Partial<{page: number; hasMore: boolean; isLoading: boolean}>,
   ) => void;
-  // currentCallId: string | null;
+
   currentCall: Call | null;
   localStream: MediaStream | null;
-  localStream2: MediaStream | null;
+  switchVideoSources: boolean;
   remoteStream: MediaStream | null;
-  // peerConnection: RTCPeerConnection | null;
   peerConnection: any;
   candidates: any[];
   callState: CallState | null;
   callType: 'video' | 'audio' | null;
   caller: Contact | null;
   callTimer: number;
+  disabledButtons: boolean;
 
   isMuted: boolean;
   isVideoEnabled: boolean;
+  isRemoteVideoEnabled: boolean;
   isFrontCamera: boolean;
   offer: any;
   answer: any;
-
-  // updateWebRTCState: (
-  //   data: Partial<Omit<WebRTCSlice, 'updateWebRTCState'>>,
-  // ) => void;
 
   updateWebRTCState: (data: Partial<WebRTCSlice>) => void;
 
   resetCallState: () => void;
 
   updateCalls: (updateFunction: (currentCalls: Call[]) => Call[]) => void;
-  // updateCalls: (newData: Call) => void;
 
   updateCandidates: (
     updateFunction: (currentCandidates: any[]) => any[],
   ) => void;
-
-  // sortCalls: () => void;
 };
 
 const webRTCSlice: StateCreator<WebRTCSlice> = (set, get) => ({
@@ -65,7 +63,7 @@ const webRTCSlice: StateCreator<WebRTCSlice> = (set, get) => ({
     })),
   currentCall: null,
   localStream: null,
-  localStream2: null,
+  switchVideoSources: false,
   remoteStream: null,
   peerConnection: null,
   candidates: [],
@@ -73,26 +71,20 @@ const webRTCSlice: StateCreator<WebRTCSlice> = (set, get) => ({
   callType: null,
   caller: null,
   callTimer: 0,
+  disabledButtons: false,
 
   isMuted: false,
-  isVideoEnabled: true,
+  isVideoEnabled: false,
+  isRemoteVideoEnabled: false,
   isFrontCamera: true,
   offer: null,
   answer: null,
-  // Update function
-  // updateWebRTCState: data =>
-  //   set(state => ({
-  //     ...state,
-  //     ...data,
-  //   })),
   updateWebRTCState: set,
 
   resetCallState: () =>
     set({
-      // currentCallId: null,
       currentCall: null,
       localStream: null,
-      localStream2: null,
       remoteStream: null,
       peerConnection: null,
       candidates: [],
@@ -121,20 +113,6 @@ const webRTCSlice: StateCreator<WebRTCSlice> = (set, get) => ({
     // set({candidates: updatedCandidates});
     set({candidates: updatedCandidates.filter(Boolean)});
   },
-
-  // sortCalls: () => {
-  //   const {calls} = get();
-
-  //   const sortedCalls = calls.sort((a, b) => {
-  //     const dateA = +Date.parse(a?.createdAt ?? '');
-  //     const dateB = +Date.parse(b?.createdAt ?? '');
-
-  //     // return dateA - dateB;
-  //     return dateB - dateA;
-  //   });
-
-  //   set({calls: sortedCalls});
-  // },
 });
 
 type CreateSlice = PersonaSlice &
@@ -348,6 +326,5 @@ export const useAppStore = create<CreateSlice>()((...args) => ({
   ...chatSlice(...args),
   ...socketSlice(...args),
   ...createTokenSlice(...args),
-  // ...callSlice(...args),
   ...webRTCSlice(...args),
 }));

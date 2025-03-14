@@ -3,7 +3,7 @@ import {Alert, Linking} from 'react-native';
 
 import {useAppStore} from '../store';
 
-import {Message} from './types';
+import {Contact, Message} from './types';
 
 import {request, check, RESULTS} from 'react-native-permissions';
 
@@ -11,6 +11,8 @@ import {removeToken} from './TokenStorage';
 
 import {navigate, reset} from '../navigation/navigationRef';
 import {permission} from './permissions';
+import {apiClient} from '../api/apiClient';
+import {ADD_FRIEND} from '../api/apis';
 
 // ====================================================================
 // Helper functions related to MESSAGES
@@ -121,18 +123,17 @@ export const logout = async () => {
   const {
     updateFuncChat,
     setUserInfoStatus,
-    setToken,
     setUserPersona,
     updateCalls,
     setCallsPagination,
     disconnectSocket,
   } = useAppStore.getState();
 
+  // remove token , disconnect socket
   await removeToken();
   disconnectSocket();
 
-  setToken(null);
-
+  // reset user persona for logout/login app state
   setUserPersona({
     username: '',
     pin: '',
@@ -140,8 +141,10 @@ export const logout = async () => {
     id: '',
   });
 
+  // user info needes to be fetched again by the new user if app state stays active during logout/login
   setUserInfoStatus(false);
 
+  // conversations, friends, paginations
   updateFuncChat({
     conversations: [],
     friends: [],
@@ -149,6 +152,7 @@ export const logout = async () => {
     friendsPagination: {page: 0, hasMore: true, isLoading: false},
   });
 
+  // calls
   updateCalls(() => []);
   setCallsPagination({
     page: 0,
@@ -168,5 +172,30 @@ export const openScanner = async () => {
   const status = await checkPermissionStatus(permission.camera);
   if (status) {
     navigate('Scanner');
+  }
+};
+
+// Add Friend
+export const addFriend = async (scannedUser: Contact) => {
+  const {socket, id, setUserInfoStatus, updateFriends} = useAppStore.getState();
+
+  try {
+    const res = await apiClient.post(ADD_FRIEND, {
+      recipientId: scannedUser?._id,
+    });
+
+    if (res.status === 200) {
+      updateFriends(current => [scannedUser, ...current]);
+
+      await socket?.emit('addFriend', {
+        recipientId: scannedUser?._id,
+        senderId: id,
+      });
+      setUserInfoStatus(false);
+      reset('BottomTabNavigation');
+      Alert.alert('Success', 'Friend successfully added!');
+    }
+  } catch (error: any) {
+    Alert.alert('Error', error.response.data.message);
   }
 };

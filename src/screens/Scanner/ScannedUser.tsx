@@ -14,15 +14,17 @@ import FullScreenLoader from '../../components/Loading/FullScreenLoader';
 import useScannedUser from '../../utils/hooks/useScannedUser';
 
 import {COLORS} from '../../theme/theme';
+import {goBack} from '../../navigation/navigationRef';
+import {addFriend} from '../../utils/helpers';
 
 type ScannedUserProps = NativeStackScreenProps<
   RootStackParamList,
   'ScannedUser'
 >;
 
-const ScannedUser: React.FC<ScannedUserProps> = ({route, navigation}) => {
+const ScannedUser: React.FC<ScannedUserProps> = ({route}) => {
   const {recipientId} = route?.params;
-  const {scannedUser, addFriend} = useScannedUser(recipientId, navigation);
+  const {scannedUser} = useScannedUser(recipientId);
 
   return (
     <SafeAreaView style={styles.content}>
@@ -50,12 +52,10 @@ const ScannedUser: React.FC<ScannedUserProps> = ({route, navigation}) => {
         fontWeight={400}
         color="black"
         textDecorationLine="underline"
-        onPress={addFriend}>
-        Send Request
+        onPress={() => addFriend(scannedUser)}>
+        Add Friend
       </ReusableText>
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}>
+      <TouchableOpacity style={styles.backButton} onPress={goBack}>
         <CloseIcon width={35} height={35} fill={'#000'} />
       </TouchableOpacity>
       <FullScreenLoader version={'absolute'} />
