@@ -49,15 +49,6 @@ export const endCall = async () => {
 
   updateWebRTCState({disabledButtons: true});
 
-  // peerConnection?.getSenders().forEach((sender: any) => {
-  //   peerConnection.removeTrack(sender);
-  // });
-  // localStream?.getTracks().forEach(track => track.stop());
-  // peerConnection?.close();
-  // InCallManager.setSpeakerphoneOn(false);
-  // InCallManager.setKeepScreenOn(true);
-  // InCallManager.stop(); // reset any audio settings
-
   closePeerConnection();
   await socket.emit('notifyEndCall', {to: receiverId, callStatus});
   await callUpdate(callStatus);
@@ -79,30 +70,26 @@ export const notifyEndCall = async ({
     ),
   ]);
 
-  // peerConnection?.getSenders().forEach((sender: any) => {
-  //   peerConnection.removeTrack(sender);
-  // });
-  // localStream?.getTracks().forEach(track => track.stop());
-  // peerConnection?.close();
-  // InCallManager.setSpeakerphoneOn(false);
-  // InCallManager.setKeepScreenOn(true);
-  // InCallManager.stop(); // reset any audio settings
-
   closePeerConnection();
 };
 
 // Close connection
 export const closePeerConnection = () => {
-  const {peerConnection, localStream} = useAppStore.getState();
+  const {peerConnection, localStream, resetCallState} = useAppStore.getState();
+
+  if (!peerConnection) {
+    return;
+  }
 
   peerConnection?.getSenders().forEach((sender: any) => {
     peerConnection.removeTrack(sender);
   });
   localStream?.getTracks().forEach(track => track.stop());
   peerConnection?.close();
-  InCallManager.setSpeakerphoneOn(false);
-  InCallManager.setKeepScreenOn(true);
+  // InCallManager.setSpeakerphoneOn(false);
+  // InCallManager.setKeepScreenOn(true);
   InCallManager.stop(); // reset any audio settings
+  resetCallState();
 };
 
 // ====================================================================
@@ -317,15 +304,6 @@ export const startCall = async () => {
       .getTracks()
       .forEach(track => peerConnection.addTrack(track, localStream));
 
-    if (callType === 'video') {
-      InCallManager.setSpeakerphoneOn(true);
-      InCallManager.start({media: 'video'});
-    } else {
-      InCallManager.setSpeakerphoneOn(false);
-      InCallManager.start({media: 'audio'});
-      InCallManager.setKeepScreenOn(false);
-    }
-
     // Create Offer
     const offer = await peerConnection.createOffer({
       offerToReceiveAudio: true,
@@ -339,6 +317,21 @@ export const startCall = async () => {
       localStream: localStream,
       isVideoEnabled: callType === 'video',
     });
+
+    if (callType === 'video') {
+      InCallManager.setSpeakerphoneOn(true);
+      InCallManager.setKeepScreenOn(true);
+      InCallManager.start({
+        media: 'video',
+      });
+    } else {
+      InCallManager.start({
+        media: 'audio',
+      });
+      InCallManager.setKeepScreenOn(false);
+    }
+
+    InCallManager.startRingback('_BUNDLE_');
 
     // Send Offer
     socket?.emit('incomingCall', {
@@ -427,15 +420,15 @@ export const answer = async ({answer}: {answer: any}) => {
   }
 
   try {
-    if (
-      peerConnection.signalingState === 'stable' ||
-      peerConnection.remoteDescription
-    ) {
-      console.warn(
-        '⚠️ Signaling state is already stable! Skipping setRemoteDescription.',
-      );
-      return;
-    }
+    // if (
+    //   peerConnection.signalingState === 'stable' ||
+    //   peerConnection.remoteDescription
+    // ) {
+    //   console.warn(
+    //     '⚠️ Signaling state is already stable! Skipping setRemoteDescription.',
+    //   );
+    //   return;
+    // }
 
     // Step 7: Set remote description
     await peerConnection.setRemoteDescription(
@@ -444,6 +437,7 @@ export const answer = async ({answer}: {answer: any}) => {
     await processCandidates();
 
     updateWebRTCState({isRemoteVideoEnabled: true});
+    InCallManager.stopRingback();
   } catch (err) {
     console.error('Answer error:', err);
   }
@@ -469,6 +463,21 @@ export const incomingCall = async ({
           }
         : false,
   };
+
+  InCallManager.startRingtone('_DEFAULT_', 1, 'default', 20);
+
+  if (callType === 'video') {
+    InCallManager.setSpeakerphoneOn(true);
+    InCallManager.setKeepScreenOn(true);
+    InCallManager.start({
+      media: 'video',
+    });
+  } else {
+    InCallManager.start({
+      media: 'audio',
+    });
+    InCallManager.setKeepScreenOn(false);
+  }
 
   try {
     const peerConnection = new RTCPeerConnection(servers);
@@ -512,6 +521,9 @@ export const acceptCall = async () => {
   const {socket, caller, offer, callType, peerConnection, updateWebRTCState} =
     useAppStore.getState();
 
+  InCallManager.stopRingtone();
+  // InCallManager.stopRingback();
+
   let status: boolean;
 
   if (callType === 'audio') {
@@ -533,17 +545,6 @@ export const acceptCall = async () => {
   if (!offer) {
     console.log('No offer received!');
     return;
-  }
-
-  // const {localStream, peerConnection} = await getMedia();
-
-  if (callType === 'video') {
-    InCallManager.setSpeakerphoneOn(true);
-    InCallManager.start({media: 'video'});
-  } else {
-    InCallManager.setSpeakerphoneOn(false);
-    InCallManager.start({media: 'audio'});
-    InCallManager.setKeepScreenOn(false);
   }
 
   await peerConnection?.setRemoteDescription(new RTCSessionDescription(offer));

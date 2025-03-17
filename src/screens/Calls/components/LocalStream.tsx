@@ -28,17 +28,6 @@ const LocalStream = () => {
             <AudioUserDetails version="stream" />
           </View>
         )}
-        {/* {!switchVideoSources && !isVideoEnabled && (
-          <View style={styles.cameraDisable}>
-            <AudioUserDetails version="stream" />
-          </View>
-        )} */}
-
-        {/* {switchVideoSources && !isVideoEnabled && (
-          <View style={styles.cameraDisable}>
-            <AudioUserDetails />
-          </View>
-        )} */}
 
         {switchVideoSources && !isRemoteVideoEnabled && (
           <View style={styles.cameraDisable}>

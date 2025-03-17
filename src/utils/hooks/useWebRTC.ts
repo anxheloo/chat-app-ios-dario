@@ -1,6 +1,7 @@
 import {useEffect} from 'react';
 import {useAppStore} from '../../store';
 import {goBack} from '../../navigation/navigationRef';
+import {closePeerConnection} from '../webrtc';
 
 const useWebRTC = () => {
   // const peerConnection = useRef<RTCPeerConnection | null>(null);
@@ -274,7 +275,6 @@ const useWebRTC = () => {
   //   navigate('JoinScreen');
   // };
 
-  const resetCallState = useAppStore(state => state.resetCallState);
   const peerConnection = useAppStore(state => state.peerConnection);
   const updateWebRTCState = useAppStore(state => state.updateWebRTCState);
   const callState = useAppStore(state => state.callState);
@@ -283,8 +283,6 @@ const useWebRTC = () => {
   const selectedChatData = useAppStore(state => state.selectedChatData);
 
   useEffect(() => {
-    updateWebRTCState({disabledButtons: false});
-
     if (!peerConnection || !socket) {
       return;
     }
@@ -373,12 +371,14 @@ const useWebRTC = () => {
           break;
         case 'closed':
           // You can handle the call being closed here.
-          resetCallState();
+          // closePeerConnection();
+          // resetCallState();
           goBack();
           console.log('call closed');
           break;
         case 'failed':
-          resetCallState();
+          closePeerConnection();
+          // resetCallState();
           goBack();
           console.log('Error', ev.error);
           break;
