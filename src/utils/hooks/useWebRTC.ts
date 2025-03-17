@@ -276,54 +276,89 @@ const useWebRTC = () => {
   // };
 
   const peerConnection = useAppStore(state => state.peerConnection);
-  const updateWebRTCState = useAppStore(state => state.updateWebRTCState);
-  const callState = useAppStore(state => state.callState);
+  // const resetCallState = useAppStore(state => state.resetCallState);
+  // const updateWebRTCState = useAppStore(state => state.updateWebRTCState);
+  // const callState = useAppStore(state => state.callState);
   const socket = useAppStore(state => state.socket);
-  const caller = useAppStore(state => state.caller);
-  const selectedChatData = useAppStore(state => state.selectedChatData);
+  // const caller = useAppStore(state => state.caller);
+  // const selectedChatData = useAppStore(state => state.selectedChatData);
 
   useEffect(() => {
     if (!peerConnection || !socket) {
       return;
     }
 
-    peerConnection.ontrack = event => {
-      if (event.streams?.[0]) {
-        console.log('Got remote track');
-        updateWebRTCState({remoteStream: event.streams[0]});
-      } else {
-        console.log('No remote track');
-      }
-    };
+    // peerConnection.ontrack = event => {
+    //   if (event.streams?.[0]) {
+    //     console.log('Got remote track');
+    //     updateWebRTCState({remoteStream: event.streams[0]});
+    //   } else {
+    //     console.log('No remote track');
+    //   }
+    // };
 
-    peerConnection.onicecandidate = ({
-      candidate,
-    }: {
-      candidate: RTCIceCandidate;
-    }) => {
-      if (candidate) {
-        let receiverId;
+    // peerConnection.onicecandidate = ({
+    //   candidate,
+    // }: {
+    //   candidate: RTCIceCandidate;
+    // }) => {
+    //   if (candidate) {
+    //     let receiverId;
 
-        if (callState === 'incoming') {
-          // The current user is the receiver (send ICE to the caller)
-          receiverId = caller?._id;
-        } else {
-          // The current user is the caller (send ICE to the selected chat)
-          receiverId = selectedChatData?._id;
-        }
+    //     if (callState === 'incoming') {
+    //       // The current user is the receiver (send ICE to the caller)
+    //       receiverId = caller?._id;
+    //     } else {
+    //       // The current user is the caller (send ICE to the selected chat)
+    //       receiverId = selectedChatData?._id;
+    //     }
 
-        if (!receiverId) {
-          console.warn('⚠️ No valid receiver found for ICE Candidate.');
-          return;
-        }
+    //     if (!receiverId) {
+    //       console.warn('⚠️ No valid receiver found for ICE Candidate.');
+    //       return;
+    //     }
 
-        console.log(`🔵 Sending ICE Candidate to: ${receiverId}`);
-        socket.emit('ICEcandidate', {
-          to: receiverId,
-          candidate,
-        });
-      }
-    };
+    //     console.log(`🔵 Sending ICE Candidate to: ${receiverId}`);
+    //     socket.emit('ICEcandidate', {
+    //       to: receiverId,
+    //       candidate,
+    //     });
+    //   }
+    // };
+
+    // peerConnection.addEventListener('icecandidate', event => {
+    //   // When you find a null candidate then there are no more candidates.
+    //   // Gathering of candidates has finished.
+    //   // if (!event.candidate) {
+    //   //   return;
+    //   // }
+
+    //   if (event.candidate) {
+    //     let receiverId;
+
+    //     if (callState === 'incoming') {
+    //       // The current user is the receiver (send ICE to the caller)
+    //       receiverId = caller?._id;
+    //     } else {
+    //       // The current user is the caller (send ICE to the selected chat)
+    //       receiverId = selectedChatData?._id;
+    //     }
+
+    //     if (!receiverId) {
+    //       console.warn('⚠️ No valid receiver found for ICE Candidate.');
+    //       return;
+    //     }
+
+    //     console.log(`🔵 Sending ICE Candidate to: ${receiverId}`);
+    //     socket.emit('ICEcandidate', {
+    //       to: receiverId,
+    //       candidate: event.candidate,
+    //     });
+    //   }
+
+    //   // Send the event.candidate onto the person you're calling.
+    //   // Keeping to Trickle ICE Standards, you should send the candidates immediately.
+    // });
 
     peerConnection.addEventListener('icecandidateerror', event => {
       // You can ignore some candidate errors.
@@ -362,9 +397,9 @@ const useWebRTC = () => {
           break;
         case 'connected':
           console.log('Online');
-          updateWebRTCState({
-            callState: 'active',
-          });
+          // updateWebRTCState({
+          //   callState: 'active',
+          // });
           break;
         case 'disconnected':
           console.log('Disconnecting…');
@@ -373,14 +408,14 @@ const useWebRTC = () => {
           // You can handle the call being closed here.
           // closePeerConnection();
           // resetCallState();
-          goBack();
+          // goBack();
           console.log('call closed');
           break;
         case 'failed':
-          closePeerConnection();
+          // closePeerConnection();
           // resetCallState();
-          goBack();
-          console.log('Error', ev.error);
+          // goBack();
+          console.log('Error', ev);
           break;
       }
     };

@@ -135,5 +135,6 @@ dependencies {
     }
 
      implementation("androidx.activity:activity:1.9.+")
+    //  implementation project(':react-native-incall-manager')
 }
 

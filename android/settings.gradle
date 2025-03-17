@@ -4,3 +4,5 @@ extensions.configure(com.facebook.react.ReactSettingsExtension){ ex -> ex.autoli
 rootProject.name = 'ReactNativeChatAppArbri'
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')
+// include ':react-native-incall-manager'
+// project(':react-native-incall-manager').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-incall-manager/android')

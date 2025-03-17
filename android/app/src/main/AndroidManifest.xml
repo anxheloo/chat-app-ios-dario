@@ -5,13 +5,14 @@
 <uses-feature android:name="android.hardware.camera.autofocus" />
 <uses-feature android:name="android.hardware.audio.output" />
 <uses-feature android:name="android.hardware.microphone" />
-<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 <uses-permission android:name="android.permission.VIBRATE"/>
 <uses-permission android:name="android.permission-group.CAMERA"/>
 
 <!-- Camera and Microphone Permissions -->
 <uses-permission android:name="android.permission.CAMERA" />
 <uses-permission android:name="android.permission.RECORD_AUDIO" />
+<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+<uses-permission android:name="android.permission.WAKE_LOCK" />
 
 <!-- Internet and Networking -->
 <uses-permission android:name="android.permission.INTERNET" />
