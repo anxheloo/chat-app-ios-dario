@@ -48,8 +48,11 @@ const useLogin = (
         navigation?.replace('BottomTabNavigation', {screen: 'Messages'});
       }
     } catch (error: any) {
-      console.log('This is error:', error);
-      console.log('This is error.response.data:', error.response.data);
+      console.log('This is error inside Login:', error);
+      console.log(
+        'This is error.response.data inside Login:',
+        error.response.data,
+      );
       Alert.alert('Login Error', error?.response.data.message);
       setUsername('');
       setPin('');

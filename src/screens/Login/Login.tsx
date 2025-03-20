@@ -57,14 +57,12 @@ const Login: React.FC<LoginScreenProps> = ({navigation}) => {
                   value={username}
                   onChange={setUsername}
                   icon1={<ReusableText fontSize={FONTSIZE.md}>@</ReusableText>}
-                  // marginHorizontal={20}
                 />
                 <ReusableInput
                   placeholder="PIN"
                   value={pin}
                   onChange={setPin}
                   isPassword={true}
-                  // marginHorizontal={20}
                 />
 
                 <ReusableText

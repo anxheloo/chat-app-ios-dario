@@ -2,10 +2,11 @@ import React from 'react';
 import {StyleSheet, Text} from 'react-native';
 
 import {COLORS, FONTSIZE} from '../../../../theme/theme';
+import MessageHOC from './MessageHOC';
 
 type TextMsgProps = {
   isSender: boolean;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   isDeleted?: boolean;
 };
 
@@ -35,4 +36,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TextMsg;
+export default MessageHOC(TextMsg);
+// export default TextMsg;

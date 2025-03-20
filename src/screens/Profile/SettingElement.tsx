@@ -7,6 +7,7 @@ import ClockIcon from '../../assets/icons/profile/ClockIcon';
 import RightIcon from '../../assets/icons/profile/RighArrow';
 import {useAppStore} from '../../store';
 import {SettingType} from '../../utils/types';
+import LogoutComponent from './LogoutComponent';
 
 type SettingProps = {
   type: SettingType;
@@ -46,7 +47,11 @@ const SettingElement: React.FC<SettingProps> = memo(({type, onPress}) => {
     <TouchableOpacity style={styles.container} onPress={onPress}>
       <View style={styles.conditionalView}>
         {icon}
-        <Text style={styles.username}>{text}</Text>
+        {type === 'logout' ? (
+          <LogoutComponent text={text} />
+        ) : (
+          <Text style={styles.username}>{text}</Text>
+        )}
       </View>
       <RightIcon width={4} height={8} />
     </TouchableOpacity>

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   StyleSheet,
   ActivityIndicator,
@@ -6,79 +5,74 @@ import {
   View,
   Text,
 } from 'react-native';
-import React, {memo, useCallback, useMemo, useState} from 'react';
-import Video from 'react-native-video';
-import {BORDERRADIUS} from '../../../../theme/theme';
-import {Message, NavigationProps} from '../../../../utils/types';
+import React, {memo, useCallback} from 'react';
+
 import {useNavigation} from '@react-navigation/native';
-import PlayIcon from '../../../../assets/icons/messages/PlayIcon';
+
+import Video from 'react-native-video';
+
 import {formatDuration} from '../../../../utils/helpers';
+import {Message, NavigationProps} from '../../../../utils/types';
+
+import {BORDERRADIUS} from '../../../../theme/theme';
+
+import PlayIcon from '../../../../assets/icons/messages/PlayIcon';
+import MessageHOC from './MessageHOC';
 
 type VideoProps = {
   message: Message;
-  uploading: boolean;
   isSender: boolean;
 };
 
-const VideoComponent: React.FC<VideoProps> = memo(
-  ({message, uploading, isSender}) => {
-    const navigation = useNavigation<NavigationProps>();
-    // const [upload, setUpload] = useState(true);
+const VideoComponent: React.FC<VideoProps> = memo(({message, isSender}) => {
+  const navigation = useNavigation<NavigationProps>();
 
-    const openVideo = useCallback(() => {
-      if (!uploading) {
-        navigation.navigate('FullScreenMedia', {
-          fileUrl: message.fileUrl,
-          type: 'video',
-        });
-      }
-    }, [uploading, navigation, message]);
+  const openVideo = useCallback(() => {
+    if (!message.uploading) {
+      navigation.navigate('FullScreenMedia', {
+        fileUrl: message.fileUrl,
+        type: 'video',
+      });
+    }
+  }, [navigation, message]);
 
-    // const formatDuration = useMemo(() => {
-    //   let duration: any = Math.floor(message?.duration ?? 0);
-    //   let m: string | number = Math.floor(duration / 60);
-    //   m = m >= 10 ? m : '0' + m;
-    //   duration = Math.floor(duration % 60);
-    //   duration = duration >= 10 ? duration : '0' + duration;
-    //   return m + ':' + duration;
-    // }, [message?.duration]);
+  const format = formatDuration(Number(message.duration) ?? 0);
 
-    const format = formatDuration(message?.duration ?? 0);
+  return (
+    <View style={styles.container}>
+      {message.uploading ? (
+        <ActivityIndicator
+          size="small"
+          color={isSender ? '#fff' : '#000'}
+          style={styles.activityIndicator}
+        />
+      ) : (
+        <Video
+          fullscreenOrientation="all"
+          source={{uri: message.fileUrl}}
+          style={styles.video}
+          resizeMode="cover"
+          paused={true}
+          useTextureView={false}
+          // onLoad={() => setUpload(false)}
+          onError={error =>
+            console.log('This is error inside video component:', error)
+          }
+        />
+      )}
 
-    return (
-      <View style={styles.container}>
-        {uploading ? (
-          <ActivityIndicator
-            size="small"
-            color={isSender ? '#fff' : '#000'}
-            style={styles.activityIndicator}
-          />
-        ) : (
-          <Video
-            fullscreenOrientation="all"
-            source={{uri: message.fileUrl}}
-            style={styles.video}
-            resizeMode="cover"
-            paused={true}
-            useTextureView={false}
-            // onLoad={() => setUpload(false)}
-            onError={error => console.log('This is error:', error)}
-          />
-        )}
-
-        <View style={styles.videoDuration}>
-          <Text style={styles.durationText}>{format}</Text>
-        </View>
-
-        {!uploading && (
-          <TouchableOpacity style={styles.playButton} onPress={openVideo}>
-            <PlayIcon width={24} height={24} />
-          </TouchableOpacity>
-        )}
+      <View style={styles.videoDuration}>
+        <Text style={styles.durationText}>{format}</Text>
       </View>
-    );
-  },
-);
+
+      {!message.uploading && (
+        <TouchableOpacity style={styles.playButton} onPress={openVideo}>
+          <PlayIcon width={24} height={24} />
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -90,11 +84,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     overflow: 'scroll',
   },
-
-  // thumbnail: {
-  //   width: '100%',
-  //   height: '100%',
-  // },
 
   video: {
     width: 220,
@@ -128,7 +117,6 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    // textAlignVertical: 'center',
     overflow: 'hidden',
   },
   durationText: {
@@ -137,4 +125,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default VideoComponent;
+export default MessageHOC(VideoComponent);

@@ -1,10 +1,16 @@
 import React, {memo, useMemo, useRef} from 'react';
-import {ActivityIndicator, FlatList, StyleSheet, View} from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  View,
+  Animated,
+} from 'react-native';
 
 import {useAppStore} from '../../store';
 
 import {NavigationProps} from '../../utils/types';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 
 // import useConversations from '../../utils/hooks/useConversations';
 import useAppState from '../../utils/hooks/useAppState';
@@ -67,7 +73,7 @@ const Content = memo(() => {
         icon1={<SearchIcon width={15} height={15} fill={'#000'} />}
         icon2={<CloseIcon width={15} height={15} fill={'#000'} />}
       />
-      <FlatList
+      <Animated.FlatList
         ref={flatListRef}
         // onScroll={handleScroll}
         scrollEventThrottle={16}

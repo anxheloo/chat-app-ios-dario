@@ -1,19 +1,22 @@
-import React, {memo} from 'react';
+import React from 'react';
 import {StyleSheet, View} from 'react-native';
 
-import MessageTime from './MessageTime';
+import {Message} from '../../../../utils/types';
 
 import {BORDERRADIUS, COLORS} from '../../../../theme/theme';
 
+import MessageTime from './MessageTime';
+
 type Props = {
+  message: Message;
   isSender: boolean;
-  children: React.ReactNode;
-  createdAt: string;
-  isDeleted?: boolean;
+  children?: React.ReactNode;
 };
 
-const MessageContent: React.FC<Props> = memo(
-  ({isSender, children, createdAt, isDeleted}) => {
+const MessageHOC = (Component: React.FC<Props>) => {
+  return ({message, children, isSender}: Props) => {
+    const isDeleted = message?.messageType === 'deleted';
+
     return (
       <View
         style={[
@@ -27,22 +30,27 @@ const MessageContent: React.FC<Props> = memo(
           },
           isSender ? styles.senderStyles : styles.recipientStyles,
         ]}>
-        {children}
+        <Component message={message} isSender={isSender}>
+          {children}
+        </Component>
         <MessageTime
-          createdAt={createdAt}
+          messageId={message._id}
+          duration={message.duration}
+          isVoice={message.messageType === 'audio'}
+          createdAt={message.createdAt}
           isSender={isSender}
           isDeleted={isDeleted}
         />
       </View>
     );
-  },
-);
+  };
+};
 
 const styles = StyleSheet.create({
   messageContainer: {
     borderRadius: BORDERRADIUS.radius_14,
     padding: 2,
-    minWidth: 100,
+    minWidth: 120,
     maxWidth: '70%',
     overflow: 'hidden',
   },
@@ -55,4 +63,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MessageContent;
+export default MessageHOC;

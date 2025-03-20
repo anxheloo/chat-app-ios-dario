@@ -1,5 +1,11 @@
-import React, {useMemo} from 'react';
-import {ActivityIndicator, FlatList, StyleSheet, View} from 'react-native';
+import React, {useContext, useMemo} from 'react';
+import {
+  ActivityIndicator,
+  Animated,
+  FlatList,
+  StyleSheet,
+  View,
+} from 'react-native';
 
 import {useAppStore} from '../../store';
 
@@ -13,12 +19,14 @@ import CloseIcon from '../../assets/icons/messages/CloseIcon';
 
 import {COLORS} from '../../theme/theme';
 
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 
 import {Call, NavigationProps} from '../../utils/types';
 import {loadMoreCalls, refetchCalls} from '../../utils/DataFetching';
 import useSearch from '../../utils/hooks/useSearch';
 import useAppState from '../../utils/hooks/useAppState';
+import {AnimationContext} from '../../store/HeaderAnimationContext';
+import HorizontalLine from '../../components/HorizontalLine';
 
 const CallList = () => {
   const navigation = useNavigation<NavigationProps>();
@@ -46,6 +54,50 @@ const CallList = () => {
     [calls, debouncedSearch],
   );
 
+  const animatedValue = useContext(AnimationContext);
+
+  const updateAnimation = () => {
+    animatedValue?.setValue(0);
+  };
+
+  useFocusEffect(() => {
+    console.log('This is call list');
+    updateAnimation();
+  });
+
+  // const onScroll = Animated.event(
+  //   // [{nativeEvent: {contentOffset: {y: animatedValue}}}],
+  //   {
+  //     useNativeDriver: false,
+  //     listener: event => {
+  //       const currentScrollY = event.nativeEvent.contentOffset.y;
+
+  //       // ✅ Hide header when scrolling down, show when scrolling up
+  //       if (currentScrollY > prevScrollY.current && currentScrollY > 50) {
+  //         Animated.timing(animatedValue, {
+  //           toValue: 50, // Hide
+  //           duration: 150,
+  //           useNativeDriver: false,
+  //         }).start();
+  //       } else if (currentScrollY < prevScrollY.current && currentScrollY < 50) {
+  //         Animated.timing(animatedValue, {
+  //           toValue: 0, // Show
+  //           duration: 150,
+  //           useNativeDriver: false,
+  //         }).start();
+  //       }
+
+  //       // prevScrollY.current = currentScrollY; // ✅ Update previous scroll position
+  //     },
+  //   },
+  // );
+
+  const onScroll = animatedValue
+    ? Animated.event([{nativeEvent: {contentOffset: {y: animatedValue}}}], {
+        useNativeDriver: false,
+      })
+    : undefined;
+
   if (!calls.length) {
     return <EmptyCall />;
   }
@@ -61,7 +113,10 @@ const CallList = () => {
         icon1={<SearchIcon width={15} height={15} fill={'#000'} />}
         icon2={<CloseIcon width={15} height={15} fill={'#000'} />}
       />
-      <FlatList
+
+      <HorizontalLine />
+      <Animated.FlatList
+        onScroll={onScroll}
         scrollEventThrottle={16}
         onEndReached={loadMoreCalls}
         onEndReachedThreshold={0.1}

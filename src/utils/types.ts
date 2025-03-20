@@ -51,10 +51,11 @@ export type Message = {
   expiresAt: string;
   messageType: string;
   fileUrl: string;
-  thumbnailUrl: string | null;
+  thumbnailUrl?: string | null;
   uploading: boolean;
   duration?: number | null;
   showDate?: boolean;
+  waveMetering?: number[] | null;
 };
 
 export type Contact = {

@@ -9,19 +9,22 @@ import InternetPopup from './src/components/Internet/InternetPopup';
 
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import CustomBottomSheetModal from './src/components/BottomSheet/CustomBottomSheetModal';
+import {AnimationProvider} from './src/store/HeaderAnimationContext';
 
 const App = () => {
   return (
-    <GestureHandlerRootView style={styles.gestureHandlerContainer}>
-      <BottomSheetModalProvider>
-        <SafeAreaProvider>
-          <StatusBar backgroundColor="white" barStyle={'dark-content'} />
-          <MainNavigation />
-          <InternetPopup />
-          <CustomBottomSheetModal />
-        </SafeAreaProvider>
-      </BottomSheetModalProvider>
-    </GestureHandlerRootView>
+    <AnimationProvider>
+      <GestureHandlerRootView style={styles.gestureHandlerContainer}>
+        <BottomSheetModalProvider>
+          <SafeAreaProvider>
+            <StatusBar backgroundColor="white" barStyle={'dark-content'} />
+            <MainNavigation />
+            <InternetPopup />
+            <CustomBottomSheetModal />
+          </SafeAreaProvider>
+        </BottomSheetModalProvider>
+      </GestureHandlerRootView>
+    </AnimationProvider>
   );
 };
 

@@ -14,7 +14,8 @@ import {useAppStore} from '../../store';
 import {NavigationProps} from '../../utils/types';
 import ReusableButton from '../../components/ReusableButton';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import useRegister from '../../utils/hooks/useRegister';
+import {handleRegister} from '../../utils/DataFetching';
+// import useRegister from '../../utils/hooks/useRegister';
 
 type CreatePinScreenProps = {
   navigation: NavigationProps;
@@ -24,7 +25,7 @@ const CreatePin: React.FC<CreatePinScreenProps> = ({navigation}) => {
   const setUserPersona = useAppStore(state => state.setUserPersona);
   const pin = useAppStore(state => state.pin);
   const [pinError, setPinError] = useState<boolean>(false);
-  const handleRegister = useRegister(navigation);
+  // const handleRegister = useRegister(navigation);
 
   const onChange = (text: string): void => {
     setUserPersona({pin: text});
@@ -37,12 +38,12 @@ const CreatePin: React.FC<CreatePinScreenProps> = ({navigation}) => {
     return pin.length === 4;
   };
 
-  const onPress = (): void => {
+  const onPress = async (): Promise<void> => {
     if (!isValidPin()) {
       setPinError(true);
       return;
     }
-    handleRegister();
+    await handleRegister();
   };
 
   const cancel = useCallback((): void => {

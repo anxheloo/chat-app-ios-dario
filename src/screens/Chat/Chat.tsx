@@ -11,15 +11,27 @@ import DeleteMsg from '../../components/modals/DeleteMsg';
 import ChatHeader from './components/ChatHeader';
 import ChatContainer from './components/ChatContainer';
 import ChatFooter from './components/ChatFooter';
+import {getAudioPlayer} from '../../utils/voiceMessage';
 
 const Chat = () => {
-  const updateFuncChat = useAppStore(state => state.updateFuncChat);
+  const {updateFuncChat, updateMicSlice} = useAppStore.getState();
 
   useEffect(() => {
     return () => {
       updateFuncChat({selectedChatMessages: [], selectedChatData: null});
+
+      // Stop the audio player if it's still playing
+      const audioPlayer = getAudioPlayer();
+      audioPlayer.stopPlayer();
+      audioPlayer.removePlayBackListener();
+      updateMicSlice({
+        playingAudioId: null,
+        isPlaying: false,
+        recordSecs: 0,
+        recordTime: '',
+      });
     };
-  }, [updateFuncChat]);
+  }, [updateFuncChat, updateMicSlice]);
 
   return (
     <KeyboardAvoidingView

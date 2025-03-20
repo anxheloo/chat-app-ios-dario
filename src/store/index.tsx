@@ -13,6 +13,17 @@ import {
 } from '../utils/types';
 
 import {MediaStream} from 'react-native-webrtc';
+import {Animated} from 'react-native';
+
+type ScrollSlice = {
+  scrollYRef: React.RefObject<Animated.Value> | null;
+  setScrollRef: (ref: React.RefObject<Animated.Value>) => void;
+};
+
+const scrollSlice: StateCreator<ScrollSlice> = set => ({
+  scrollYRef: null,
+  setScrollRef: ref => set(() => ({scrollYRef: ref})),
+});
 
 type CallState = 'pending' | 'incoming' | 'active';
 
@@ -120,9 +131,11 @@ const webRTCSlice: StateCreator<WebRTCSlice> = (set, get) => ({
 });
 
 type CreateSlice = PersonaSlice &
+  ScrollSlice &
   TokenSlice &
   StatusSlice &
   ChatSlice &
+  MicSlice &
   SocketSlice &
   WebRTCSlice;
 
@@ -241,6 +254,50 @@ const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
   },
 });
 
+type MicSlice = {
+  // playing: boolean;
+  isRecording: boolean;
+  recordSecs: number;
+  recordTime: string;
+  // playTime: string;
+  // currentPositionSec: number;
+  // currentDurationSec: number;
+  // duration: string;
+  waveMetering: number[] | null;
+
+  playingAudioId: string | null;
+  isPlaying: boolean;
+
+  updateMicSlice: (data: Partial<MicSlice>) => void;
+
+  updateMetering: (newData: number) => void;
+  // set(state => ({
+  //   waveMetering: [...state.waveMetering, newData],
+  // })),
+};
+
+const micSlice: StateCreator<MicSlice> = set => ({
+  // playing: false,
+  isRecording: false,
+  recordSecs: 0,
+  recordTime: '',
+  // playTime: '',
+  // currentDurationSec: 0,
+  // currentPositionSec: 0,
+  // duration: '',
+  waveMetering: null,
+
+  playingAudioId: null,
+  isPlaying: false,
+
+  updateMicSlice: set,
+
+  updateMetering: newData =>
+    set(state => ({
+      waveMetering: [...(state.waveMetering || []), newData],
+    })),
+});
+
 type StatusSlice = {
   loading: boolean;
   message: string | null;
@@ -325,9 +382,11 @@ const socketSlice: StateCreator<SocketSlice> = (set, get) => ({
 });
 
 export const useAppStore = create<CreateSlice>()((...args) => ({
+  ...scrollSlice(...args),
   ...createPersonaSlice(...args),
   ...createStatusSlice(...args),
   ...chatSlice(...args),
+  ...micSlice(...args),
   ...socketSlice(...args),
   ...createTokenSlice(...args),
   ...webRTCSlice(...args),

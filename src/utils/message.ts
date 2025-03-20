@@ -164,7 +164,7 @@ export const onButtonPress = async (
           updateKeys({loading: false});
           await handleCameraUpload(res, setCameraOptions);
         } else {
-          updateKeys({loading: true});
+          updateKeys({loading: false});
           setCameraOptions(false);
           Alert.alert('Camera error or cancelled:', res.error || 'Cancelled');
         }
@@ -298,6 +298,8 @@ export const handleCameraUpload = async (
         //   thumbnail = thumbnailResponse.path; // Thumbnail path
         // }
 
+        console.log('This is media.duration', media.duration);
+
         return {
           _id: tempId,
           conversationId: selectedChatData?.conversationId || '',
@@ -305,7 +307,7 @@ export const handleCameraUpload = async (
           recipient: selectedChatData?._id || '',
           timestamp: new Date().toISOString(),
           createdAt: new Date().toISOString(),
-          messageType: 'file',
+          messageType: isVideo ? 'video' : 'image',
           fileUrl: media.uri,
           // fileUrl: compressedUri,
           // thumbnailUrl: thumbnail, // Save thumbnail

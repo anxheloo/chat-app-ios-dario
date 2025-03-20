@@ -12,7 +12,7 @@ import {removeToken} from './TokenStorage';
 import {navigate, reset} from '../navigation/navigationRef';
 import {permission} from './permissions';
 import {apiClient} from '../api/apiClient';
-import {ADD_FRIEND} from '../api/apis';
+import {ADD_FRIEND, LOGOUT_ROUTE} from '../api/apis';
 
 // ====================================================================
 // Helper functions related to MESSAGES
@@ -36,6 +36,15 @@ export const checkIfVideo = (fileUrl: string): boolean => {
   );
 };
 
+// Check if a message is audio
+export const checkIfVoice = (fileUrl: string): boolean => {
+  return (
+    fileUrl.endsWith('.m4a') ||
+    fileUrl.endsWith('.mp3') ||
+    fileUrl.endsWith('.wav')
+  );
+};
+
 // Show the general date in chat for messages, like today, yesterday and so on
 export const preprocessMessages = (messages: Message[]) => {
   let lastMessageDate: any = null;
@@ -47,12 +56,14 @@ export const preprocessMessages = (messages: Message[]) => {
   });
 };
 
-// Format the duration number of a message
+// Format the duration number of a message | THis takes seconds as input
 export const formatDuration = (durationValue: number) => {
   if (durationValue) {
     let duration: any = Math.floor(durationValue ?? 0);
+    // get minutes
     let m: string | number = Math.floor(duration / 60);
     m = m >= 10 ? m : '0' + m;
+    // get remaining seconds
     duration = Math.floor(duration % 60);
     duration = duration >= 10 ? duration : '0' + duration;
     return m + ':' + duration;
@@ -127,40 +138,55 @@ export const logout = async () => {
     updateCalls,
     setCallsPagination,
     disconnectSocket,
+    updateKeys,
   } = useAppStore.getState();
 
-  // remove token , disconnect socket
-  await removeToken();
-  disconnectSocket();
+  updateKeys({loading: true});
 
-  // reset user persona for logout/login app state
-  setUserPersona({
-    username: '',
-    pin: '',
-    avatar: 0,
-    id: '',
-  });
+  try {
+    const response = await apiClient.post(LOGOUT_ROUTE);
 
-  // user info needes to be fetched again by the new user if app state stays active during logout/login
-  setUserInfoStatus(false);
+    if (response.status === 200) {
+      console.log('Logout success');
+      // remove token , disconnect socket
+      await removeToken();
+      disconnectSocket();
 
-  // conversations, friends, paginations
-  updateFuncChat({
-    conversations: [],
-    friends: [],
-    conversationPagination: {page: 0, hasMore: true, isLoading: false},
-    friendsPagination: {page: 0, hasMore: true, isLoading: false},
-  });
+      // reset user persona for logout/login app state
+      setUserPersona({
+        username: '',
+        pin: '',
+        avatar: 0,
+        id: '',
+      });
 
-  // calls
-  updateCalls(() => []);
-  setCallsPagination({
-    page: 0,
-    hasMore: true,
-    isLoading: false,
-  });
+      // user info needes to be fetched again by the new user if app state stays active during logout/login
+      setUserInfoStatus(false);
 
-  reset('Login');
+      // conversations, friends, paginations
+      updateFuncChat({
+        conversations: [],
+        friends: [],
+        conversationPagination: {page: 0, hasMore: true, isLoading: false},
+        friendsPagination: {page: 0, hasMore: true, isLoading: false},
+      });
+
+      // calls
+      updateCalls(() => []);
+      setCallsPagination({
+        page: 0,
+        hasMore: true,
+        isLoading: false,
+      });
+
+      reset('Login');
+    }
+  } catch (error) {
+    console.error('Error logout:', error);
+    Alert.alert('Error', 'Failed to logout');
+  } finally {
+    updateKeys({loading: false});
+  }
 };
 
 // ====================================================================

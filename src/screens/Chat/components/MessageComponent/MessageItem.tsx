@@ -1,16 +1,21 @@
 import React, {useCallback, useMemo} from 'react';
 import {StyleSheet, Text, TouchableOpacity} from 'react-native';
+
 import {Message} from '../../../../utils/types';
+
 import {useAppStore} from '../../../../store';
+
 import {BORDERRADIUS, FONTSIZE} from '../../../../theme/theme';
-import {checkIfImage, checkIfVideo} from '../../../../utils/helpers';
-import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
-import DeleteIcon from '../../../../assets/icons/Chat/DeleteIcon';
+
 import ImageComponent from './ImageComponent';
 import VideoComponent from './VideoComponent';
-import moment from 'moment';
-import MessageContent from './MessageContent';
+import Voice from './Voice/Voice';
 import TextMsg from './TextMsg';
+
+import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
+import moment from 'moment';
+
+import DeleteIcon from '../../../../assets/icons/Chat/DeleteIcon';
 
 type MessageItemProps = {
   message: Message;
@@ -22,65 +27,50 @@ const MessageItem: React.FC<MessageItemProps> = React.memo(({message}) => {
   const isSender = message?.sender === loggedInUserId;
 
   // Show modal on delete icon click
-  const handleShowModal = useCallback(() => {
+  const showDeleteModal = useCallback(() => {
     updateFuncChat({selectedMessageToDelete: message});
   }, [message, updateFuncChat]);
 
   // Render messages based on message type
-  const renderMessageContent = useMemo(() => {
-    switch (message.messageType) {
-      case 'text':
-        return <TextMsg isSender={isSender}>{message.content}</TextMsg>;
-      case 'file':
-        if (checkIfImage(message.fileUrl)) {
+  const renderMessage = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    (isSender: boolean) => {
+      switch (message.messageType) {
+        case 'text':
           return (
-            <ImageComponent
-              message={message}
-              uploading={message?.uploading}
-              isSender={isSender}
-            />
+            <TextMsg message={message} isSender={isSender}>
+              {message.content}
+            </TextMsg>
           );
-        }
-        if (checkIfVideo(message.fileUrl)) {
+        case 'image':
+          return <ImageComponent message={message} isSender={isSender} />;
+        case 'video':
+          return <VideoComponent message={message} isSender={isSender} />;
+        case 'audio':
+          return <Voice message={message} isSender={isSender} />;
+        case 'deleted':
           return (
-            <VideoComponent
-              message={message}
-              uploading={message?.uploading}
-              isSender={isSender}
-            />
+            <TextMsg message={message} isSender={isSender}>
+              Message deleted
+            </TextMsg>
           );
-        }
-        return (
-          <TouchableOpacity
-            onPress={() => {
-              console.log('File pressed');
-            }}>
-            <Text style={styles.fileName}>
-              {message.fileUrl.split('/').pop()}
-            </Text>
-          </TouchableOpacity>
-        );
-      case 'deleted':
-        return (
-          <TextMsg isSender={isSender} isDeleted={true}>
-            Message deleted
-          </TextMsg>
-        );
-      default:
-        return null;
-    }
-  }, [message, isSender]);
+        default:
+          return null;
+      }
+    },
+    [message],
+  );
 
   // Render delete icon
   const renderRightActions = useMemo(() => {
     return (
       <TouchableOpacity
-        onPress={handleShowModal}
+        onPress={showDeleteModal}
         style={styles.renderRightActions}>
         <DeleteIcon width={17.5} height={21.5} color={'red'} />
       </TouchableOpacity>
     );
-  }, [handleShowModal]);
+  }, [showDeleteModal]);
 
   return (
     <>
@@ -101,17 +91,10 @@ const MessageItem: React.FC<MessageItemProps> = React.memo(({message}) => {
         <Swipeable
           renderRightActions={() => renderRightActions}
           overshootRight={false}>
-          <MessageContent isSender={isSender} createdAt={message.createdAt}>
-            {renderMessageContent}
-          </MessageContent>
+          {renderMessage(isSender)}
         </Swipeable>
       ) : (
-        <MessageContent
-          isSender={isSender}
-          createdAt={message.createdAt}
-          isDeleted={message.messageType === 'deleted'}>
-          {renderMessageContent}
-        </MessageContent>
+        renderMessage(isSender)
       )}
     </>
   );

@@ -34,3 +34,9 @@ export function reset(screenName: string) {
     //    });
   }
 }
+
+// export function replace(screenName: string) {
+//   if (navigationRef.isReady()) {
+//     navigationRef.dispatch(CommonActions.replace(screenName));
+//   }
+// }

@@ -6,9 +6,12 @@ import {
   GET_ALL_FRIENDS,
   GET_CONVERSATIONS,
   GET_USER_INFO,
+  SIGNUP_ROUTES,
 } from '../api/apis';
 
 import {useAppStore} from '../store';
+import {saveToken} from './TokenStorage';
+import {reset} from '../navigation/navigationRef';
 
 export const getUserInfo = async () => {
   const {
@@ -304,5 +307,40 @@ export const loadMoreCalls = () => {
 
   if (!isLoading && hasMore) {
     getCalls();
+  }
+};
+
+// =====================================================================
+// Register user
+// =====================================================================
+
+export const handleRegister = async () => {
+  const {setUserPersona, updateKeys, username, avatar, pin} =
+    useAppStore.getState();
+  console.log('Inside Handle Register');
+
+  updateKeys({loading: true});
+  try {
+    const response = await apiClient.post(SIGNUP_ROUTES, {
+      username,
+      pin,
+      avatar,
+    });
+
+    if (response.status === 201) {
+      console.log('This is response success');
+
+      updateKeys({loading: false, message: 'Registered Successful'});
+
+      await saveToken(response.data.token);
+
+      reset('BottomTabNavigation');
+    }
+  } catch (error: any) {
+    updateKeys({loading: false, message: 'Register Failed'});
+    setUserPersona({username: '', pin: '', avatar: 0});
+    Alert.alert('Register Error', error?.response.data.message);
+  } finally {
+    updateKeys({loading: false});
   }
 };
