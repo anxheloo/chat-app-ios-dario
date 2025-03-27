@@ -1,40 +1,42 @@
-import React, {memo, useCallback, useContext} from 'react';
+import React, {memo} from 'react';
 import {Animated, StyleSheet, TouchableOpacity} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
 
 import {useAppStore} from '../../store';
 
 import ScanIcon from '../../assets/icons/messages/ScanIcon';
 import ReusableText from '../ReusableText';
 
-import {NavigationProps} from '../../utils/types';
 import useUserInfo from '../../utils/hooks/useUserInfo';
 
 import {openScanner} from '../../utils/helpers';
-import {AnimationContext} from '../../store/HeaderAnimationContext';
+import {navigate} from '../../navigation/navigationRef';
 
 const Header = memo(() => {
   const username = useAppStore(state => state.username);
-  const navigation = useNavigation<NavigationProps>();
+  const scrollY = useAppStore(state => state.scrollY);
 
   // Get user info, user conversations, calls and friends
   useUserInfo();
 
-  const animatedValue = useContext(AnimationContext);
-  const headerHeight = animatedValue?.interpolate({
+  // const animatedValue = useContext(AnimationContext);
+  const headerHeight = scrollY?.interpolate({
     inputRange: [0, 20],
     outputRange: [60, 0],
     extrapolate: 'clamp',
   });
-
-  const navigateToHomePage = useCallback(() => {
-    navigation?.replace('BottomTabNavigation', {screen: 'Messages'});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const bottomBorderOpacity = scrollY?.interpolate({
+    inputRange: [0, 20],
+    outputRange: [100, 0],
+    extrapolate: 'clamp',
+  });
 
   return (
-    <Animated.View style={[styles.container, {height: headerHeight}]}>
-      <TouchableOpacity onPress={navigateToHomePage}>
+    <Animated.View
+      style={[
+        styles.container,
+        {height: headerHeight, opacity: bottomBorderOpacity},
+      ]}>
+      <TouchableOpacity onPress={() => navigate('Messages')}>
         <ReusableText fontWeight={500}>@{username}</ReusableText>
       </TouchableOpacity>
 

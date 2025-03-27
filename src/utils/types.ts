@@ -35,7 +35,7 @@ export const MessageFromServer = {};
 export type LastMessage = {
   _id: string;
   content: string | null;
-  messageType: 'text' | 'file';
+  messageType: string;
   fileUrl?: string | null;
   createdAt: string;
 };
@@ -46,16 +46,16 @@ export type Message = {
   sender: string;
   recipient: string;
   content?: string;
-  timestamp: string;
   createdAt: string;
-  expiresAt: string;
+  expiresAt: number | null;
   messageType: string;
   fileUrl: string;
   thumbnailUrl?: string | null;
   uploading: boolean;
-  duration?: number | null;
+  duration?: number;
   showDate?: boolean;
   waveMetering?: number[] | null;
+  seen?: boolean;
 };
 
 export type Contact = {
@@ -70,7 +70,7 @@ export type Conversation = {
   participants: Contact[];
   lastMessageTime?: string | null;
   lastMessage?: LastMessage;
-  lastMessageType?: 'text' | 'file' | null;
+  lastMessageType?: string;
   lastMessageFileUrl?: string | null;
 };
 

@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {StatusBar, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {
   useCameraDevice,
@@ -53,6 +53,14 @@ const ScannerScreen = ({
     codeTypes: ['qr', 'ean-13'],
     onCodeScanned: onCodeScanned,
   });
+
+  useEffect(() => {
+    console.log('✅ Scanner Mounted');
+
+    return () => {
+      console.log('❌ Scanner Unmounted');
+    };
+  }, []);
 
   return (
     <View style={styles.container}>

@@ -34,7 +34,6 @@ const ReusableInput: React.FC<inputProps> = memo(
     icon2,
     onPress,
     onChange,
-    // onSubmitEditing,
   }) => {
     const [isFocused, setIsFocused] = useState(false);
 
@@ -64,7 +63,7 @@ const ReusableInput: React.FC<inputProps> = memo(
           style={[styles.input, passwordAlign]}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          multiline={true}
+          multiline={isPassword ? false : true}
         />
 
         {icon2 && (
@@ -84,7 +83,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     alignSelf: 'center',
     marginVertical: 10,
-    backgroundColor: 'red',
   },
   focused: {
     borderColor: COLORS.Black,
@@ -92,8 +90,12 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
+    // height: '100%',
     paddingHorizontal: 10,
     color: COLORS.Black,
+    // backgroundColor: 'red',
+    // textAlignVertical: 'center',
+    textAlign: 'center',
   },
 });
 

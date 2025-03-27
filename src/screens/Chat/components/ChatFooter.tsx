@@ -4,13 +4,20 @@ import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
 import ReusableInput from '../../../components/ReusableInput';
 import CameraOptions from './CameraOptions';
 
-import {onMicPress, onMicRelease} from '../../../utils/voiceMessage';
+import {
+  getAudioPermissions,
+  onMicPress,
+  onMicRelease,
+} from '../../../utils/voiceMessage';
 import {sendMessage} from '../../../utils/message';
 
 import MicrophoneIcon from '../../../assets/icons/Chat/MicrophoneIcon';
 import CameraIcon from '../../../assets/icons/Chat/CameraIcon';
+
 import {COLORS} from '../../../theme/theme';
+
 import {useAppStore} from '../../../store';
+
 import OnRecord from './MessageComponent/Voice/OnRecord';
 
 const ChatFooter = () => {
@@ -42,8 +49,9 @@ const ChatFooter = () => {
           )}
 
           <TouchableOpacity
-            onPressIn={() => onMicPress()}
-            onPressOut={() => onMicRelease()}>
+            onPressIn={getAudioPermissions}
+            onLongPress={onMicPress}
+            onPressOut={onMicRelease}>
             <MicrophoneIcon width={24} height={24} />
           </TouchableOpacity>
         </>

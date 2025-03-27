@@ -16,13 +16,11 @@ import {MediaStream} from 'react-native-webrtc';
 import {Animated} from 'react-native';
 
 type ScrollSlice = {
-  scrollYRef: React.RefObject<Animated.Value> | null;
-  setScrollRef: (ref: React.RefObject<Animated.Value>) => void;
+  scrollY: Animated.Value;
 };
 
 const scrollSlice: StateCreator<ScrollSlice> = set => ({
-  scrollYRef: null,
-  setScrollRef: ref => set(() => ({scrollYRef: ref})),
+  scrollY: new Animated.Value(0),
 });
 
 type CallState = 'pending' | 'incoming' | 'active';
@@ -144,7 +142,7 @@ type PersonaSlice = {
   avatar: number;
   pin: string;
   id: string;
-  disappearingMessages: string;
+  disappearingMessages: {text: string; value: number | null};
   isUserInfoFetched: boolean;
   setUserInfoStatus: (status: boolean) => void;
   setUserPersona: (data: Partial<PersonaSlice>) => void;
@@ -155,7 +153,7 @@ const createPersonaSlice: StateCreator<PersonaSlice> = set => ({
   avatar: 0,
   pin: '',
   id: '',
-  disappearingMessages: 'None',
+  disappearingMessages: {text: 'None', value: null},
   isUserInfoFetched: false,
   setUserInfoStatus: (status: boolean) => set({isUserInfoFetched: status}),
   setUserPersona: set,
@@ -255,40 +253,29 @@ const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
 });
 
 type MicSlice = {
-  // playing: boolean;
   isRecording: boolean;
   recordSecs: number;
-  recordTime: string;
-  // playTime: string;
-  // currentPositionSec: number;
-  // currentDurationSec: number;
-  // duration: string;
   waveMetering: number[] | null;
 
   playingAudioId: string | null;
   isPlaying: boolean;
 
+  longPressed: boolean;
+
   updateMicSlice: (data: Partial<MicSlice>) => void;
 
   updateMetering: (newData: number) => void;
-  // set(state => ({
-  //   waveMetering: [...state.waveMetering, newData],
-  // })),
 };
 
 const micSlice: StateCreator<MicSlice> = set => ({
-  // playing: false,
   isRecording: false,
   recordSecs: 0,
-  recordTime: '',
-  // playTime: '',
-  // currentDurationSec: 0,
-  // currentPositionSec: 0,
-  // duration: '',
   waveMetering: null,
 
   playingAudioId: null,
   isPlaying: false,
+
+  longPressed: false,
 
   updateMicSlice: set,
 

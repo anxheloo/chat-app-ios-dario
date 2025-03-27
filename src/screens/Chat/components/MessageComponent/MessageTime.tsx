@@ -7,54 +7,51 @@ import {COLORS, FONTSIZE} from '../../../../theme/theme';
 import moment from 'moment';
 import {formatDuration} from '../../../../utils/helpers';
 import {useAppStore} from '../../../../store';
+import {Message} from '../../../../utils/types';
 
 type Props = {
-  createdAt: string;
-  messageId: string;
   isSender: boolean;
-  isDeleted?: boolean;
-  isVoice?: boolean;
-  duration: number | null | undefined;
+  message: Message;
 };
 
-const MessageTime: React.FC<Props> = React.memo(
-  ({createdAt, isSender, isDeleted, duration, isVoice, messageId}) => {
-    const recordSecs = useAppStore(state => state.recordSecs);
-    const playingAudioId = useAppStore(state => state.playingAudioId);
+const MessageTime: React.FC<Props> = React.memo(({isSender, message}) => {
+  const {duration, createdAt, messageType, _id} = message;
 
-    const isCurrentlyPlaying = playingAudioId === messageId;
+  const recordSecs = useAppStore(state => state.recordSecs);
+  const playingAudioId = useAppStore(state => state.playingAudioId);
 
-    return (
-      <View style={[styles.messageDate]}>
-        {isVoice && (
-          <Text
-            style={[
-              styles.text,
-              {
-                color: isDeleted || isSender ? 'white' : COLORS.Black,
-                paddingLeft: 10,
-              },
-            ]}>
-            {formatDuration(
-              isCurrentlyPlaying ? recordSecs : Number(duration),
-            ) ?? '00:00'}
-          </Text>
-        )}
+  const isCurrentlyPlaying = playingAudioId === _id;
+  const isDeleted = messageType === 'deleted';
+
+  return (
+    <View style={[styles.messageDate]}>
+      {messageType === 'audio' && (
         <Text
           style={[
             styles.text,
             {
-              color: isDeleted || isSender ? 'white' : COLORS.Black,
-              flex: 1,
-              textAlign: 'right',
+              color: isSender ? 'white' : COLORS.Black,
+              paddingLeft: 10,
             },
           ]}>
-          {moment(createdAt).format('H:mm')}
+          {formatDuration(isCurrentlyPlaying ? recordSecs : Number(duration)) ??
+            '00:00'}
         </Text>
-      </View>
-    );
-  },
-);
+      )}
+      <Text
+        style={[
+          styles.text,
+          {
+            color: isDeleted || isSender ? 'white' : COLORS.Black,
+            flex: 1,
+            textAlign: 'right',
+          },
+        ]}>
+        {moment(createdAt).format('H:mm')}
+      </Text>
+    </View>
+  );
+});
 
 const styles = StyleSheet.create({
   messageDate: {

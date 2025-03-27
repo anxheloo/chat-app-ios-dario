@@ -58,6 +58,8 @@ const Content = memo(() => {
     [conversations, debouncedSearch],
   );
 
+  console.log('This are searchedConversations', searchedConversations);
+
   if (!conversations.length) {
     return <EmptyChat navigation={navigation} />;
   }

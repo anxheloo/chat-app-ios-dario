@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
   messageText: {
     fontWeight: 300,
     fontSize: FONTSIZE.sm,
-    paddingTop: 10,
+    paddingTop: 5,
     paddingHorizontal: 8,
     flexDirection: 'row',
     flexWrap: 'wrap',

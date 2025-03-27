@@ -1,7 +1,6 @@
-import React, {memo, useCallback} from 'react';
+import React, {memo} from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
 
-import {useNavigation} from '@react-navigation/native';
 import {useAppStore} from '../../../store';
 
 import ReusableText from '../../../components/ReusableText';
@@ -12,19 +11,18 @@ import {COLORS} from '../../../theme/theme';
 import CallIcon from '../../../assets/icons/BottomTabIcons/Call-Icon';
 import VideoIcon from '../../../assets/icons/Chat/VideoIcon';
 
-import {NavigationProps} from '../../../utils/types';
-
 import {handleCall} from '../../../utils/webrtc';
 
+import {useNavigation} from '@react-navigation/native';
+import {NavigationProps} from '../../../utils/types';
+
 const ChatHeader = memo(() => {
-  const navigation = useNavigation<NavigationProps>();
   const {selectedChatData} = useAppStore.getState();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const goBack = useCallback(() => navigation.goBack(), []);
+  const navigation = useNavigation<NavigationProps>();
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={goBack}>
+      <TouchableOpacity onPress={() => navigation.goBack()}>
         <ReusableText fontWeight={500}>Back</ReusableText>
       </TouchableOpacity>
 

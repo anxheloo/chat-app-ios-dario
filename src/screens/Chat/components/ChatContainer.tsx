@@ -39,7 +39,7 @@ const ChatContainer = () => {
     const distanceFromBottom =
       contentSize.height - (layoutMeasurement.height + contentOffset.y);
 
-    // Update the `isNearBottom` flag based on scroll position
+    //   // Update the `isNearBottom` flag based on scroll position
     setTimeout(() => {
       setIsNearBottom(distanceFromBottom < 200);
     }, 200);
@@ -55,13 +55,15 @@ const ChatContainer = () => {
           onRefresh={loadMoreItem}
           ref={flatListRef}
           contentContainerStyle={styles.chatContainer}
-          // removeClippedSubviews
+          removeClippedSubviews={false}
           data={messagesData}
           renderItem={({item}) => <MessageItem message={item} />}
           keyExtractor={item => item._id}
-          onContentSizeChange={() =>
-            isNearBottom && scrollToBottom(0, flatListRef?.current)
-          }
+          onContentSizeChange={() => {
+            if (flatListRef.current && isNearBottom) {
+              scrollToBottom(0, flatListRef.current);
+            }
+          }}
           initialNumToRender={20}
           maxToRenderPerBatch={20}
         />

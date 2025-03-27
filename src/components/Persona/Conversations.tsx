@@ -16,7 +16,6 @@ import {DELETE_CONVERSATION} from '../../api/apis';
 import {apiClient} from '../../api/apiClient';
 
 import {Conversation, NavigationProps} from '../../utils/types';
-import {checkIfImage, checkIfVideo} from '../../utils/helpers';
 import {COLORS, FONTSIZE} from '../../theme/theme';
 
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
@@ -25,6 +24,8 @@ import moment from 'moment';
 import CameraIcon from '../../assets/icons/Chat/CameraIcon';
 import VideoIcon from '../../assets/icons/Chat/VideoIcon';
 import DeleteIcon from '../../assets/icons/Chat/DeleteIcon';
+import MicrophoneIcon from '../../assets/icons/Chat/MicrophoneIcon';
+import {navigate} from '../../navigation/navigationRef';
 
 type ConversationsProps = {
   conversation: Conversation;
@@ -34,7 +35,7 @@ type ConversationsProps = {
 };
 
 const Conversations: React.FC<ConversationsProps> = React.memo(
-  ({conversation, navigation, backgroundColor, cancel}) => {
+  ({conversation, backgroundColor, cancel}) => {
     const {updateFuncChat, id: loggedInUserId} = useAppStore.getState();
     const conversations = useAppStore(state => state.conversations);
     const [loading, setLoading] = useState(false);
@@ -44,6 +45,8 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
         user => user._id !== loggedInUserId,
       );
     }, [conversation.participants, loggedInUserId]);
+
+    console.log('This is conversation: ', conversation);
 
     // Select contact to update chat
     const selectContact = useCallback(() => {
@@ -57,9 +60,9 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
           conversationId: conversation._id,
         },
       });
-      navigation?.navigate('Chat');
+      navigate('Chat');
       cancel?.();
-    }, [conversation._id, recipient, updateFuncChat, navigation, cancel]);
+    }, [conversation._id, recipient, updateFuncChat, cancel]);
 
     const renderLastMessage = useMemo(() => {
       if (!conversation.lastMessage) {
@@ -68,39 +71,45 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
 
       const {messageType, content, fileUrl} = conversation?.lastMessage;
 
-      if (messageType === 'text') {
-        return (
-          <Text style={styles.lastMessage} numberOfLines={1}>
-            {content}
-          </Text>
-        );
-      }
-
-      if (messageType === 'file' && fileUrl) {
-        if (checkIfImage(fileUrl)) {
+      switch (messageType) {
+        case 'text':
+          return (
+            <View style={styles.lastMessage}>
+              <Text style={styles.lastMessage} numberOfLines={1}>
+                {content}
+              </Text>
+            </View>
+          );
+        case 'image':
           return (
             <View style={styles.lastMessage}>
               <CameraIcon width={12} height={12} />
               <Text style={styles.lastMessage}>Image</Text>
             </View>
           );
-        } else if (checkIfVideo(fileUrl)) {
+        case 'video':
           return (
             <View style={styles.lastMessage}>
               <VideoIcon width={15} height={15} />
               <Text style={styles.lastMessage}>Video</Text>
             </View>
           );
-        } else {
+        case 'audio':
+          return (
+            <View style={styles.lastMessage}>
+              <MicrophoneIcon width={13} height={13} />
+              <Text style={styles.lastMessage}>Voice message</Text>
+            </View>
+          );
+        case 'file':
           return (
             <View style={styles.lastMessage}>
               <Text style={styles.lastMessage}>File</Text>
             </View>
           );
-        }
+        default:
+          return null;
       }
-
-      return null;
     }, [conversation.lastMessage]);
 
     const deleteConversation = useCallback(async () => {

@@ -4,6 +4,7 @@ import {Image, StyleSheet, View} from 'react-native';
 import Video from 'react-native-video';
 import {RootStackParamList} from '../../utils/types';
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
+import {HOST} from '../../api/apis';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'FullScreenMedia'>;
 
@@ -22,7 +23,7 @@ const FullScreenMedia: React.FC<Props> = ({route, navigation}) => {
 
       {type === 'image' ? (
         <Image
-          source={{uri: fileUrl}}
+          source={{uri: `${HOST}/${fileUrl}`}}
           style={styles.media}
           resizeMode="contain"
         />

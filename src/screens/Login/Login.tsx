@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -7,8 +7,6 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-
-import {NavigationProps} from '../../utils/types';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -21,15 +19,11 @@ import ReusableButton from '../../components/ReusableButton';
 import useLogin from '../../utils/hooks/useLogin';
 import useCheckToken from '../../utils/hooks/useCheckToken';
 
-type LoginScreenProps = {
-  navigation: NavigationProps;
-};
+import {navigate} from '../../navigation/navigationRef';
 
-const Login: React.FC<LoginScreenProps> = ({navigation}) => {
-  const [username, setUsername] = useState('');
-  const [pin, setPin] = useState('');
-  const onPress = useLogin(username, pin, setUsername, setPin, navigation);
-  useCheckToken(navigation);
+const Login = () => {
+  const {onPress, username, pin, setUsername, setPin} = useLogin();
+  useCheckToken();
 
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.safeAreaView}>
@@ -66,7 +60,7 @@ const Login: React.FC<LoginScreenProps> = ({navigation}) => {
                 />
 
                 <ReusableText
-                  onPress={() => navigation.navigate('CreatePersona')}
+                  onPress={() => navigate('CreatePersona')}
                   textDecorationLine="underline"
                   fontWeight={FONTWEIGHT[300]}
                   color={COLORS.Black}>

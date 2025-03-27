@@ -1,19 +1,20 @@
+import {useState} from 'react';
 import {Alert} from 'react-native';
+
 import {useAppStore} from '../../store';
+import {saveToken} from '../TokenStorage';
+
 import {apiClient} from '../../api/apiClient';
 import {LOGIN_ROUTE} from '../../api/apis';
-import {saveToken} from '../TokenStorage';
-import {NavigationProps} from '../types';
 
-const useLogin = (
-  username: string,
-  pin: string,
-  setUsername: (text: string) => void,
-  setPin: (text: string) => void,
-  navigation: NavigationProps,
-) => {
+import {replace} from '../../navigation/navigationRef';
+
+const useLogin = () => {
   const updateKeys = useAppStore(state => state.updateKeys);
   const setToken = useAppStore(state => state.setToken);
+
+  const [username, setUsername] = useState('');
+  const [pin, setPin] = useState('');
 
   const validateInput = (): boolean => {
     if (!username || !pin) {
@@ -45,7 +46,7 @@ const useLogin = (
         await saveToken(response.data.token);
         setToken(response.data.token);
 
-        navigation?.replace('BottomTabNavigation', {screen: 'Messages'});
+        replace('BottomTabNavigation');
       }
     } catch (error: any) {
       console.log('This is error inside Login:', error);
@@ -67,7 +68,7 @@ const useLogin = (
     }
   };
 
-  return onPress;
+  return {onPress, username, pin, setUsername, setPin};
 };
 
 export default useLogin;

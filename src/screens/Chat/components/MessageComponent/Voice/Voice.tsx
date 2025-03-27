@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
   ActivityIndicator,
   StyleSheet,
@@ -6,13 +6,16 @@ import {
   View,
 } from 'react-native';
 
+import {useAppStore} from '../../../../../store';
+
+import {onPlayPause} from '../../../../../utils/voiceMessage';
 import {Message} from '../../../../../utils/types';
 
-import PlayIcon from '../../../../../assets/icons/Chat/PlayVoice.svg';
-import PauseIcon from '../../../../../assets/icons/Chat/PauseVoice.svg';
 import MessageHOC from '../MessageHOC';
-import {useAppStore} from '../../../../../store';
-import {onPlayPause} from '../../../../../utils/voiceMessage';
+import AudioWave from './AudioWave';
+
+import Play from '../../../../../assets/icons/Chat/Play';
+import Pause from '../../../../../assets/icons/Chat/Pause';
 
 type Props = {
   message: Message;
@@ -20,7 +23,8 @@ type Props = {
 };
 
 const Voice: React.FC<Props> = ({message, isSender}) => {
-  const {playingAudioId, isPlaying} = useAppStore(state => state);
+  const isPlaying = useAppStore(state => state.isPlaying);
+  const playingAudioId = useAppStore(state => state.playingAudioId);
 
   const isCurrentlyPlaying = playingAudioId === message._id && isPlaying;
 
@@ -34,10 +38,20 @@ const Voice: React.FC<Props> = ({message, isSender}) => {
       ) : (
         <TouchableOpacity
           onPress={() => onPlayPause(message._id, message.fileUrl)}>
-          {isCurrentlyPlaying ? <PauseIcon /> : <PlayIcon />}
+          {isCurrentlyPlaying ? (
+            <Pause color={isSender ? 'white' : 'black'} />
+          ) : (
+            <Play color={isSender ? 'white' : 'black'} />
+          )}
         </TouchableOpacity>
       )}
-      <View style={styles.wave} />
+      <AudioWave
+        waveMetering={message.waveMetering}
+        isSender={isSender}
+        duration={message.duration}
+        id={message._id}
+        fileUrl={message.fileUrl}
+      />
     </View>
   );
 };
@@ -47,6 +61,7 @@ const styles = StyleSheet.create({
     height: 55,
     width: 220,
     flexDirection: 'row',
+    gap: 5,
     alignItems: 'center',
     paddingHorizontal: 10,
   },

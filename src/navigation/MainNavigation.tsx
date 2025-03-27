@@ -26,7 +26,7 @@ const MainNavigation = () => {
       <Stack.Navigator
         id={undefined}
         screenOptions={{
-          animation: 'fade',
+          animation: 'slide_from_right',
         }}>
         <Stack.Screen
           name="Login"
@@ -44,6 +44,11 @@ const MainNavigation = () => {
           options={{headerShown: false}}
         />
         <Stack.Screen
+          name="BottomTabNavigation"
+          component={BottomTabNavigation}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
           name="Chat"
           component={Chat}
           options={{headerShown: false}}
@@ -51,11 +56,6 @@ const MainNavigation = () => {
         <Stack.Screen
           name="FullScreenMedia"
           component={FullScreenMedia}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="BottomTabNavigation"
-          component={BottomTabNavigation}
           options={{headerShown: false}}
         />
         <Stack.Screen

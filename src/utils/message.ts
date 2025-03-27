@@ -7,7 +7,7 @@ import {useAppStore} from '../store';
 import {Contact, Conversation, Message} from './types';
 import {ObjectId} from 'bson';
 
-import {HOST, UPLOAD_FILE} from '../api/apis';
+import {UPLOAD_FILE} from '../api/apis';
 import {apiClient} from '../api/apiClient';
 import {checkPermissionStatus} from './helpers';
 import {permission} from './permissions';
@@ -64,6 +64,7 @@ export const handleReceiveMessage = (message: any) => {
       ...current.filter(msg => msg._id !== message._id),
       {
         ...message,
+        seen: true,
         uploading: false,
         recipient: message.recipient._id,
         sender: message.sender._id,
@@ -107,6 +108,12 @@ export const handleMessageDeleted = ({messageId}: {messageId: string}) => {
 
 export const handleConversationUpdated = (conversation: Conversation) => {
   const {conversations, updateFuncChat} = useAppStore.getState();
+
+  console.log(
+    'This is conversation inside handleConversationUpdated:',
+    conversation,
+  );
+
   const existingConversations = conversations.map(item => {
     if (item._id === conversation._id) {
       return {
@@ -244,11 +251,12 @@ export const sendMessage = async (
     messages: [
       {
         sender: id,
-        content: message,
+        content: message.trim(),
         recipient: selectedChatData?._id,
         messageType: 'text',
         fileUrl: undefined,
-        expiresAt: disappearingMessages,
+        expiresAt: disappearingMessages.value,
+        conversationId: selectedChatData?.conversationId || '',
       },
     ],
   });
@@ -302,19 +310,19 @@ export const handleCameraUpload = async (
 
         return {
           _id: tempId,
-          conversationId: selectedChatData?.conversationId || '',
+          conversationId: selectedChatData?.conversationId,
           sender: id,
           recipient: selectedChatData?._id || '',
-          timestamp: new Date().toISOString(),
           createdAt: new Date().toISOString(),
           messageType: isVideo ? 'video' : 'image',
           fileUrl: media.uri,
           // fileUrl: compressedUri,
           // thumbnailUrl: thumbnail, // Save thumbnail
           thumbnailUrl: null, // Save thumbnail
-          expiresAt: disappearingMessages,
+          expiresAt: disappearingMessages.value,
           uploading: true,
           duration: isVideo ? media.duration : null,
+          seen: false,
         };
       }),
     );
@@ -374,7 +382,8 @@ export const postMediaMessages = async (
         (tempMsg: Message, index: number) => ({
           ...tempMsg,
           uploading: false,
-          fileUrl: `${HOST}/${uploadedFilePaths[index]}`,
+          // fileUrl: `${HOST}/${uploadedFilePaths[index]}`,
+          fileUrl: uploadedFilePaths[index],
         }),
       );
 

@@ -18,6 +18,7 @@ import {BORDERRADIUS} from '../../../../theme/theme';
 
 import PlayIcon from '../../../../assets/icons/messages/PlayIcon';
 import MessageHOC from './MessageHOC';
+import {HOST} from '../../../../api/apis';
 
 type VideoProps = {
   message: Message;
@@ -49,7 +50,10 @@ const VideoComponent: React.FC<VideoProps> = memo(({message, isSender}) => {
       ) : (
         <Video
           fullscreenOrientation="all"
-          source={{uri: message.fileUrl}}
+          source={{
+            // uri: message.fileUrl
+            uri: `${HOST}/${message.fileUrl}`,
+          }}
           style={styles.video}
           resizeMode="cover"
           paused={true}

@@ -33,14 +33,7 @@ const MessageHOC = (Component: React.FC<Props>) => {
         <Component message={message} isSender={isSender}>
           {children}
         </Component>
-        <MessageTime
-          messageId={message._id}
-          duration={message.duration}
-          isVoice={message.messageType === 'audio'}
-          createdAt={message.createdAt}
-          isSender={isSender}
-          isDeleted={isDeleted}
-        />
+        <MessageTime message={message} isSender={isSender} />
       </View>
     );
   };

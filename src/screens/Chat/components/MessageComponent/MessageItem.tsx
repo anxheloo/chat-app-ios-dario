@@ -1,5 +1,5 @@
-import React, {useCallback, useMemo} from 'react';
-import {StyleSheet, Text, TouchableOpacity} from 'react-native';
+import React, {useCallback} from 'react';
+import {StyleSheet, TouchableOpacity} from 'react-native';
 
 import {Message} from '../../../../utils/types';
 
@@ -13,9 +13,9 @@ import Voice from './Voice/Voice';
 import TextMsg from './TextMsg';
 
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
-import moment from 'moment';
 
 import DeleteIcon from '../../../../assets/icons/Chat/DeleteIcon';
+import DayDate from './DayDate';
 
 type MessageItemProps = {
   message: Message;
@@ -62,7 +62,7 @@ const MessageItem: React.FC<MessageItemProps> = React.memo(({message}) => {
   );
 
   // Render delete icon
-  const renderRightActions = useMemo(() => {
+  const renderRightActions = () => {
     return (
       <TouchableOpacity
         onPress={showDeleteModal}
@@ -70,32 +70,21 @@ const MessageItem: React.FC<MessageItemProps> = React.memo(({message}) => {
         <DeleteIcon width={17.5} height={21.5} color={'red'} />
       </TouchableOpacity>
     );
-  }, [showDeleteModal]);
+  };
 
   return (
     <>
-      {message.showDate && (
-        <Text style={styles.dateLabel}>
-          {moment(message.timestamp).calendar(null, {
-            sameDay: '[Today]',
-            nextDay: '[Tomorrow]',
-            nextWeek: 'dddd',
-            lastDay: '[Yesterday]',
-            lastWeek: '[Last] dddd',
-            sameElse: 'MMM Do, YYYY',
-          })}
-        </Text>
-      )}
-
+      <DayDate showDate={message.showDate} createdAt={message.createdAt} />
       {isSender && message.messageType !== 'deleted' ? (
         <Swipeable
-          renderRightActions={() => renderRightActions}
+          renderRightActions={renderRightActions}
           overshootRight={false}>
           {renderMessage(isSender)}
         </Swipeable>
       ) : (
         renderMessage(isSender)
       )}
+      {/* {renderMessage(isSender)} */}
     </>
   );
 });
@@ -130,13 +119,6 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-
-  dateLabel: {
-    textAlign: 'center',
-    color: 'gray',
-    marginVertical: 10,
-    fontSize: 12,
   },
 });
 

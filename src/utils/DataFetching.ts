@@ -12,6 +12,7 @@ import {
 import {useAppStore} from '../store';
 import {saveToken} from './TokenStorage';
 import {reset} from '../navigation/navigationRef';
+import {logout} from './helpers';
 
 export const getUserInfo = async () => {
   const {
@@ -48,6 +49,7 @@ export const getUserInfo = async () => {
       conversationsRes.status === 200 &&
       callsRes.status === 200
     ) {
+      console.log('Status 200 of userInfo');
       setUserInfoStatus(true);
       setUserPersona(userRes.data);
       updateFuncChat({
@@ -80,6 +82,7 @@ export const getUserInfo = async () => {
       'Error',
       error.response?.data?.message || 'Failed to get user datas.',
     );
+    logout();
   } finally {
     updateKeys({loading: false});
   }

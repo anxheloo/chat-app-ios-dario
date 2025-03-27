@@ -10,6 +10,8 @@ const useMessages = (flatListRef: any) => {
   );
   const selectedChatData = useAppStore(state => state.selectedChatData);
 
+  console.log('This are selectedChatData', selectedChatData);
+
   const [pagination, setPagination] = useState({
     isLoading: false,
     hasMore: true,
@@ -18,8 +20,17 @@ const useMessages = (flatListRef: any) => {
 
   const getAllMessages = async () => {
     const {isLoading, hasMore, page} = pagination;
+    console.log(
+      'this is: selectedChatData?.conversationId:',
+      !selectedChatData?.conversationId,
+    );
 
     if (isLoading || !hasMore) {
+      return;
+    }
+
+    if (!selectedChatData?.conversationId) {
+      console.warn('No conversation ID found, skipping fetch.');
       return;
     }
 
@@ -27,7 +38,7 @@ const useMessages = (flatListRef: any) => {
 
     try {
       const response = await apiClient.post(GET_ALL_MESSAGES, {
-        id: selectedChatData?._id,
+        conversationId: selectedChatData?.conversationId,
         page,
       });
 
@@ -44,16 +55,11 @@ const useMessages = (flatListRef: any) => {
 
           setPagination(prev => ({
             ...prev,
-            page: prev.page + 1,
+            // page: prev.page + 1,
+            page: messages.length > 0 ? prev.page + 1 : prev.page,
             hasMore: updatedHasMore,
           }));
         }
-        // else {
-        //   setPagination(prev => ({
-        //     ...prev,
-        //     hasMore: false,
-        //   }));
-        // }
       }
     } catch (error) {
       Alert.alert('Error', 'Failed to get messages', [
@@ -90,7 +96,7 @@ const useMessages = (flatListRef: any) => {
     }
   }, []);
 
-  // Scroll to end on mount
+  // // // Scroll to end on mount
   useEffect(() => {
     scrollToBottom(1000, flatListRef);
   }, [flatListRef, scrollToBottom]);

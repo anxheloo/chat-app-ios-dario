@@ -14,10 +14,14 @@ import ChatFooter from './components/ChatFooter';
 import {getAudioPlayer} from '../../utils/voiceMessage';
 
 const Chat = () => {
-  const {updateFuncChat, updateMicSlice} = useAppStore.getState();
+  const updateMicSlice = useAppStore(state => state.updateMicSlice);
+  const updateFuncChat = useAppStore(state => state.updateFuncChat);
 
   useEffect(() => {
+    console.log('✅ ChatContainer Mounted');
+
     return () => {
+      console.log('❌ ChatContainer Unmounted');
       updateFuncChat({selectedChatMessages: [], selectedChatData: null});
 
       // Stop the audio player if it's still playing
@@ -28,10 +32,10 @@ const Chat = () => {
         playingAudioId: null,
         isPlaying: false,
         recordSecs: 0,
-        recordTime: '',
       });
     };
-  }, [updateFuncChat, updateMicSlice]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <KeyboardAvoidingView

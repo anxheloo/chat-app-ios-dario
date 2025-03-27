@@ -12,6 +12,7 @@ import {BORDERRADIUS} from '../../../../theme/theme';
 
 import {Message, NavigationProps} from '../../../../utils/types';
 import MessageHOC from './MessageHOC';
+import {HOST} from '../../../../api/apis';
 
 type ImageProps = {
   message: Message;
@@ -47,7 +48,7 @@ const ImageComponent: React.FC<ImageProps> = ({message, isSender}) => {
           height={150}
           // source={{uri: `data:image/png;base64,${message.fileUrl}`}}
           source={{
-            uri: message.fileUrl,
+            uri: `${HOST}/${message.fileUrl}`,
           }}
           style={styles.image}
           resizeMode="cover"

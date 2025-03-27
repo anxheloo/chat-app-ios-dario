@@ -47,11 +47,11 @@ export const checkIfVoice = (fileUrl: string): boolean => {
 
 // Show the general date in chat for messages, like today, yesterday and so on
 export const preprocessMessages = (messages: Message[]) => {
-  let lastMessageDate: any = null;
+  let day: any = null;
   return messages.map(message => {
     const currentMessageDate = moment(message.createdAt).format('YYYY-MM-DD');
-    const showDate = currentMessageDate !== lastMessageDate;
-    lastMessageDate = currentMessageDate;
+    const showDate = currentMessageDate !== day;
+    day = currentMessageDate;
     return {...message, showDate};
   });
 };

@@ -21,8 +21,10 @@
 <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
 <!-- Storage and Media Permissions for API < 30 -->
-<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+<!-- <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> -->
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29"/>
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="29"/>
 
 <!-- Manage Storage for API ≥ 30 (Only if required) -->
 <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />

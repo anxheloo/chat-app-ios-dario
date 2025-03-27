@@ -1,11 +1,12 @@
-import React, {useContext} from 'react';
-import {Animated, StyleSheet, View} from 'react-native';
-import {AnimationContext} from '../store/HeaderAnimationContext';
+import React from 'react';
+import {Animated, StyleSheet} from 'react-native';
 import {COLORS} from '../theme/theme';
+import {useAppStore} from '../store';
 
 const HorizontalLine = () => {
-  const animatedValue = useContext(AnimationContext);
-  const height = animatedValue?.interpolate({
+  const scrollY = useAppStore(state => state.scrollY);
+  // const animatedValue = useContext(AnimationContext);
+  const height = scrollY?.interpolate({
     inputRange: [0, 20],
     outputRange: [0, 1],
     extrapolate: 'clamp',

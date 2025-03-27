@@ -31,8 +31,10 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = memo(({cancel}) => {
   const setUserPersona = useAppStore(state => state.setUserPersona);
   const disappearingMessages = useAppStore(state => state.disappearingMessages);
 
-  const [selectableOption, setSelectableOption] =
-    useState<string>(disappearingMessages);
+  const [selectableOption, setSelectableOption] = useState<{
+    text: string;
+    value: number | null;
+  }>(disappearingMessages);
   const [loading, setIsLoading] = useState<boolean>(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -40,14 +42,14 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = memo(({cancel}) => {
   const dropdownPadding = useRef(new Animated.Value(0)).current;
 
   const options = [
-    'None',
-    '30 seconds',
-    '5 minutes',
-    '30 minutes',
-    '1 hour',
-    '8 hours',
-    '1 day',
-    '1 week',
+    {text: 'None', value: null},
+    {text: '30 seconds', value: 30 * 1000},
+    {text: '5 minutes', value: 5 * 60 * 1000},
+    {text: '30 minutes', value: 30 * 60 * 1000},
+    {text: '1 hour', value: 60 * 60 * 1000},
+    {text: '8 hours', value: 8 * 60 * 60 * 1000},
+    {text: '1 day', value: 24 * 60 * 60 * 1000},
+    {text: '1 week', value: 7 * 24 * 60 * 60 * 1000},
   ];
 
   const toggleDropdown = useCallback(() => {
@@ -110,6 +112,9 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = memo(({cancel}) => {
     }
   }, [cancel, selectableOption, setUserPersona, toggleDropdown]);
 
+  console.log('This is disappearingMessages:', disappearingMessages);
+  console.log('This is selectableOption:', selectableOption);
+
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.contentContainer}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -154,7 +159,7 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = memo(({cancel}) => {
                 fontWeight={FONTWEIGHT[300]}
                 fontSize={FONTSIZE.md}
                 style={{flex: 1}}>
-                {disappearingMessages}
+                {disappearingMessages.text}
               </ReusableText>
               <View
                 style={{
@@ -172,20 +177,20 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = memo(({cancel}) => {
               {isExpanded &&
                 options.map(item => (
                   <TouchableOpacity
-                    key={item}
+                    key={item.value}
                     style={styles.option}
                     onPress={() => {
-                      setSelectableOption(item);
+                      setSelectableOption({text: item.text, value: item.value});
                     }}>
                     <View style={styles.circle}>
-                      {selectableOption === item && (
+                      {selectableOption.value === item.value && (
                         <View style={styles.selectableCircle} />
                       )}
                     </View>
                     <ReusableText
                       fontWeight={FONTWEIGHT[300]}
                       fontSize={FONTSIZE.md}>
-                      {item}
+                      {item.text}
                     </ReusableText>
                   </TouchableOpacity>
                 ))}
