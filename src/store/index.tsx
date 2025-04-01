@@ -23,7 +23,7 @@ const scrollSlice: StateCreator<ScrollSlice> = set => ({
   scrollY: new Animated.Value(0),
 });
 
-type CallState = 'pending' | 'incoming' | 'active';
+type CallState = 'pending' | 'incoming' | 'active' | 'busy';
 
 type WebRTCSlice = {
   calls: Call[];

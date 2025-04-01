@@ -256,6 +256,16 @@ export const permissions = async (
   return status;
 };
 
+export const busyCall = async ({callState}: {callState: 'busy'}) => {
+  const {updateWebRTCState} = useAppStore.getState();
+
+  updateWebRTCState({callState});
+  await callUpdate('missed');
+
+  closePeerConnection();
+  goBack();
+};
+
 // ====================================================================
 // CALLER
 // ====================================================================
@@ -437,7 +447,17 @@ export const incomingCall = async ({
   callType,
   currentCall,
 }: any) => {
-  const {updateWebRTCState, updateCalls} = useAppStore.getState();
+  const {updateWebRTCState, updateCalls, callState, socket} =
+    useAppStore.getState();
+
+  if (callState === 'active' || callState === 'incoming') {
+    updateCalls(currentCalls => [
+      {...currentCall, callStatus: 'missed'},
+      ...currentCalls.filter(c => c && c?._id !== currentCall?.id),
+    ]);
+    socket?.emit('busyCall', {to: caller?._id, callState: 'busy'});
+    return;
+  }
 
   try {
     updateCalls(currentCalls => [

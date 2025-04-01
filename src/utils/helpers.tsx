@@ -144,43 +144,43 @@ export const logout = async () => {
   updateKeys({loading: true});
 
   try {
-    const response = await apiClient.post(LOGOUT_ROUTE);
+    // const response = await apiClient.post(LOGOUT_ROUTE);
 
-    if (response.status === 200) {
-      console.log('Logout success');
-      // remove token , disconnect socket
-      await removeToken();
-      disconnectSocket();
+    // if (response.status === 200) {
+    console.log('Logout success');
+    // remove token , disconnect socket
+    await removeToken();
+    disconnectSocket();
 
-      // reset user persona for logout/login app state
-      setUserPersona({
-        username: '',
-        pin: '',
-        avatar: 0,
-        id: '',
-      });
+    // reset user persona for logout/login app state
+    setUserPersona({
+      username: '',
+      pin: '',
+      avatar: 0,
+      id: '',
+    });
 
-      // user info needes to be fetched again by the new user if app state stays active during logout/login
-      setUserInfoStatus(false);
+    // user info needes to be fetched again by the new user if app state stays active during logout/login
+    setUserInfoStatus(false);
 
-      // conversations, friends, paginations
-      updateFuncChat({
-        conversations: [],
-        friends: [],
-        conversationPagination: {page: 0, hasMore: true, isLoading: false},
-        friendsPagination: {page: 0, hasMore: true, isLoading: false},
-      });
+    // conversations, friends, paginations
+    updateFuncChat({
+      conversations: [],
+      friends: [],
+      conversationPagination: {page: 0, hasMore: true, isLoading: false},
+      friendsPagination: {page: 0, hasMore: true, isLoading: false},
+    });
 
-      // calls
-      updateCalls(() => []);
-      setCallsPagination({
-        page: 0,
-        hasMore: true,
-        isLoading: false,
-      });
+    // calls
+    updateCalls(() => []);
+    setCallsPagination({
+      page: 0,
+      hasMore: true,
+      isLoading: false,
+    });
 
-      reset('Login');
-    }
+    reset('Login');
+    // }
   } catch (error) {
     console.error('Error logout:', error);
     Alert.alert('Error', 'Failed to logout');

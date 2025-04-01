@@ -43,6 +43,8 @@ const BtnGroup = memo(() => {
           ? timer
           : isIncoming
           ? `Incoming ${callType} call...`
+          : callState === 'busy'
+          ? 'User is busy...'
           : 'Calling...'}
       </ReusableText>
 
