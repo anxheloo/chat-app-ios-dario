@@ -30,7 +30,7 @@ const MessageHOC = (Component: React.FC<Props>) => {
           },
           isSender ? styles.senderStyles : styles.recipientStyles,
         ]}>
-        <Component message={message} isSender={isSender}>
+        <Component message={message} isSender={isSender} isDeleted={isDeleted}>
           {children}
         </Component>
         <MessageTime message={message} isSender={isSender} />

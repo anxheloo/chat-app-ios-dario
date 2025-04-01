@@ -23,6 +23,7 @@ import {HOST} from '../../../../api/apis';
 type VideoProps = {
   message: Message;
   isSender: boolean;
+  isDeleted?: boolean;
 };
 
 const VideoComponent: React.FC<VideoProps> = memo(({message, isSender}) => {

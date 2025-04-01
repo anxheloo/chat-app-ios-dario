@@ -56,9 +56,12 @@ export const handleReceiveMessage = (message: any) => {
     conversations: tempConversations,
   });
 
+  // sortConversations();
+
   if (
     selectedChatData?._id === message.recipient._id ||
-    selectedChatData?._id === message.sender._id
+    selectedChatData?._id === message.sender._id ||
+    selectedChatData?.conversationId === message.conversationId
   ) {
     updateSelectedChatMessages(current => [
       ...current.filter(msg => msg._id !== message._id),
@@ -89,7 +92,8 @@ export const handleMessageDeleted = ({messageId}: {messageId: string}) => {
   if (
     messageToDelete &&
     (messageToDelete.sender === selectedChatData?._id ||
-      messageToDelete.recipient === selectedChatData?._id)
+      messageToDelete.recipient === selectedChatData?._id ||
+      selectedChatData?.conversationId === messageToDelete.conversationId)
   ) {
     updateFuncChat({
       selectedChatMessages: selectedChatMessages.map(msg => {
@@ -369,7 +373,6 @@ export const postMediaMessages = async (
     const uploadResponse = await apiClient.post(UPLOAD_FILE, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
-        // Accept: 'application/json',
       },
     });
 
@@ -382,7 +385,6 @@ export const postMediaMessages = async (
         (tempMsg: Message, index: number) => ({
           ...tempMsg,
           uploading: false,
-          // fileUrl: `${HOST}/${uploadedFilePaths[index]}`,
           fileUrl: uploadedFilePaths[index],
         }),
       );

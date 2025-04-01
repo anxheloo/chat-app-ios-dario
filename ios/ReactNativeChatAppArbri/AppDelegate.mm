@@ -2,8 +2,9 @@
 #import <React/RCTBundleURLProvider.h>
 #import <CallKit/CallKit.h>
 #import <WebRTC/RTCAudioSession.h>
+#import "RNSplashScreen.h"
 
-@interface AppDelegate () <CXProviderDelegate> // ✅ Declare CallKit Delegate
+@interface AppDelegate () <CXProviderDelegate> 
 @end
 
 @implementation AppDelegate

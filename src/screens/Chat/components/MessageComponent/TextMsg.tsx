@@ -17,7 +17,8 @@ const TextMsg: React.FC<TextMsgProps> = ({isSender, children, isDeleted}) => {
         styles.messageText,
         // eslint-disable-next-line react-native/no-inline-styles
         {
-          color: isDeleted || isSender ? 'white' : COLORS.Black,
+          // color: isDeleted || isSender ? 'white' : COLORS.Black,
+          color: isSender || isDeleted ? 'white' : COLORS.Black,
         },
       ]}>
       {children}

@@ -20,6 +20,7 @@ import Pause from '../../../../../assets/icons/Chat/Pause';
 type Props = {
   message: Message;
   isSender: boolean;
+  isDeleted?: boolean;
 };
 
 const Voice: React.FC<Props> = ({message, isSender}) => {

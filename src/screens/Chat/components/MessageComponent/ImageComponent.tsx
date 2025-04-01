@@ -17,6 +17,7 @@ import {HOST} from '../../../../api/apis';
 type ImageProps = {
   message: Message;
   isSender: boolean;
+  isDeleted?: boolean;
 };
 
 const ImageComponent: React.FC<ImageProps> = ({message, isSender}) => {

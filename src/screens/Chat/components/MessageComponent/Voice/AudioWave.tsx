@@ -1,5 +1,5 @@
 import React, {useEffect, useRef} from 'react';
-import {View, StyleSheet, PanResponder} from 'react-native';
+import {View, StyleSheet, PanResponder, Platform} from 'react-native';
 import {useAppStore} from '../../../../../store';
 // import {getAudioPlayer, onPlayPause} from '../../../../../utils/voiceMessage';
 // import {Gesture, GestureDetector} from 'react-native-gesture-handler';
@@ -8,6 +8,7 @@ import Animated, {
   useSharedValue,
   withTiming,
   useAnimatedStyle,
+  cancelAnimation,
 } from 'react-native-reanimated';
 // import 'react-native-reanimated';
 
@@ -84,13 +85,11 @@ const AudioWave: React.FC<Props> = ({
   }));
 
   useEffect(() => {
+    // const remainingTime = Number(duration) - recordSecs;
+    // const remainingTime = Math.round(Number(duration)) - Math.round(recordSecs);
+
     if (id === playingAudioId) {
       console.log('Ready to play');
-
-      const remainingTime =
-        Math.round((duration ?? 0) * 1000) -
-        Math.round(recordSecs * 1000) +
-        200;
 
       if (isPlaying) {
         //   Animated.timing(progress, {
@@ -102,34 +101,36 @@ const AudioWave: React.FC<Props> = ({
         // } else {
         //   progress.stopAnimation();
         // }
+
         progress.value = withTiming(SLIDER_MAX_POSITION, {
-          duration: remainingTime,
+          duration: Math.round(Number(duration)) - Math.round(recordSecs),
           easing: Easing.linear,
         });
       } else {
-        progress.value = progress.value;
+        cancelAnimation(progress);
       }
     } else {
       // progress.stopAnimation();
       // progress.setValue(0);
+      cancelAnimation(progress);
       progress.value = 0;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [duration, id, isPlaying, playingAudioId]);
+  }, [id, isPlaying, playingAudioId]);
 
-  useEffect(() => {
-    return () => {
-      progress.value = 0; // Reset animation when unmounting
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     progress.value = 0; // Reset animation when unmounting
+  //   };
+  // }, []);
 
   const positiveDecibels = waveMetering?.map(value => Math.max(3, 70 + value));
   const fillEmptySpace = new Array(TOTAL_BARS).fill(3);
 
   if (positiveDecibels) {
-    const startIndex = Math.max(0, 33 - positiveDecibels.length);
+    const startIndex = Math.max(0, 32 - positiveDecibels.length);
     positiveDecibels?.forEach((height, index) => {
-      fillEmptySpace[startIndex + index] = Math.floor(height);
+      fillEmptySpace[startIndex + index] = Math.round(height);
     });
   }
 
@@ -150,7 +151,14 @@ const AudioWave: React.FC<Props> = ({
       ))}
 
       {/* <GestureDetector gesture={panGesture}> */}
-      <Animated.View style={[styles.slider, animatedStyle]} />
+      <Animated.View
+        style={[
+          styles.slider,
+          // eslint-disable-next-line react-native/no-inline-styles
+          {backgroundColor: isSender ? 'white' : 'black'},
+          animatedStyle,
+        ]}
+      />
       {/* </GestureDetector> */}
     </View>
   );
@@ -183,7 +191,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 13,
     height: 13,
-    backgroundColor: 'white',
     borderRadius: 50,
   },
 });

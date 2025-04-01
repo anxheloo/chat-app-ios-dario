@@ -34,8 +34,11 @@ const MessageTime: React.FC<Props> = React.memo(({isSender, message}) => {
               paddingLeft: 10,
             },
           ]}>
-          {formatDuration(isCurrentlyPlaying ? recordSecs : Number(duration)) ??
-            '00:00'}
+          {formatDuration(
+            isCurrentlyPlaying
+              ? Math.round(recordSecs / 1000)
+              : Math.round(Number(duration) / 1000),
+          ) ?? '00:00'}
         </Text>
       )}
       <Text

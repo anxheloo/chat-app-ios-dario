@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {StatusBar, StyleSheet} from 'react-native';
 
 import {SafeAreaProvider} from 'react-native-safe-area-context';
@@ -10,7 +10,13 @@ import InternetPopup from './src/components/Internet/InternetPopup';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import CustomBottomSheetModal from './src/components/BottomSheet/CustomBottomSheetModal';
 
+import SplashScreen from 'react-native-splash-screen';
+
 const App = () => {
+  useEffect(() => {
+    SplashScreen.hide();
+  }, []);
+
   return (
     <GestureHandlerRootView style={styles.gestureHandlerContainer}>
       <BottomSheetModalProvider>

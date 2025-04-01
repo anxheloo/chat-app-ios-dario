@@ -48,10 +48,7 @@ const ChatFooter = () => {
             </TouchableOpacity>
           )}
 
-          <TouchableOpacity
-            onPressIn={getAudioPermissions}
-            onLongPress={onMicPress}
-            onPressOut={onMicRelease}>
+          <TouchableOpacity onLongPress={onMicPress} onPressOut={onMicRelease}>
             <MicrophoneIcon width={24} height={24} />
           </TouchableOpacity>
         </>

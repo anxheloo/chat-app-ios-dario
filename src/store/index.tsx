@@ -253,29 +253,24 @@ const chatSlice: StateCreator<ChatSlice> = (set, get) => ({
 });
 
 type MicSlice = {
+  playingAudioId: string | null;
+  isPlaying: boolean;
   isRecording: boolean;
   recordSecs: number;
   waveMetering: number[] | null;
-
-  playingAudioId: string | null;
-  isPlaying: boolean;
-
-  longPressed: boolean;
+  micPermission: boolean;
 
   updateMicSlice: (data: Partial<MicSlice>) => void;
-
   updateMetering: (newData: number) => void;
 };
 
 const micSlice: StateCreator<MicSlice> = set => ({
+  playingAudioId: null,
+  isPlaying: false,
   isRecording: false,
   recordSecs: 0,
   waveMetering: null,
-
-  playingAudioId: null,
-  isPlaying: false,
-
-  longPressed: false,
+  micPermission: false,
 
   updateMicSlice: set,
 

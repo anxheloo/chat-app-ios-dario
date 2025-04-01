@@ -6,6 +6,7 @@ import AudioRecorderPlayer, {
   AudioSourceAndroidType,
   AVEncoderAudioQualityIOSType,
   AVEncodingOption,
+  AVModeIOSOption,
   OutputFormatAndroidType,
   PlayBackType,
   RecordBackType,
@@ -38,124 +39,98 @@ export const getAudioPlayer = (() => {
   };
 })();
 
-export const getAudioPermissions = async () => {
-  console.log('PRESSED IN');
-  await checkPermissionStatus(permission.microphone);
-
-  return;
-};
-
 // Record Function
 export const onMicPress = async () => {
   const {updateMicSlice, updateMetering} = useAppStore.getState();
   const status = await checkPermissionStatus(permission.microphone);
 
-  console.log('LONG PRESSED');
+  console.log('This is status:', status);
 
   if (!status) {
     console.log('No permmission');
     return;
   }
 
-  updateMicSlice({longPressed: true});
+  updateMicSlice({micPermission: true});
 
   const audioRecorderPlayer = getAudioPlayer();
 
-  updateMicSlice({isRecording: true});
-
   const audioSet: AudioSet = {
-    AudioEncoderAndroid: AudioEncoderAndroidType.AAC,
-    AudioSourceAndroid: AudioSourceAndroidType.MIC,
+    // iOS settings
+    AVFormatIDKeyIOS: AVEncodingOption.aac,
     AVEncoderAudioQualityKeyIOS: AVEncoderAudioQualityIOSType.high,
     AVNumberOfChannelsKeyIOS: 2,
-    AVFormatIDKeyIOS: AVEncodingOption.aac,
-    OutputFormatAndroid: OutputFormatAndroidType.AAC_ADTS,
-  };
-  const meteringEnabled = true;
 
-  // const path = 'recordedAudio.m4a';
+    // Android settings
+    AudioSourceAndroid: AudioSourceAndroidType.MIC,
+    AudioEncoderAndroid: AudioEncoderAndroidType.AAC,
+    OutputFormatAndroid: OutputFormatAndroidType.MPEG_4,
+  };
 
   const dirs = ReactNativeBlobUtil.fs.dirs;
 
-  const path = Platform.select({
-    ios: 'recordedAudio.m4a',
-    // android: `${dirs.CacheDir}/recordedAudio.mp3`,
-    android: `${dirs.CacheDir}/recordedAudio.m4a`,
-  });
+  const path =
+    Platform.OS === 'ios'
+      ? 'recordedAudio.m4a'
+      : `${dirs.CacheDir}/recordedAudio.m4a`;
 
-  // const path =
-  //   Platform.OS === 'android'
-  //     ? `${dirs.CacheDir}/recordedAudio.m4a`
-  //     : 'recordedAudio.m4a';
+  // const path = Platform.select({
+  //   ios: 'recordedAudio.m4a',
+  //   android: `${dirs.CacheDir}/recordedAudio.m4a`,
+  // });
 
   try {
-    const uri = await audioRecorderPlayer.startRecorder(
+    console.log('Inside try catc');
+    const result = await audioRecorderPlayer.startRecorder(
       path,
       audioSet,
-      meteringEnabled,
+      true,
     );
+    console.log('Recording started at path:', result);
 
-    console.log('THis is uri inside onMicPress: ' + uri);
+    updateMicSlice({isRecording: true});
 
     audioRecorderPlayer.addRecordBackListener((e: RecordBackType) => {
       updateMicSlice({
-        recordSecs: e.currentPosition / 1000,
+        recordSecs: e.currentPosition,
       });
 
       if (e.currentMetering) {
-        console.log(
-          'This is e.currentMetering for android: ' + e.currentMetering,
-        );
         updateMetering(e.currentMetering);
       }
     });
+
+    updateMicSlice({isPlaying: false, playingAudioId: null});
   } catch (e) {
     console.log('THis is error inside onMicPress', e);
   }
 };
 // Stop Function and upload
 export const onMicRelease = async () => {
-  const {updateMicSlice, longPressed} = useAppStore.getState();
-  const status = await checkPermissionStatus(permission.microphone);
+  const {updateMicSlice, micPermission} = useAppStore.getState();
 
-  console.log('RELEASED');
+  if (!micPermission) {
+    console.log('No permmission');
+    return;
+  }
 
-  if (status && longPressed) {
+  const audioRecorderPlayer = getAudioPlayer();
+
+  try {
+    const result = await audioRecorderPlayer.stopRecorder();
+    audioRecorderPlayer.removeRecordBackListener();
     updateMicSlice({isRecording: false});
 
-    const audioRecorderPlayer = getAudioPlayer();
+    // Upload the audio file to the server immediately
+    await uploadAudioMessage(result);
 
-    try {
-      const result = await audioRecorderPlayer.stopRecorder();
-      console.log('Recording stopped. File saved at:', result);
-      audioRecorderPlayer.removeRecordBackListener();
-
-      // Upload the audio file to the server immediately
-      await uploadAudioMessage(result);
-
-      updateMicSlice({
-        recordSecs: 0,
-        waveMetering: null,
-        longPressed: false,
-      });
-    } catch (error) {
-      console.error('Error stopping recording:', error);
-    }
-  } else {
-    return;
+    console.log('Ready to release');
+  } catch (error) {
+    console.error('Error stopping recording:', error);
   }
 };
 
 export const uploadAudioMessage = async (fileUri: string) => {
-  console.log('This is fileUri: ' + fileUri);
-
-  // let correctedUri = fileUri;
-
-  // // ✅ Fix incorrect file URI format on Android
-  // if (Platform.OS === 'android') {
-  //   correctedUri = fileUri.replace('file:////', 'file:///'); // Remove extra slash
-  // }
-
   const {
     selectedChatData,
     id,
@@ -164,6 +139,7 @@ export const uploadAudioMessage = async (fileUri: string) => {
     socket,
     recordSecs,
     waveMetering,
+    updateMicSlice,
   } = useAppStore.getState();
 
   // Create a temporary message object
@@ -189,11 +165,8 @@ export const uploadAudioMessage = async (fileUri: string) => {
     const formData = new FormData();
     formData.append('files', {
       uri: fileUri,
-      // uri: correctedUri,
       name: `audio-${Date.now()}.m4a`,
       type: 'audio/m4a',
-      // name: `audio-${Date.now()}.${Platform.OS === 'ios' ? 'm4a' : 'mp3'}`,
-      // type: `audio/${Platform.OS === 'ios' ? 'm4a' : 'mp3'}`,
     });
 
     // Upload the file to the server
@@ -202,13 +175,16 @@ export const uploadAudioMessage = async (fileUri: string) => {
     });
 
     if (response.status === 200) {
-      const uploadedFilePath = response.data.filePaths;
+      console.log('Inside 200');
+      const uploadedFilePath = response.data.filePaths[0];
+
+      console.log('This is uploadedFilePath:', uploadedFilePath);
 
       // // Create final message with correct file URL
       const uploadedVoice = {
         ...tempMsg,
         uploading: false,
-        fileUrl: `${HOST}/${uploadedFilePath}`,
+        fileUrl: uploadedFilePath,
       };
 
       console.log('This is uploadedVoice:', uploadedVoice);
@@ -225,12 +201,20 @@ export const uploadAudioMessage = async (fileUri: string) => {
     updateSelectedChatMessages(current =>
       current.filter(msg => msg._id !== tempMsg._id),
     );
+  } finally {
+    updateMicSlice({
+      recordSecs: 0,
+      waveMetering: null,
+      // longPressed: false,
+    });
   }
 };
 
 export const onPlayPause = async (messageId: string, filePath: string) => {
   const {playingAudioId, isPlaying, updateMicSlice} = useAppStore.getState();
   const audioRecorderPlayer = getAudioPlayer();
+
+  console.log('This is filepath:', `${HOST}/${filePath}`);
 
   try {
     // If the same message is playing, toggle pause/play
@@ -255,16 +239,18 @@ export const onPlayPause = async (messageId: string, filePath: string) => {
       });
     }
 
-    // Start playing the new audio
-    await audioRecorderPlayer.startPlayer(filePath);
+    // TEST e.isFinished , also test what e returns in android
+
+    // Start playing the new audio. This keeps listeners going for playing audios.
+    await audioRecorderPlayer.startPlayer(`${HOST}/${filePath}`);
     updateMicSlice({playingAudioId: messageId, isPlaying: true});
 
     audioRecorderPlayer.addPlayBackListener((e: PlayBackType) => {
       updateMicSlice({
-        recordSecs: e.currentPosition / 1000,
+        recordSecs: e.currentPosition,
       });
 
-      if (e.currentPosition >= e.duration) {
+      if (e.currentPosition >= e.duration || e.isFinished) {
         audioRecorderPlayer.stopPlayer();
         audioRecorderPlayer.removePlayBackListener();
         // Stop when finished

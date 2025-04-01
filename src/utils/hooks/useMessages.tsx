@@ -29,16 +29,18 @@ const useMessages = (flatListRef: any) => {
       return;
     }
 
-    if (!selectedChatData?.conversationId) {
-      console.warn('No conversation ID found, skipping fetch.');
-      return;
-    }
+    // if (!selectedChatData?.conversationId) {
+    //   console.warn('No conversation ID found, skipping fetch.');
+    //   return;
+    // }
 
     setPagination(prev => ({...prev, isLoading: true}));
 
     try {
       const response = await apiClient.post(GET_ALL_MESSAGES, {
+        // conversationId: selectedChatData?.conversationId,
         conversationId: selectedChatData?.conversationId,
+        recipientId: selectedChatData?._id,
         page,
       });
 

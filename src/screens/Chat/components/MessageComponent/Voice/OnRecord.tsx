@@ -15,7 +15,9 @@ const OnRecord = () => {
   return (
     <View style={styles.recordingContainer}>
       <MicrophoneIcon width={27} height={27} color={'red'} />
-      <Text style={styles.recordingSecs}>{formatDuration(recordSecs)}</Text>
+      <Text style={styles.recordingSecs}>
+        {formatDuration(Math.round(recordSecs / 1000))}
+      </Text>
       <Text style={styles.recordingText}>Recording...</Text>
     </View>
   );
