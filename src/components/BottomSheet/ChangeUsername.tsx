@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-shadow */
+import React, {useCallback, useState} from 'react';
 import {
   View,
   StyleSheet,
@@ -8,14 +9,17 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
-import React, {useCallback, useState} from 'react';
+
 import ReusableText from '../ReusableText';
-import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import ReusableInput from '../ReusableInput';
-import CloseIcon from '../../assets/icons/messages/CloseIcon';
-import {UPDATE_USERNAME} from '../../api/apis';
-import {apiClient} from '../../api/apiClient';
+
 import {useAppStore} from '../../store';
+
+import {apiClient} from '../../api/apiClient';
+import {UPDATE_USERNAME} from '../../api/apis';
+
+import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
+import CloseIcon from '../../assets/icons/messages/CloseIcon';
 
 type ChangeUsernameProps = {
   cancel: () => void;

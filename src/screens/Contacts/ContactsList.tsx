@@ -1,5 +1,7 @@
 import React, {useMemo} from 'react';
-import {ActivityIndicator, FlatList, StyleSheet, View} from 'react-native';
+import {ActivityIndicator, StyleSheet, View} from 'react-native';
+
+import {useFocusEffect} from '@react-navigation/native';
 
 import {useAppStore} from '../../store';
 import {NavigationProps} from '../../utils/types';
@@ -7,8 +9,8 @@ import {loadMoreFriends, refetchFriends} from '../../utils/DataFetching';
 
 import EmptyContacts from './EmptyContacts';
 import Persona from '../../components/Persona/Persona';
-import FullScreenLoader from '../../components/Loading/FullScreenLoader';
 import ReusableInput from '../../components/ReusableInput';
+import HorizontalLine from '../../components/HorizontalLine';
 
 import SearchIcon from '../../assets/icons/messages/SearchIcon';
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
@@ -17,15 +19,17 @@ import useSearch from '../../utils/hooks/useSearch';
 import useAppState from '../../utils/hooks/useAppState';
 
 import {COLORS} from '../../theme/theme';
+import Animated from 'react-native-reanimated';
 
 type ContentProps = {
   navigation: NavigationProps;
 };
 
 const ContactsList: React.FC<ContentProps> = ({navigation}) => {
+  const {search, updateSearch, clearSearch, debouncedSearch} = useSearch();
   const friends = useAppStore(state => state.friends);
   const isLoading = useAppStore(state => state.friendsPagination.isLoading);
-  const {search, updateSearch, clearSearch, debouncedSearch} = useSearch();
+  const updateScrollControl = useAppStore(state => state.updateScrollControl);
 
   // Fetch friends on app state change from inactive, background to active
   useAppState(refetchFriends);
@@ -37,6 +41,18 @@ const ContactsList: React.FC<ContentProps> = ({navigation}) => {
       ),
     [debouncedSearch, friends],
   );
+
+  useFocusEffect(() => {
+    updateScrollControl(false);
+  });
+
+  const onScroll = (event: any) => {
+    if (event.nativeEvent.contentOffset.y > 20) {
+      updateScrollControl(true);
+    } else {
+      updateScrollControl(false);
+    }
+  };
 
   if (!friends.length) {
     return <EmptyContacts navigation={navigation} />;
@@ -53,7 +69,9 @@ const ContactsList: React.FC<ContentProps> = ({navigation}) => {
         icon1={<SearchIcon width={15} height={15} fill={'#000'} />}
         icon2={<CloseIcon width={15} height={15} fill={'#000'} />}
       />
-      <FlatList
+      <HorizontalLine />
+      <Animated.FlatList
+        onScroll={onScroll}
         scrollEventThrottle={16}
         onEndReached={loadMoreFriends}
         onEndReachedThreshold={0.1}
@@ -70,7 +88,6 @@ const ContactsList: React.FC<ContentProps> = ({navigation}) => {
         maxToRenderPerBatch={20}
         scrollEnabled={true}
       />
-      <FullScreenLoader version={'absolute'} />
     </View>
   );
 };
@@ -79,7 +96,7 @@ const styles = StyleSheet.create({
   content: {
     backgroundColor: COLORS.White,
     flexGrow: 1,
-    paddingBottom: 80,
+    paddingBottom: 40,
   },
 });
 

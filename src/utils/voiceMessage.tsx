@@ -6,7 +6,6 @@ import AudioRecorderPlayer, {
   AudioSourceAndroidType,
   AVEncoderAudioQualityIOSType,
   AVEncodingOption,
-  AVModeIOSOption,
   OutputFormatAndroidType,
   PlayBackType,
   RecordBackType,
@@ -24,6 +23,16 @@ import {ObjectId} from 'bson';
 
 import {HOST, UPLOAD_FILE} from '../api/apis';
 import {apiClient} from '../api/apiClient';
+
+declare global {
+  interface FormData {
+    append(
+      name: string,
+      value: {uri: string; name: string; type: string},
+      filename?: string,
+    ): void;
+  }
+}
 
 // ====================================================
 // Voice recording
@@ -44,14 +53,10 @@ export const onMicPress = async () => {
   const {updateMicSlice, updateMetering} = useAppStore.getState();
   const status = await checkPermissionStatus(permission.microphone);
 
-  console.log('This is status:', status);
-
   if (!status) {
     console.log('No permmission');
     return;
   }
-
-  updateMicSlice({micPermission: true});
 
   const audioRecorderPlayer = getAudioPlayer();
 
@@ -74,19 +79,8 @@ export const onMicPress = async () => {
       ? 'recordedAudio.m4a'
       : `${dirs.CacheDir}/recordedAudio.m4a`;
 
-  // const path = Platform.select({
-  //   ios: 'recordedAudio.m4a',
-  //   android: `${dirs.CacheDir}/recordedAudio.m4a`,
-  // });
-
   try {
-    console.log('Inside try catc');
-    const result = await audioRecorderPlayer.startRecorder(
-      path,
-      audioSet,
-      true,
-    );
-    console.log('Recording started at path:', result);
+    await audioRecorderPlayer.startRecorder(path, audioSet, true);
 
     updateMicSlice({isRecording: true});
 
@@ -100,17 +94,21 @@ export const onMicPress = async () => {
       }
     });
 
-    updateMicSlice({isPlaying: false, playingAudioId: null});
+    updateMicSlice({
+      isPlaying: false,
+      playingAudioId: null,
+    });
   } catch (e) {
     console.log('THis is error inside onMicPress', e);
   }
 };
 // Stop Function and upload
 export const onMicRelease = async () => {
-  const {updateMicSlice, micPermission} = useAppStore.getState();
+  const {updateMicSlice} = useAppStore.getState();
+  const status = await checkPermissionStatus(permission.microphone);
 
-  if (!micPermission) {
-    console.log('No permmission');
+  if (!status) {
+    console.log('No permission');
     return;
   }
 

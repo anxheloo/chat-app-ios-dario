@@ -1,25 +1,18 @@
 import React, {memo, useMemo, useRef} from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  StyleSheet,
-  View,
-  Animated,
-} from 'react-native';
+import {ActivityIndicator, FlatList, StyleSheet, View} from 'react-native';
 
 import {useAppStore} from '../../store';
 
 import {NavigationProps} from '../../utils/types';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 
-// import useConversations from '../../utils/hooks/useConversations';
 import useAppState from '../../utils/hooks/useAppState';
 import useSearch from '../../utils/hooks/useSearch';
 
 import EmptyChat from './EmptyChat';
 import Conversations from '../../components/Persona/Conversations';
-import FullScreenLoader from '../../components/Loading/FullScreenLoader';
 import ReusableInput from '../../components/ReusableInput';
+import HorizontalLine from '../../components/HorizontalLine';
 
 import SearchIcon from '../../assets/icons/messages/SearchIcon';
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
@@ -30,16 +23,20 @@ import {
   refetchConversations,
 } from '../../utils/DataFetching';
 
+import Animated from 'react-native-reanimated';
+
 const Content = memo(() => {
+  const {search, updateSearch, clearSearch, debouncedSearch} = useSearch();
+  // Fetch conversations on app state change from inactive, background to active
+  useAppState(refetchConversations);
+
   const flatListRef = useRef<FlatList>(null);
   const navigation = useNavigation<NavigationProps>();
   const conversations = useAppStore(state => state.conversations);
   const isLoading = useAppStore(
     state => state.conversationPagination.isLoading,
   );
-  const {search, updateSearch, clearSearch, debouncedSearch} = useSearch();
-  // Fetch conversations on app state change from inactive, background to active
-  useAppState(refetchConversations);
+  const updateScrollControl = useAppStore(state => state.updateScrollControl);
 
   const searchedConversations = useMemo(
     () =>
@@ -58,7 +55,17 @@ const Content = memo(() => {
     [conversations, debouncedSearch],
   );
 
-  console.log('This are searchedConversations', searchedConversations);
+  useFocusEffect(() => {
+    updateScrollControl(false);
+  });
+
+  const onScroll = (event: any) => {
+    if (event.nativeEvent.contentOffset.y > 20) {
+      updateScrollControl(true);
+    } else {
+      updateScrollControl(false);
+    }
+  };
 
   if (!conversations.length) {
     return <EmptyChat navigation={navigation} />;
@@ -75,9 +82,10 @@ const Content = memo(() => {
         icon1={<SearchIcon width={15} height={15} fill={'#000'} />}
         icon2={<CloseIcon width={15} height={15} fill={'#000'} />}
       />
+      <HorizontalLine />
       <Animated.FlatList
         ref={flatListRef}
-        // onScroll={handleScroll}
+        onScroll={onScroll}
         scrollEventThrottle={16}
         onEndReached={loadMoreConversations}
         onEndReachedThreshold={0.1}
@@ -99,7 +107,6 @@ const Content = memo(() => {
         maxToRenderPerBatch={20}
         scrollEnabled={true}
       />
-      <FullScreenLoader version={'absolute'} />
     </View>
   );
 });

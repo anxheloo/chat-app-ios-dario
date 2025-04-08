@@ -113,11 +113,11 @@ export const closePeerConnection = () => {
     peerConnection?.close();
   }
 
-  InCallManager.setSpeakerphoneOn(false);
-  InCallManager.setKeepScreenOn(false);
+  InCallManager.stop();
   InCallManager.stopRingtone();
   InCallManager.stopRingback();
-  InCallManager.stop(); // reset any audio settings
+  InCallManager.setSpeakerphoneOn(false);
+  InCallManager.setKeepScreenOn(false);
   resetCallState();
 };
 
@@ -221,20 +221,13 @@ export const setUpCallManager = async (
   if (callType === 'video') {
     InCallManager.setSpeakerphoneOn(true);
     InCallManager.setKeepScreenOn(true);
-    if (isCaller) {
-      InCallManager.start({
-        media: 'video',
-        ringback: '_DEFAULT_',
-      });
-    }
-  } else {
-    if (isCaller) {
-      InCallManager.start({
-        media: 'audio',
-        ringback: '_DEFAULT_',
-      });
-    }
-    InCallManager.setKeepScreenOn(false);
+  }
+
+  if (isCaller) {
+    InCallManager.start({
+      media: callType,
+      ringback: '_BUNDLE_',
+    });
   }
 };
 
@@ -473,9 +466,14 @@ export const incomingCall = async ({
       currentCall,
     });
 
-    navigate('JoinScreen');
+    InCallManager.startRingtone(
+      '_BUNDLE_',
+      [1000, 1000, 1000, 1000, 1000],
+      '_BUNDLE_',
+      15,
+    );
 
-    InCallManager.startRingtone('_DEFAULT_', 1, 'default', 0);
+    navigate('JoinScreen');
   } catch (err) {
     console.log(err);
   }

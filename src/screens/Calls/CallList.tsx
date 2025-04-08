@@ -1,10 +1,9 @@
 import React, {useMemo} from 'react';
-import {ActivityIndicator, Animated, StyleSheet, View} from 'react-native';
+import {ActivityIndicator, StyleSheet, View} from 'react-native';
 
 import {useAppStore} from '../../store';
 
 import CallComponent from '../../components/Persona/CallComponent';
-import FullScreenLoader from '../../components/Loading/FullScreenLoader';
 import EmptyCall from './EmptyCall';
 import ReusableInput from '../../components/ReusableInput';
 
@@ -21,15 +20,17 @@ import useSearch from '../../utils/hooks/useSearch';
 import useAppState from '../../utils/hooks/useAppState';
 import HorizontalLine from '../../components/HorizontalLine';
 
-const CallList = () => {
-  const navigation = useNavigation<NavigationProps>();
-  const calls = useAppStore(state => state.calls);
-  const scrollY = useAppStore(state => state.scrollY);
-  const isLoading = useAppStore(state => state.callsPagination.isLoading);
-  const {search, updateSearch, clearSearch, debouncedSearch} = useSearch();
+import Animated from 'react-native-reanimated';
 
+const CallList = () => {
+  const {search, updateSearch, clearSearch, debouncedSearch} = useSearch();
   // Fetch calls on app state change from inactive, background to active
   useAppState(refetchCalls);
+
+  const navigation = useNavigation<NavigationProps>();
+  const calls = useAppStore(state => state.calls);
+  const updateScrollControl = useAppStore(state => state.updateScrollControl);
+  const isLoading = useAppStore(state => state.callsPagination.isLoading);
 
   const searchedCalls: Call[] = useMemo(
     () =>
@@ -49,18 +50,16 @@ const CallList = () => {
   );
 
   useFocusEffect(() => {
-    const updateAnimation = () => {
-      scrollY?.setValue(0);
-    };
-
-    updateAnimation();
+    updateScrollControl(false);
   });
 
-  const onScroll = scrollY
-    ? Animated.event([{nativeEvent: {contentOffset: {y: scrollY}}}], {
-        useNativeDriver: false,
-      })
-    : undefined;
+  const onScroll = (event: any) => {
+    if (event.nativeEvent.contentOffset.y > 20) {
+      updateScrollControl(true);
+    } else {
+      updateScrollControl(false);
+    }
+  };
 
   if (!calls.length) {
     return <EmptyCall />;
@@ -101,7 +100,6 @@ const CallList = () => {
         maxToRenderPerBatch={20}
         scrollEnabled={true}
       />
-      <FullScreenLoader version={'absolute'} />
     </View>
   );
 };
@@ -110,7 +108,7 @@ const styles = StyleSheet.create({
   content: {
     backgroundColor: COLORS.White,
     flexGrow: 1,
-    paddingBottom: 80,
+    paddingBottom: 40,
   },
 });
 

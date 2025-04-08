@@ -51,6 +51,7 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
+
 target 'ReactNativeChatAppArbri' do
   config = use_native_modules!
 
@@ -58,6 +59,9 @@ target 'ReactNativeChatAppArbri' do
     :path => config[:reactNativePath],
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
+
+
+  pod 'ReactNativeIncallManager', :path => '../node_modules/react-native-incall-manager'
 
   target 'ReactNativeChatAppArbriTests' do
     inherit! :complete

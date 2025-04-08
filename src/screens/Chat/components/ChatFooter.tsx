@@ -1,14 +1,10 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
 
 import ReusableInput from '../../../components/ReusableInput';
 import CameraOptions from './CameraOptions';
 
-import {
-  getAudioPermissions,
-  onMicPress,
-  onMicRelease,
-} from '../../../utils/voiceMessage';
+import {onMicPress, onMicRelease} from '../../../utils/voiceMessage';
 import {sendMessage} from '../../../utils/message';
 
 import MicrophoneIcon from '../../../assets/icons/Chat/MicrophoneIcon';
@@ -19,11 +15,17 @@ import {COLORS} from '../../../theme/theme';
 import {useAppStore} from '../../../store';
 
 import OnRecord from './MessageComponent/Voice/OnRecord';
+import {checkPermissionStatus} from '../../../utils/helpers';
+import {permission} from '../../../utils/permissions';
 
 const ChatFooter = () => {
   const [message, setMessage] = useState('');
   const [cameraOptions, setCameraOptions] = useState(false);
   const isRecording = useAppStore(state => state.isRecording);
+
+  useEffect(() => {
+    checkPermissionStatus(permission.microphone);
+  }, []);
 
   return (
     <View style={styles.footerContainer}>
@@ -48,7 +50,7 @@ const ChatFooter = () => {
             </TouchableOpacity>
           )}
 
-          <TouchableOpacity onLongPress={onMicPress} onPressOut={onMicRelease}>
+          <TouchableOpacity onPressIn={onMicPress} onPressOut={onMicRelease}>
             <MicrophoneIcon width={24} height={24} />
           </TouchableOpacity>
         </>

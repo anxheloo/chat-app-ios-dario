@@ -50,6 +50,7 @@ const ChatContainer = () => {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <FlatList
           onScroll={handleScroll}
+          contentOffset={{x: 0, y: 20}}
           scrollEventThrottle={16}
           refreshing={isLoading}
           onRefresh={loadMoreItem}

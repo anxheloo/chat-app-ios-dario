@@ -13,14 +13,15 @@ import {
 } from '../utils/types';
 
 import {MediaStream} from 'react-native-webrtc';
-import {Animated} from 'react-native';
 
 type ScrollSlice = {
-  scrollY: Animated.Value;
+  scrollControl: boolean;
+  updateScrollControl: (scrollControl: boolean) => void;
 };
 
 const scrollSlice: StateCreator<ScrollSlice> = set => ({
-  scrollY: new Animated.Value(0),
+  scrollControl: false,
+  updateScrollControl: (scrollControl: boolean) => set({scrollControl}),
 });
 
 type CallState = 'pending' | 'incoming' | 'active' | 'busy';
@@ -258,7 +259,6 @@ type MicSlice = {
   isRecording: boolean;
   recordSecs: number;
   waveMetering: number[] | null;
-  micPermission: boolean;
 
   updateMicSlice: (data: Partial<MicSlice>) => void;
   updateMetering: (newData: number) => void;
@@ -270,7 +270,6 @@ const micSlice: StateCreator<MicSlice> = set => ({
   isRecording: false,
   recordSecs: 0,
   waveMetering: null,
-  micPermission: false,
 
   updateMicSlice: set,
 

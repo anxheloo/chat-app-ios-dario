@@ -1,29 +1,23 @@
 import React from 'react';
-import {Animated, StyleSheet} from 'react-native';
+import {StyleSheet} from 'react-native';
 import {COLORS} from '../theme/theme';
 import {useAppStore} from '../store';
+import Animated, {useAnimatedStyle, withTiming} from 'react-native-reanimated';
 
 const HorizontalLine = () => {
-  const scrollY = useAppStore(state => state.scrollY);
-  // const animatedValue = useContext(AnimationContext);
-  const height = scrollY?.interpolate({
-    inputRange: [0, 20],
-    outputRange: [0, 1],
-    extrapolate: 'clamp',
-  });
+  const scrollControl = useAppStore(state => state.scrollControl);
 
-  return (
-    <Animated.View
-      style={[
-        styles.main,
-        {height: height, backgroundColor: COLORS.border},
-      ]}></Animated.View>
-  );
+  const animatedStyle = useAnimatedStyle(() => ({
+    height: withTiming(scrollControl ? 1 : 0, {duration: 300}),
+  }));
+
+  return <Animated.View style={[styles.main, animatedStyle]} />;
 };
 
 const styles = StyleSheet.create({
   main: {
     width: '100%',
+    backgroundColor: COLORS.border,
   },
 });
 
