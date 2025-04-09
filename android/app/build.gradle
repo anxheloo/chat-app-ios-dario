@@ -79,9 +79,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.reactnativechatapparbri"
+    namespace "com.Solitar"
     defaultConfig {
-        applicationId "com.reactnativechatapparbri"
+        applicationId "com.Solitar"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

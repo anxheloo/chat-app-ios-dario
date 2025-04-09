@@ -18,6 +18,12 @@ import OnRecord from './MessageComponent/Voice/OnRecord';
 import {checkPermissionStatus} from '../../../utils/helpers';
 import {permission} from '../../../utils/permissions';
 
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
+
 const ChatFooter = () => {
   const [message, setMessage] = useState('');
   const [cameraOptions, setCameraOptions] = useState(false);
@@ -27,20 +33,36 @@ const ChatFooter = () => {
     checkPermissionStatus(permission.microphone);
   }, []);
 
+  const translateValue = useSharedValue(0);
+  const translateX = useAnimatedStyle(() => ({
+    transform: [
+      {
+        translateX: withTiming(translateValue.value, {duration: 200}),
+      },
+    ],
+  }));
+
+  useEffect(() => {
+    console.log('This is translateValue: ', translateValue);
+    translateValue.value = isRecording ? -295 : 0; // adjust value as needed
+  }, [isRecording, translateValue]);
+
   return (
     <View style={styles.footerContainer}>
       {/* SHOW OPTIONS TO SELECT OR TAKE IMAGE/VIDEO */}
       {cameraOptions && <CameraOptions setCameraOptions={setCameraOptions} />}
-      <View style={styles.inputContainer}>
-        {isRecording ? (
-          <OnRecord />
-        ) : (
+
+      <View style={styles.inputContainerParent}>
+        <Animated.View style={[styles.inputContainer, translateX]}>
           <ReusableInput
             placeholder="Write"
             value={message}
             onChange={setMessage}
+            minWidth={295}
+            otherStyles={{flex: 1}}
           />
-        )}
+          {message === '' && <OnRecord />}
+        </Animated.View>
       </View>
       {message === '' ? (
         <>
@@ -50,7 +72,7 @@ const ChatFooter = () => {
             </TouchableOpacity>
           )}
 
-          <TouchableOpacity onPressIn={onMicPress} onPressOut={onMicRelease}>
+          <TouchableOpacity onLongPress={onMicPress} onPressOut={onMicRelease}>
             <MicrophoneIcon width={24} height={24} />
           </TouchableOpacity>
         </>
@@ -73,12 +95,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 15,
-    paddingHorizontal: 20,
+    paddingHorizontal: 15,
     borderTopWidth: 1,
     borderTopColor: '#E5E5E5',
     height: 66,
   },
-  inputContainer: {flex: 1},
+
+  inputContainerParent: {
+    flex: 1,
+    overflow: 'hidden',
+  },
+
+  inputContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    gap: 10,
+    alignItems: 'center',
+  },
 
   sendIconContainer: {
     width: 30,

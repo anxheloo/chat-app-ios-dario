@@ -1,4 +1,4 @@
-package com.reactnativechatapparbri
+package com.Solitar
 
 import android.app.Application
 import com.facebook.react.PackageList

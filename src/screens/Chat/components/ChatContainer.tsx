@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   FlatList,
   Keyboard,
@@ -23,6 +23,7 @@ const ChatContainer = () => {
   const {loadMoreItem, isLoading, scrollToBottom, refetch} = useMessages(
     flatListRef?.current,
   );
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Listen for app state changes to check if app has come to foreground and fetch new messages (temporary solution)
   useAppState(refetch);
@@ -39,10 +40,18 @@ const ChatContainer = () => {
     const distanceFromBottom =
       contentSize.height - (layoutMeasurement.height + contentOffset.y);
 
-    //   // Update the `isNearBottom` flag based on scroll position
-    setTimeout(() => {
+    // setIsNearBottom(distanceFromBottom < 200);
+
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
       setIsNearBottom(distanceFromBottom < 200);
     }, 200);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
   }, []);
 
   return (

@@ -1,9 +1,9 @@
 import React, {memo} from 'react';
 
 import {
-  Keyboard,
+  // Keyboard,
   StyleSheet,
-  TouchableWithoutFeedback,
+  // TouchableWithoutFeedback,
   View,
 } from 'react-native';
 
@@ -21,13 +21,13 @@ const Layout: React.FC<Props> = memo(({children}) => {
   const insets = useSafeAreaInsets();
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={[styles.safeAreaStyles, {paddingTop: insets.top}]}>
-        <Header />
-        {children}
-        <FullScreenLoader version={'absolute'} />
-      </View>
-    </TouchableWithoutFeedback>
+    // <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    <View style={[styles.safeAreaStyles, {paddingTop: insets.top}]}>
+      <Header />
+      {children}
+      <FullScreenLoader version={'absolute'} />
+    </View>
+    /* </TouchableWithoutFeedback> */
   );
 });
 

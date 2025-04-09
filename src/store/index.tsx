@@ -45,6 +45,7 @@ type WebRTCSlice = {
   callTimer: number;
   disabledButtons: boolean;
 
+  cameraSwitched: boolean;
   isMuted: boolean;
   isVideoEnabled: boolean;
   isRemoteVideoEnabled: boolean;
@@ -83,6 +84,7 @@ const webRTCSlice: StateCreator<WebRTCSlice> = (set, get) => ({
   callTimer: 0,
   disabledButtons: false,
 
+  cameraSwitched: false,
   isMuted: false,
   isVideoEnabled: false,
   isRemoteVideoEnabled: false,

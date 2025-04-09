@@ -52,7 +52,7 @@ if linkage != nil
 end
 
 
-target 'ReactNativeChatAppArbri' do
+target 'Solitar' do
   config = use_native_modules!
 
   use_react_native!(
@@ -63,7 +63,7 @@ target 'ReactNativeChatAppArbri' do
 
   pod 'ReactNativeIncallManager', :path => '../node_modules/react-native-incall-manager'
 
-  target 'ReactNativeChatAppArbriTests' do
+  target 'SolitarTests' do
     inherit! :complete
     # Pods for testing
   end

@@ -50,15 +50,19 @@ export const getAudioPlayer = (() => {
 
 // Record Function
 export const onMicPress = async () => {
+  console.log('This is press in');
   const {updateMicSlice, updateMetering} = useAppStore.getState();
+
+  const audioRecorderPlayer = getAudioPlayer();
+  await audioRecorderPlayer.stopRecorder();
+  audioRecorderPlayer.removeRecordBackListener();
+
   const status = await checkPermissionStatus(permission.microphone);
 
   if (!status) {
     console.log('No permmission');
     return;
   }
-
-  const audioRecorderPlayer = getAudioPlayer();
 
   const audioSet: AudioSet = {
     // iOS settings
@@ -99,13 +103,22 @@ export const onMicPress = async () => {
       playingAudioId: null,
     });
   } catch (e) {
+    updateMicSlice({isRecording: false});
     console.log('THis is error inside onMicPress', e);
   }
 };
 // Stop Function and upload
 export const onMicRelease = async () => {
-  const {updateMicSlice} = useAppStore.getState();
+  console.log('This is release');
+  const {updateMicSlice, recordSecs, isRecording} = useAppStore.getState();
   const status = await checkPermissionStatus(permission.microphone);
+
+  await new Promise(resolve => setTimeout(resolve, 200));
+
+  if (!isRecording) {
+    console.log('No active recording to stop');
+    return;
+  }
 
   if (!status) {
     console.log('No permission');
@@ -113,17 +126,29 @@ export const onMicRelease = async () => {
   }
 
   const audioRecorderPlayer = getAudioPlayer();
-
   try {
+    if (recordSecs < 1000) {
+      console.log('Recording too short, aborting stop');
+      await audioRecorderPlayer?.stopRecorder();
+      audioRecorderPlayer.removeRecordBackListener();
+      updateMicSlice({
+        isRecording: false,
+      });
+      return;
+    }
+
     const result = await audioRecorderPlayer.stopRecorder();
     audioRecorderPlayer.removeRecordBackListener();
-    updateMicSlice({isRecording: false});
 
+    updateMicSlice({isRecording: false});
     // Upload the audio file to the server immediately
     await uploadAudioMessage(result);
-
-    console.log('Ready to release');
   } catch (error) {
+    await audioRecorderPlayer?.stopRecorder();
+    audioRecorderPlayer.removeRecordBackListener();
+    updateMicSlice({
+      isRecording: false,
+    });
     console.error('Error stopping recording:', error);
   }
 };

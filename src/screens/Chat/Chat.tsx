@@ -1,5 +1,11 @@
 import React, {useEffect} from 'react';
-import {KeyboardAvoidingView, StyleSheet, View} from 'react-native';
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -11,6 +17,7 @@ import DeleteMsg from '../../components/modals/DeleteMsg';
 import ChatHeader from './components/ChatHeader';
 import ChatContainer from './components/ChatContainer';
 import ChatFooter from './components/ChatFooter';
+
 import {getAudioPlayer} from '../../utils/voiceMessage';
 
 const Chat = () => {
@@ -44,8 +51,12 @@ const Chat = () => {
       keyboardVerticalOffset={-30}>
       <SafeAreaView style={styles.safeAreaView}>
         <View style={styles.container}>
-          <ChatHeader />
-          <ChatContainer />
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <>
+              <ChatHeader />
+              <ChatContainer />
+            </>
+          </TouchableWithoutFeedback>
           <ChatFooter />
         </View>
         <FullScreenLoader version={'absolute'} />

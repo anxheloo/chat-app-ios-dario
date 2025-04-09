@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "ReactNativeChatAppArbri.app"
-               BlueprintName = "ReactNativeChatAppArbri"
-               ReferencedContainer = "container:ReactNativeChatAppArbri.xcodeproj">
+               BuildableName = "Solitar.app"
+               BlueprintName = "Solitar"
+               ReferencedContainer = "container:Solitar.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "ReactNativeChatAppArbriTests.xctest"
-               BlueprintName = "ReactNativeChatAppArbriTests"
-               ReferencedContainer = "container:ReactNativeChatAppArbri.xcodeproj">
+               BuildableName = "SolitarTests.xctest"
+               BlueprintName = "SolitarTests"
+               ReferencedContainer = "container:Solitar.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "ReactNativeChatAppArbri.app"
-            BlueprintName = "ReactNativeChatAppArbri"
-            ReferencedContainer = "container:ReactNativeChatAppArbri.xcodeproj">
+            BuildableName = "Solitar.app"
+            BlueprintName = "Solitar"
+            ReferencedContainer = "container:Solitar.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "ReactNativeChatAppArbri.app"
-            BlueprintName = "ReactNativeChatAppArbri"
-            ReferencedContainer = "container:ReactNativeChatAppArbri.xcodeproj">
+            BuildableName = "Solitar.app"
+            BlueprintName = "Solitar"
+            ReferencedContainer = "container:Solitar.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

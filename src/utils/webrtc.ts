@@ -127,11 +127,13 @@ export const closePeerConnection = () => {
 
 // Switch camera
 export const switchCamera = () => {
-  const {localStream} = useAppStore.getState();
+  const {localStream, updateWebRTCState, cameraSwitched} =
+    useAppStore.getState();
 
   localStream?.getVideoTracks().forEach(track => {
     track._switchCamera();
   });
+  updateWebRTCState({cameraSwitched: !cameraSwitched});
 };
 
 // Switch remote with local and vice versa

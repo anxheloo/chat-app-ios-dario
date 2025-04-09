@@ -7,11 +7,11 @@
 #define TIMEOUT_SECONDS 600
 #define TEXT_TO_LOOK_FOR @"Welcome to React"
 
-@interface ReactNativeChatAppArbriTests : XCTestCase
+@interface SolitarTests : XCTestCase
 
 @end
 
-@implementation ReactNativeChatAppArbriTests
+@implementation SolitarTests
 
 - (BOOL)findSubviewInView:(UIView *)view matching:(BOOL (^)(UIView *view))test
 {

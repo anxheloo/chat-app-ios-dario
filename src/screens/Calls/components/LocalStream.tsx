@@ -12,13 +12,14 @@ const LocalStream = () => {
   const switchVideoSources = useAppStore(state => state.switchVideoSources);
   const isVideoEnabled = useAppStore(state => state.isVideoEnabled);
   const isRemoteVideoEnabled = useAppStore(state => state.isRemoteVideoEnabled);
+  const cameraSwitched = useAppStore(state => state.cameraSwitched);
 
   return localStream ? (
     <Pressable onPress={switchSources} style={styles.localStream}>
       <>
         <RTCView
           style={styles.rtcView}
-          mirror={true}
+          mirror={cameraSwitched ? false : true}
           streamURL={localStream?.toURL()}
           objectFit="cover"
         />

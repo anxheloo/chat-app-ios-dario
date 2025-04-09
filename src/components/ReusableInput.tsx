@@ -14,12 +14,14 @@ type inputProps = {
   isPassword?: boolean;
   backgroundColor?: string;
   maxWidth?: number;
+  minWidth?: number;
   marginHorizontal?: number;
   icon1?: React.ReactNode;
   icon2?: React.ReactNode;
   onPress?: () => void;
   onChange: (value: string) => void;
   onSubmitEditing?: () => void;
+  otherStyles?: any;
 };
 
 const ReusableInput: React.FC<inputProps> = memo(
@@ -29,11 +31,13 @@ const ReusableInput: React.FC<inputProps> = memo(
     isPassword,
     backgroundColor = COLORS.LightGray2,
     maxWidth,
+    minWidth,
     marginHorizontal,
     icon1,
     icon2,
     onPress,
     onChange,
+    otherStyles,
   }) => {
     const [isFocused, setIsFocused] = useState(false);
 
@@ -49,8 +53,10 @@ const ReusableInput: React.FC<inputProps> = memo(
           {
             backgroundColor,
             maxWidth,
+            minWidth,
             marginHorizontal,
           },
+          otherStyles,
         ]}>
         {icon1 && icon1}
         <TextInput
@@ -90,11 +96,8 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    // height: '100%',
     paddingHorizontal: 10,
     color: COLORS.Black,
-    // backgroundColor: 'red',
-    // textAlignVertical: 'center',
     textAlign: 'center',
   },
 });
