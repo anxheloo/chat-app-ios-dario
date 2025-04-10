@@ -15,10 +15,14 @@ import Animated, {
 import {FONTSIZE} from '../../../../../theme/theme';
 
 const ShimmerText = ({children}: {children: string}) => {
-  const translateX = useSharedValue(200); // start right to left
+  const translateX = useSharedValue(130); // start right to left
 
   useEffect(() => {
-    translateX.value = withRepeat(withTiming(0, {duration: 1500}), -1, false);
+    translateX.value = withRepeat(
+      withTiming(-100, {duration: 1500}),
+      -1,
+      false,
+    );
   }, [translateX]);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -52,8 +56,6 @@ const ShimmerText = ({children}: {children: string}) => {
 const styles = StyleSheet.create({
   parentContainer: {
     flex: 1,
-    backgroundColor: 'transparent',
-    height: '100%',
   },
   shimmerText: {
     fontSize: FONTSIZE.md,
@@ -63,7 +65,6 @@ const styles = StyleSheet.create({
   },
   backgroundFill: {
     position: 'relative',
-    backgroundColor: 'blue',
   },
   gradientWrapper: {
     ...StyleSheet.absoluteFillObject,

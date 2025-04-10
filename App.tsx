@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {StatusBar, StyleSheet} from 'react-native';
+import {StatusBar} from 'react-native';
 
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
@@ -18,7 +18,7 @@ const App = () => {
   }, []);
 
   return (
-    <GestureHandlerRootView style={styles.gestureHandlerContainer}>
+    <GestureHandlerRootView>
       <BottomSheetModalProvider>
         <SafeAreaProvider>
           <StatusBar backgroundColor="white" barStyle={'dark-content'} />
@@ -30,11 +30,5 @@ const App = () => {
     </GestureHandlerRootView>
   );
 };
-
-const styles = StyleSheet.create({
-  gestureHandlerContainer: {
-    flex: 1,
-  },
-});
 
 export default App;

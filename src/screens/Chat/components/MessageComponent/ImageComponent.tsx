@@ -26,7 +26,9 @@ const ImageComponent: React.FC<ImageProps> = ({message, isSender}) => {
   const openImage = useCallback(() => {
     if (!message.uploading) {
       navigation.navigate('FullScreenMedia', {
-        fileUrl: message.fileUrl,
+        fileUrl: message?.isLocalUri
+          ? message.fileUrl
+          : `${HOST}/${message.fileUrl}`,
         type: 'image',
       });
     }
@@ -49,7 +51,9 @@ const ImageComponent: React.FC<ImageProps> = ({message, isSender}) => {
           height={150}
           // source={{uri: `data:image/png;base64,${message.fileUrl}`}}
           source={{
-            uri: `${HOST}/${message.fileUrl}`,
+            uri: message?.isLocalUri
+              ? message.fileUrl
+              : `${HOST}/${message.fileUrl}`,
           }}
           style={styles.image}
           resizeMode="cover"

@@ -1,5 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 
 import ReusableInput from '../../../components/ReusableInput';
 import CameraOptions from './CameraOptions';
@@ -29,10 +35,8 @@ const ChatFooter = () => {
   const [cameraOptions, setCameraOptions] = useState(false);
   const isRecording = useAppStore(state => state.isRecording);
 
-  useEffect(() => {
-    checkPermissionStatus(permission.microphone);
-  }, []);
-
+  const {width: screenWidth} = useWindowDimensions();
+  const [width, setWidth] = useState(screenWidth);
   const translateValue = useSharedValue(0);
   const translateX = useAnimatedStyle(() => ({
     transform: [
@@ -43,29 +47,35 @@ const ChatFooter = () => {
   }));
 
   useEffect(() => {
-    console.log('This is translateValue: ', translateValue);
-    translateValue.value = isRecording ? -295 : 0; // adjust value as needed
-  }, [isRecording, translateValue]);
+    checkPermissionStatus(permission.microphone);
+  }, []);
+
+  useEffect(() => {
+    translateValue.value = isRecording ? -width : 0; // adjust value as needed
+  }, [isRecording, translateValue, width]);
 
   return (
     <View style={styles.footerContainer}>
       {/* SHOW OPTIONS TO SELECT OR TAKE IMAGE/VIDEO */}
       {cameraOptions && <CameraOptions setCameraOptions={setCameraOptions} />}
 
-      <View style={styles.inputContainerParent}>
-        <Animated.View style={[styles.inputContainer, translateX]}>
-          <ReusableInput
-            placeholder="Write"
-            value={message}
-            onChange={setMessage}
-            minWidth={295}
-            otherStyles={{flex: 1}}
-          />
-          {message === '' && <OnRecord />}
+      <View
+        style={styles.inputContainerParent}
+        onLayout={e => setWidth(e.nativeEvent.layout.width)}>
+        <Animated.View
+          style={[styles.inputContainer, translateX, {width: width * 2}]}>
+          <View style={{width}}>
+            <ReusableInput
+              placeholder="Write"
+              value={message}
+              onChange={setMessage}
+            />
+          </View>
+          <View style={{width}}>{message === '' && <OnRecord />}</View>
         </Animated.View>
       </View>
       {message === '' ? (
-        <>
+        <View style={styles.iconContainer}>
           {!isRecording && (
             <TouchableOpacity onPress={() => setCameraOptions(prev => !prev)}>
               <CameraIcon width={24} height={24} />
@@ -75,7 +85,7 @@ const ChatFooter = () => {
           <TouchableOpacity onLongPress={onMicPress} onPressOut={onMicRelease}>
             <MicrophoneIcon width={24} height={24} />
           </TouchableOpacity>
-        </>
+        </View>
       ) : (
         <TouchableOpacity
           onPress={() => sendMessage(message, setMessage)}
@@ -103,14 +113,17 @@ const styles = StyleSheet.create({
 
   inputContainerParent: {
     flex: 1,
+    width: '83%',
+    height: '100%',
     overflow: 'hidden',
   },
 
   inputContainer: {
     flex: 1,
     flexDirection: 'row',
-    gap: 10,
+    // gap: 60,
     alignItems: 'center',
+    // width: 600,
   },
 
   sendIconContainer: {
@@ -121,6 +134,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     resizeMode: 'contain',
+  },
+
+  iconContainer: {
+    flexDirection: 'row',
+    gap: 20,
+    width: '17%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    paddingHorizontal: 5,
+    marginLeft: 15,
   },
 
   image: {

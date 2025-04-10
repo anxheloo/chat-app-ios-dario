@@ -11,8 +11,7 @@ const FullScreenLoader: React.FC<Props> = ({version, type}) => {
   const loading = useAppStore(state =>
     type ? state[type].isLoading : state.loading,
   );
-  // const color = version === 'absolute' ? 'white' : 'black';
-  const color = 'black';
+  const color = version === 'absolute' || 'flex' ? 'white' : 'black';
 
   if (!loading) {
     return null;
@@ -36,8 +35,8 @@ const styles = StyleSheet.create({
     inset: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    // backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    // backgroundColor: 'white',
   },
 
   loadingContainer2: {

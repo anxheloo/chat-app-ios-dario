@@ -1,9 +1,10 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import {
   FlatList,
   Keyboard,
   StyleSheet,
   TouchableWithoutFeedback,
+  View,
 } from 'react-native';
 
 import {useAppStore} from '../../../store';
@@ -23,7 +24,6 @@ const ChatContainer = () => {
   const {loadMoreItem, isLoading, scrollToBottom, refetch} = useMessages(
     flatListRef?.current,
   );
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Listen for app state changes to check if app has come to foreground and fetch new messages (temporary solution)
   useAppState(refetch);
@@ -40,18 +40,7 @@ const ChatContainer = () => {
     const distanceFromBottom =
       contentSize.height - (layoutMeasurement.height + contentOffset.y);
 
-    // setIsNearBottom(distanceFromBottom < 200);
-
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => {
-      setIsNearBottom(distanceFromBottom < 200);
-    }, 200);
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
+    setIsNearBottom(distanceFromBottom < 200);
   }, []);
 
   return (
@@ -74,6 +63,7 @@ const ChatContainer = () => {
               scrollToBottom(0, flatListRef.current);
             }
           }}
+          ListFooterComponent={<View style={styles.footer} />}
           initialNumToRender={20}
           maxToRenderPerBatch={20}
         />
@@ -91,8 +81,13 @@ const ChatContainer = () => {
 const styles = StyleSheet.create({
   chatContainer: {
     flexGrow: 1,
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingTop: 20,
     gap: 10,
+  },
+
+  footer: {
+    height: 20,
   },
 });
 

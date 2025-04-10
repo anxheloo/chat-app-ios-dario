@@ -13,8 +13,8 @@ type inputProps = {
   value: string;
   isPassword?: boolean;
   backgroundColor?: string;
-  maxWidth?: number;
-  minWidth?: number;
+  maxWidth?: number | string;
+  minWidth?: number | string;
   marginHorizontal?: number;
   icon1?: React.ReactNode;
   icon2?: React.ReactNode;

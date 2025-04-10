@@ -16,6 +16,7 @@ import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 
 import DeleteIcon from '../../../../assets/icons/Chat/DeleteIcon';
 import DayDate from './DayDate';
+import Animated, {FadeInRight, FadeOutDown} from 'react-native-reanimated';
 
 type MessageItemProps = {
   message: Message;
@@ -25,11 +26,6 @@ const MessageItem: React.FC<MessageItemProps> = React.memo(({message}) => {
   const loggedInUserId = useAppStore(state => state.id);
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
   const isSender = message?.sender === loggedInUserId;
-
-  // Show modal on delete icon click
-  const showDeleteModal = useCallback(() => {
-    updateFuncChat({selectedMessageToDelete: message});
-  }, [message, updateFuncChat]);
 
   // Render messages based on message type
   const renderMessage = useCallback(
@@ -61,8 +57,13 @@ const MessageItem: React.FC<MessageItemProps> = React.memo(({message}) => {
     [message],
   );
 
+  // Show modal on delete icon click
+  const showDeleteModal = useCallback(() => {
+    updateFuncChat({selectedMessageToDelete: message});
+  }, [message, updateFuncChat]);
+
   // Render delete icon
-  const renderRightActions = () => {
+  const renderRightActions = useCallback(() => {
     return (
       <TouchableOpacity
         onPress={showDeleteModal}
@@ -70,10 +71,10 @@ const MessageItem: React.FC<MessageItemProps> = React.memo(({message}) => {
         <DeleteIcon width={17.5} height={21.5} color={'red'} />
       </TouchableOpacity>
     );
-  };
+  }, [showDeleteModal]);
 
   return (
-    <>
+    <Animated.View entering={FadeInRight} exiting={FadeOutDown}>
       <DayDate showDate={message.showDate} createdAt={message.createdAt} />
       {isSender && message.messageType !== 'deleted' ? (
         <Swipeable
@@ -85,7 +86,7 @@ const MessageItem: React.FC<MessageItemProps> = React.memo(({message}) => {
         renderMessage(isSender)
       )}
       {/* {renderMessage(isSender)} */}
-    </>
+    </Animated.View>
   );
 });
 

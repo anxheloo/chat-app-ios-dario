@@ -126,14 +126,27 @@ export const closePeerConnection = () => {
 // ====================================================================
 
 // Switch camera
-export const switchCamera = () => {
-  const {localStream, updateWebRTCState, cameraSwitched} =
-    useAppStore.getState();
+export const switchCamera = async () => {
+  const {
+    localStream,
+    remoteStream,
+    updateWebRTCState,
+    cameraSwitched,
+    switchVideoSources,
+  } = useAppStore.getState();
 
-  localStream?.getVideoTracks().forEach(track => {
-    track._switchCamera();
-  });
+  const faceMode = !cameraSwitched ? 'environment' : 'user';
+  const mediaSource = switchVideoSources ? remoteStream : localStream;
+
   updateWebRTCState({cameraSwitched: !cameraSwitched});
+
+  mediaSource?.getVideoTracks().forEach(async track => {
+    await track
+      .applyConstraints({
+        facingMode: faceMode,
+      })
+      .catch(err => console.warn('Failed to switch camera:', err));
+  });
 };
 
 // Switch remote with local and vice versa
@@ -299,6 +312,7 @@ export const startCall = async () => {
   const mediaConstraints = {
     audio: true,
     video: callType === 'video' ? true : false,
+    faceMode: callType === 'video' && 'user',
   };
 
   try {

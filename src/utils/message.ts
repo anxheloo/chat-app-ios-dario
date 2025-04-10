@@ -380,24 +380,40 @@ export const postMediaMessages = async (
     if (uploadResponse.status === 200) {
       const uploadedFilePaths = uploadResponse.data.filePaths;
 
+      const temporaryUiMessages = tempMsgs.map((tempMsg: Message) => ({
+        ...tempMsg,
+        isLocalUri: true,
+        uploading: false,
+      }));
+
+      updateSelectedChatMessages(current =>
+        current.map(
+          msg =>
+            temporaryUiMessages.find(
+              (updated: Message) => updated._id === msg._id,
+            ) || msg,
+        ),
+      );
+
       // 3. Construct the final message objects
       const uploadedMessages = tempMsgs.map(
         (tempMsg: Message, index: number) => ({
           ...tempMsg,
           uploading: false,
+          isLocalUri: false,
           fileUrl: uploadedFilePaths[index],
         }),
       );
 
       // 4. Update UI with final URLs
-      updateSelectedChatMessages(current =>
-        current.map(
-          msg =>
-            uploadedMessages.find(
-              (updated: Message) => updated._id === msg._id,
-            ) || msg,
-        ),
-      );
+      // updateSelectedChatMessages(current =>
+      //   current.map(
+      //     msg =>
+      //       uploadedMessages.find(
+      //         (updated: Message) => updated._id === msg._id,
+      //       ) || msg,
+      //   ),
+      // );
 
       await socket?.emit('sendMessage', {messages: uploadedMessages});
     }

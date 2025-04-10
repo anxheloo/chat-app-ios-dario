@@ -7,6 +7,7 @@ import {apiClient} from '../../api/apiClient';
 import {DELETE_MESSAGE} from '../../api/apis';
 
 import {useAppStore} from '../../store';
+// import { onPlayPause } from '../../utils/voiceMessage';
 
 const DeleteMsg = React.memo(() => {
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
@@ -24,6 +25,8 @@ const DeleteMsg = React.memo(() => {
 
   // Delete Specific message
   const handleDelete = async () => {
+    // await onPlayPause(msgId);
+
     try {
       const res = await apiClient.post(DELETE_MESSAGE, {msgId: msgId});
 

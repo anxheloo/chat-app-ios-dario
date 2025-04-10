@@ -175,6 +175,7 @@ export const uploadAudioMessage = async (fileUri: string) => {
     messageType: 'audio',
     fileUrl: fileUri,
     expiresAt: disappearingMessages.value,
+    // downloading: false,
     uploading: true,
     duration: recordSecs,
     waveMetering: waveMetering,
@@ -198,24 +199,22 @@ export const uploadAudioMessage = async (fileUri: string) => {
     });
 
     if (response.status === 200) {
-      console.log('Inside 200');
       const uploadedFilePath = response.data.filePaths[0];
 
-      console.log('This is uploadedFilePath:', uploadedFilePath);
+      updateSelectedChatMessages(current =>
+        current.map(msg =>
+          msg._id === tempMsg._id
+            ? {...msg, isLocalUri: true, uploading: false}
+            : msg,
+        ),
+      );
 
-      // // Create final message with correct file URL
+      // Create final message with correct file URL
       const uploadedVoice = {
         ...tempMsg,
         uploading: false,
         fileUrl: uploadedFilePath,
       };
-
-      console.log('This is uploadedVoice:', uploadedVoice);
-
-      // // Update UI and emit the message via Socket.io
-      updateSelectedChatMessages(current =>
-        current.map(msg => (msg._id === tempMsg._id ? uploadedVoice : msg)),
-      );
 
       socket?.emit('sendMessage', {messages: [uploadedVoice]});
     }
@@ -228,16 +227,34 @@ export const uploadAudioMessage = async (fileUri: string) => {
     updateMicSlice({
       recordSecs: 0,
       waveMetering: null,
-      // longPressed: false,
     });
   }
 };
 
 export const onPlayPause = async (messageId: string, filePath: string) => {
-  const {playingAudioId, isPlaying, updateMicSlice} = useAppStore.getState();
+  const {
+    playingAudioId,
+    isPlaying,
+    updateMicSlice,
+    selectedChatMessages,
+    // updateSelectedChatMessages,
+  } = useAppStore.getState();
+
+  const message = selectedChatMessages.find(msg => msg._id === messageId);
+  if (!message) {
+    return;
+  }
+
   const audioRecorderPlayer = getAudioPlayer();
 
-  console.log('This is filepath:', `${HOST}/${filePath}`);
+  let playUrl = message?.isLocalUri ? message?.fileUrl : `${HOST}/${filePath}`;
+
+  // if (!localPath) {
+  // updateSelectedChatMessages(messages =>
+  //   messages.map(msg =>
+  //     msg._id === messageId ? {...msg, isDownloading: true} : msg,
+  //   ),
+  // );
 
   try {
     // If the same message is playing, toggle pause/play
@@ -265,7 +282,7 @@ export const onPlayPause = async (messageId: string, filePath: string) => {
     // TEST e.isFinished , also test what e returns in android
 
     // Start playing the new audio. This keeps listeners going for playing audios.
-    await audioRecorderPlayer.startPlayer(`${HOST}/${filePath}`);
+    await audioRecorderPlayer.startPlayer(playUrl);
     updateMicSlice({playingAudioId: messageId, isPlaying: true});
 
     audioRecorderPlayer.addPlayBackListener((e: PlayBackType) => {

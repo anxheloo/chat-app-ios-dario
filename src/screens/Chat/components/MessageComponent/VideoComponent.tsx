@@ -32,7 +32,9 @@ const VideoComponent: React.FC<VideoProps> = memo(({message, isSender}) => {
   const openVideo = useCallback(() => {
     if (!message.uploading) {
       navigation.navigate('FullScreenMedia', {
-        fileUrl: message.fileUrl,
+        fileUrl: message?.isLocalUri
+          ? message.fileUrl
+          : `${HOST}/${message.fileUrl}`,
         type: 'video',
       });
     }
@@ -53,7 +55,9 @@ const VideoComponent: React.FC<VideoProps> = memo(({message, isSender}) => {
           fullscreenOrientation="all"
           source={{
             // uri: message.fileUrl
-            uri: `${HOST}/${message.fileUrl}`,
+            uri: message?.isLocalUri
+              ? message.fileUrl
+              : `${HOST}/${message.fileUrl}`,
           }}
           style={styles.video}
           resizeMode="cover"

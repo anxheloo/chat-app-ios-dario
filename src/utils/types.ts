@@ -52,6 +52,8 @@ export type Message = {
   fileUrl: string;
   thumbnailUrl?: string | null;
   uploading: boolean;
+  downloading?: boolean;
+  isLocalUri?: boolean;
   duration?: number;
   showDate?: boolean;
   waveMetering?: number[] | null;

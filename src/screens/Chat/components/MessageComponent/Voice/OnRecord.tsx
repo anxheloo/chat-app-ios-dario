@@ -44,12 +44,15 @@ const OnRecord = () => {
 
   return (
     <View style={styles.recordingContainer}>
-      <Animated.View style={animatedStyle}>
-        <MicrophoneIcon width={25} height={25} color={'black'} />
-      </Animated.View>
-      <Text style={styles.recordingSecs}>
-        {formatDuration(Math.round(recordSecs / 1000))}
-      </Text>
+      <View style={styles.twoChildContainer}>
+        <Animated.View style={animatedStyle}>
+          <MicrophoneIcon width={25} height={25} color={'black'} />
+        </Animated.View>
+        <Text style={styles.recordingSecs}>
+          {formatDuration(Math.round(recordSecs / 1000)) ?? '00:00'}
+        </Text>
+      </View>
+
       <ShimmerText>Recording...</ShimmerText>
     </View>
   );
@@ -60,13 +63,16 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: 295,
+    justifyContent: 'space-between',
+  },
+
+  twoChildContainer: {
+    flexDirection: 'row',
+    gap: 20,
+    alignItems: 'center',
   },
 
   recordingSecs: {
-    position: 'absolute',
-    left: 40,
     color: COLORS.LightGray,
   },
 });

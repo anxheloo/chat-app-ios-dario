@@ -1,5 +1,5 @@
 import React, {useMemo} from 'react';
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import {ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
 
 import ReusableText from '../../components/ReusableText';
 import Avatar from '../../components/Persona/Avatar';
@@ -33,7 +33,7 @@ const Profile: React.FC<ProfileProps> = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.content}>
         <View style={styles.textContainer}>
           <ReusableText fontSize={FONTSIZE.title} fontWeight={700}>
@@ -65,13 +65,13 @@ const Profile: React.FC<ProfileProps> = () => {
 
         <View style={styles.contentContainer}>{settings}</View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: 'white',
   },
 

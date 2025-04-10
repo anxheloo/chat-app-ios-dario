@@ -1,10 +1,15 @@
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useState} from 'react';
 import {ActivityIndicator, Image, StyleSheet, View} from 'react-native';
+
+import {SafeAreaView} from 'react-native-safe-area-context';
+
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+
 import Video from 'react-native-video';
+
 import {RootStackParamList} from '../../utils/types';
+
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
-import {HOST} from '../../api/apis';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'FullScreenMedia'>;
 
@@ -14,9 +19,7 @@ const FullScreenMedia: React.FC<Props> = ({route, navigation}) => {
   const [isLoading, setIsLoading] = useState(true);
 
   return (
-    <View style={styles.container}>
-      {isLoading && <ActivityIndicator size="large" color={'#FFF'} />}
-
+    <SafeAreaView style={styles.safeArea}>
       <CloseIcon
         onPress={() => navigation.goBack()}
         width={35}
@@ -25,37 +28,49 @@ const FullScreenMedia: React.FC<Props> = ({route, navigation}) => {
         fill={'#fff'}
       />
 
-      {type === 'image' ? (
-        <Image
-          source={{uri: `${HOST}/${fileUrl}`}}
-          style={styles.media}
-          resizeMode="contain"
-          onLoad={() => setIsLoading(false)}
-        />
-      ) : (
-        <Video
-          source={{uri: `${HOST}/${fileUrl}`}}
-          style={styles.media}
-          controls
-          resizeMode="contain"
-          paused={false}
-          onLoad={() => setIsLoading(false)}
-        />
+      {isLoading && (
+        <View style={[StyleSheet.absoluteFill, styles.loadingContainer]}>
+          <ActivityIndicator size="large" color={'#FFF'} />
+        </View>
       )}
-    </View>
+
+      <View
+        style={[StyleSheet.absoluteFill, styles.mediaView]}
+        pointerEvents="none">
+        {type === 'image' ? (
+          <Image
+            source={{uri: fileUrl}}
+            style={styles.media}
+            resizeMode="contain"
+            onLoad={() => setIsLoading(false)}
+          />
+        ) : (
+          <Video
+            source={{uri: fileUrl}}
+            style={styles.media}
+            controls
+            resizeMode="cover"
+            paused={false}
+            onLoad={() => setIsLoading(false)}
+          />
+        )}
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   safeArea: {flex: 1, backgroundColor: 'black'},
-  container: {
-    flex: 1,
-    backgroundColor: 'black',
+  mediaView: {
+    backgroundColor: 'transparent',
     justifyContent: 'center',
-    // alignItems: 'center',
   },
-  media: {flex: 1, maxHeight: '80%', zIndex: 10},
-  closeIcon: {position: 'absolute', top: 80, left: 20, zIndex: 20},
+  media: {flex: 1, maxHeight: '70%'},
+  closeIcon: {margin: 20},
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
 
 export default FullScreenMedia;

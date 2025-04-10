@@ -34,9 +34,6 @@ const AudioWave: React.FC<Props> = ({
   const isPlaying = useAppStore(state => state.isPlaying);
   const recordSecs = useAppStore(state => state.recordSecs);
 
-  // console.log('This is duration in AudioWave:', duration);
-  // console.log('This is recordSecs in AudioWave:', recordSecs);
-
   const progress = useSharedValue(0);
 
   const animatedStyle = useAnimatedStyle(() => ({
