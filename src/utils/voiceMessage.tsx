@@ -232,13 +232,8 @@ export const uploadAudioMessage = async (fileUri: string) => {
 };
 
 export const onPlayPause = async (messageId: string, filePath: string) => {
-  const {
-    playingAudioId,
-    isPlaying,
-    updateMicSlice,
-    selectedChatMessages,
-    // updateSelectedChatMessages,
-  } = useAppStore.getState();
+  const {playingAudioId, isPlaying, updateMicSlice, selectedChatMessages} =
+    useAppStore.getState();
 
   const message = selectedChatMessages.find(msg => msg._id === messageId);
   if (!message) {
@@ -249,12 +244,7 @@ export const onPlayPause = async (messageId: string, filePath: string) => {
 
   let playUrl = message?.isLocalUri ? message?.fileUrl : `${HOST}/${filePath}`;
 
-  // if (!localPath) {
-  // updateSelectedChatMessages(messages =>
-  //   messages.map(msg =>
-  //     msg._id === messageId ? {...msg, isDownloading: true} : msg,
-  //   ),
-  // );
+  console.log('This is message:', message);
 
   try {
     // If the same message is playing, toggle pause/play
@@ -279,29 +269,46 @@ export const onPlayPause = async (messageId: string, filePath: string) => {
       });
     }
 
-    // TEST e.isFinished , also test what e returns in android
-
     // Start playing the new audio. This keeps listeners going for playing audios.
     await audioRecorderPlayer.startPlayer(playUrl);
     updateMicSlice({playingAudioId: messageId, isPlaying: true});
 
-    audioRecorderPlayer.addPlayBackListener((e: PlayBackType) => {
+    audioRecorderPlayer.addPlayBackListener(async (e: PlayBackType) => {
       updateMicSlice({
         recordSecs: e.currentPosition,
       });
 
       if (e.currentPosition >= e.duration || e.isFinished) {
-        audioRecorderPlayer.stopPlayer();
-        audioRecorderPlayer.removePlayBackListener();
-        // Stop when finished
-        updateMicSlice({
-          isPlaying: false,
-          playingAudioId: null,
-          recordSecs: 0,
-        });
+        await stopAndClearRecorder();
       }
     });
   } catch (error) {
     console.error('Error playing voice message:', error);
   }
+
+  // ReactNativeBlobUtil.config({
+  //   // add this option that makes response data to be stored as a file,
+  //   // this is much more performant.
+  //   fileCache: true,
+  // })
+  //   .fetch('GET', `${HOST}/${filePath}`, {
+  //     //some headers ..
+  //   })
+  //   .then(res => {
+  //     // the temp file path
+  //     console.log('The file saved to ', res.path());
+  //   });
+};
+
+export const stopAndClearRecorder = async () => {
+  const {updateMicSlice} = useAppStore.getState();
+
+  const audioPlayer = getAudioPlayer();
+  await audioPlayer.stopPlayer();
+  audioPlayer.removePlayBackListener();
+  updateMicSlice({
+    playingAudioId: null,
+    isPlaying: false,
+    recordSecs: 0,
+  });
 };

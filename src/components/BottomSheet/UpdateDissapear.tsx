@@ -1,4 +1,4 @@
-import React, {memo, useCallback, useRef, useState} from 'react';
+import React, {memo, useCallback, useState} from 'react';
 import {
   View,
   StyleSheet,
@@ -7,8 +7,6 @@ import {
   KeyboardAvoidingView,
   Alert,
   TouchableOpacity,
-  Animated,
-  Easing,
   ActivityIndicator,
 } from 'react-native';
 
@@ -23,6 +21,17 @@ import {apiClient} from '../../api/apiClient';
 import ClockIcon from '../../assets/icons/profile/ClockIcon';
 import RightIcon from '../../assets/icons/profile/RighArrow';
 
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  Easing,
+  interpolate,
+  Extrapolation,
+} from 'react-native-reanimated';
+
+import {options} from '../../utils/constants';
+
 type UpdateMessagesProps = {
   cancel: () => void;
 };
@@ -35,60 +44,85 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = memo(({cancel}) => {
     text: string;
     value: number | null;
   }>(disappearingMessages);
+
   const [loading, setIsLoading] = useState<boolean>(false);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const isExpanded = useSharedValue(false);
+  const dropdownHeight = useSharedValue(0);
+  const dropdownPadding = useSharedValue(0);
 
-  const dropdownHeight = useRef(new Animated.Value(0)).current;
-  const dropdownPadding = useRef(new Animated.Value(0)).current;
+  const animatedStyle = useAnimatedStyle(() => ({
+    height: dropdownHeight.value,
+    padding: dropdownPadding.value,
+  }));
 
-  const options = [
-    {text: 'None', value: null},
-    {text: '30 seconds', value: 30 * 1000},
-    {text: '5 minutes', value: 5 * 60 * 1000},
-    {text: '30 minutes', value: 30 * 60 * 1000},
-    {text: '1 hour', value: 60 * 60 * 1000},
-    {text: '8 hours', value: 8 * 60 * 60 * 1000},
-    {text: '1 day', value: 24 * 60 * 60 * 1000},
-    {text: '1 week', value: 7 * 24 * 60 * 60 * 1000},
-  ];
+  const rotationStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        rotate: `${interpolate(
+          dropdownHeight.value,
+          [0, 350],
+          [0, 90],
+          Extrapolation.CLAMP,
+        )}deg`,
+      },
+    ],
+  }));
 
   const toggleDropdown = useCallback(() => {
-    if (isExpanded) {
-      setIsExpanded(false);
+    if (isExpanded.value) {
+      isExpanded.value = false;
       // Close dropdown
-      Animated.parallel([
-        Animated.timing(dropdownHeight, {
-          toValue: 0,
-          duration: 300,
-          easing: Easing.ease,
-          useNativeDriver: false,
-        }),
-        Animated.timing(dropdownPadding, {
-          toValue: 0,
-          duration: 300,
-          easing: Easing.ease,
-          useNativeDriver: false,
-        }),
-      ]).start();
+      // Animated.parallel([
+      //   Animated.timing(dropdownHeight, {
+      //     toValue: 0,
+      //     duration: 300,
+      //     easing: Easing.ease,
+      //     useNativeDriver: false,
+      //   }),
+      //   Animated.timing(dropdownPadding, {
+      //     toValue: 0,
+      //     duration: 300,
+      //     easing: Easing.ease,
+      //     useNativeDriver: false,
+      //   }),
+      // ]).start();
+
+      dropdownHeight.value = withTiming(0, {
+        duration: 300,
+        easing: Easing.ease,
+      });
+      dropdownPadding.value = withTiming(0, {
+        duration: 300,
+        easing: Easing.ease,
+      });
     } else {
       // open dropdown
-      setIsExpanded(true);
-      Animated.parallel([
-        Animated.timing(dropdownHeight, {
-          toValue: 350,
-          duration: 300,
-          easing: Easing.ease,
-          useNativeDriver: false,
-        }),
-        Animated.timing(dropdownPadding, {
-          toValue: 20,
-          duration: 300,
-          easing: Easing.ease,
-          useNativeDriver: false,
-        }),
-      ]).start();
+      isExpanded.value = true;
+      // Animated.parallel([
+      //   Animated.timing(dropdownHeight, {
+      //     toValue: 350,
+      //     duration: 300,
+      //     easing: Easing.ease,
+      //     useNativeDriver: false,
+      //   }),
+      //   Animated.timing(dropdownPadding, {
+      //     toValue: 20,
+      //     duration: 300,
+      //     easing: Easing.ease,
+      //     useNativeDriver: false,
+      //   }),
+      // ]).start();
+
+      dropdownHeight.value = withTiming(350, {
+        duration: 300,
+        easing: Easing.ease,
+      });
+      dropdownPadding.value = withTiming(20, {
+        duration: 300,
+        easing: Easing.ease,
+      });
     }
-  }, [isExpanded, dropdownHeight, dropdownPadding]);
+  }, [dropdownHeight, dropdownPadding, isExpanded]);
 
   const updateMessages = useCallback(async (): Promise<void> => {
     setIsLoading(true);
@@ -111,9 +145,6 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = memo(({cancel}) => {
       Alert.alert('Update Error', error.response.data.message);
     }
   }, [cancel, selectableOption, setUserPersona, toggleDropdown]);
-
-  console.log('This is disappearingMessages:', disappearingMessages);
-  console.log('This is selectableOption:', selectableOption);
 
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.contentContainer}>
@@ -161,39 +192,31 @@ const UpdateDissapear: React.FC<UpdateMessagesProps> = memo(({cancel}) => {
                 style={{flex: 1}}>
                 {disappearingMessages.text}
               </ReusableText>
-              <View
-                style={{
-                  transform: [{rotate: isExpanded ? '-90deg' : '90deg'}],
-                }}>
+              <Animated.View style={rotationStyle}>
                 <RightIcon width={7} height={7} />
-              </View>
+              </Animated.View>
             </TouchableOpacity>
 
-            <Animated.View
-              style={[
-                styles.optionsContainer,
-                {height: dropdownHeight, paddingVertical: dropdownPadding},
-              ]}>
-              {isExpanded &&
-                options.map(item => (
-                  <TouchableOpacity
-                    key={item.value}
-                    style={styles.option}
-                    onPress={() => {
-                      setSelectableOption({text: item.text, value: item.value});
-                    }}>
-                    <View style={styles.circle}>
-                      {selectableOption.value === item.value && (
-                        <View style={styles.selectableCircle} />
-                      )}
-                    </View>
-                    <ReusableText
-                      fontWeight={FONTWEIGHT[300]}
-                      fontSize={FONTSIZE.md}>
-                      {item.text}
-                    </ReusableText>
-                  </TouchableOpacity>
-                ))}
+            <Animated.View style={[styles.optionsContainer, animatedStyle]}>
+              {options.map(item => (
+                <TouchableOpacity
+                  key={item.value}
+                  style={styles.option}
+                  onPress={() => {
+                    setSelectableOption({text: item.text, value: item.value});
+                  }}>
+                  <View style={styles.circle}>
+                    {selectableOption.value === item.value && (
+                      <View style={styles.selectableCircle} />
+                    )}
+                  </View>
+                  <ReusableText
+                    fontWeight={FONTWEIGHT[300]}
+                    fontSize={FONTSIZE.md}>
+                    {item.text}
+                  </ReusableText>
+                </TouchableOpacity>
+              ))}
             </Animated.View>
           </View>
         </View>

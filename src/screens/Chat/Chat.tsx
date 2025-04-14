@@ -18,38 +18,32 @@ import ChatHeader from './components/ChatHeader';
 import ChatContainer from './components/ChatContainer';
 import ChatFooter from './components/ChatFooter';
 
-import {getAudioPlayer} from '../../utils/voiceMessage';
+import {stopAndClearRecorder} from '../../utils/voiceMessage';
+import {updateCurrentConversation} from '../../utils/message';
 
 const Chat = () => {
-  const updateMicSlice = useAppStore(state => state.updateMicSlice);
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
 
   useEffect(() => {
     console.log('✅ ChatContainer Mounted');
 
+    updateCurrentConversation();
+
     return () => {
       console.log('❌ ChatContainer Unmounted');
       updateFuncChat({selectedChatMessages: [], selectedChatData: null});
 
-      // Stop the audio player if it's still playing
-      const audioPlayer = getAudioPlayer();
-      audioPlayer.stopPlayer();
-      audioPlayer.removePlayBackListener();
-      updateMicSlice({
-        playingAudioId: null,
-        isPlaying: false,
-        recordSecs: 0,
-      });
+      stopAndClearRecorder();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <KeyboardAvoidingView
-      behavior="padding"
-      style={styles.container}
-      keyboardVerticalOffset={-30}>
-      <SafeAreaView style={styles.safeAreaView}>
+    <SafeAreaView style={styles.safeAreaView}>
+      <KeyboardAvoidingView
+        behavior="padding"
+        style={styles.container}
+        keyboardVerticalOffset={-30}>
         <View style={styles.container}>
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <>
@@ -59,10 +53,10 @@ const Chat = () => {
           </TouchableWithoutFeedback>
           <ChatFooter />
         </View>
-        <FullScreenLoader version={'absolute'} />
-      </SafeAreaView>
+      </KeyboardAvoidingView>
+      <FullScreenLoader version={'absolute'} />
       <DeleteMsg />
-    </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 

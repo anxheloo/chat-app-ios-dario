@@ -1,70 +1,16 @@
 import React from 'react';
-import {StyleSheet, Text, TouchableOpacity, View, Alert} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 
 import {BORDERRADIUS, COLORS, FONTSIZE} from '../../theme/theme';
 
-import {apiClient} from '../../api/apiClient';
-import {DELETE_MESSAGE} from '../../api/apis';
-
 import {useAppStore} from '../../store';
-// import { onPlayPause } from '../../utils/voiceMessage';
+import {closeModal, handleDelete} from '../../utils/message';
 
 const DeleteMsg = React.memo(() => {
-  const updateFuncChat = useAppStore(state => state.updateFuncChat);
-  const updateSelectedChatMessages = useAppStore(
-    state => state.updateSelectedChatMessages,
-  );
   const selectedMsgToDelete = useAppStore(
     state => state.selectedMessageToDelete,
   );
-  const socket = useAppStore(state => state.socket);
-  const id = useAppStore(state => state.id);
-
   const isShown = selectedMsgToDelete !== null;
-  const msgId = selectedMsgToDelete?._id;
-
-  // Delete Specific message
-  const handleDelete = async () => {
-    // await onPlayPause(msgId);
-
-    try {
-      const res = await apiClient.post(DELETE_MESSAGE, {msgId: msgId});
-
-      console.log('this is msgid', msgId);
-
-      if (res.status === 200) {
-        console.log('This is the new conversation:', res.data.conversation);
-
-        updateSelectedChatMessages(current =>
-          current.map(msg => {
-            if (msg._id === msgId) {
-              return {
-                ...msg,
-                messageType: 'deleted',
-                content: 'Message deleted',
-              };
-            }
-            return msg;
-          }),
-        );
-
-        await socket?.emit('deleteSpecificMessage', {
-          messageId: msgId,
-          senderId: id,
-          recipientId: res.data.recipientId,
-          conversation: res.data.conversation,
-        });
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Unable to delete the message. Please try again.');
-    } finally {
-      updateFuncChat({selectedMessageToDelete: null});
-    }
-  };
-
-  const closeModal = () => {
-    updateFuncChat({selectedMessageToDelete: null});
-  };
 
   if (!isShown) {
     return null;

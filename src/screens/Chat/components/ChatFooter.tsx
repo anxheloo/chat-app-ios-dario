@@ -25,6 +25,8 @@ import {checkPermissionStatus} from '../../../utils/helpers';
 import {permission} from '../../../utils/permissions';
 
 import Animated, {
+  Easing,
+  ReduceMotion,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -41,7 +43,11 @@ const ChatFooter = () => {
   const translateX = useAnimatedStyle(() => ({
     transform: [
       {
-        translateX: withTiming(translateValue.value, {duration: 200}),
+        translateX: withTiming(translateValue.value, {
+          duration: 400,
+          easing: Easing.circle,
+          reduceMotion: ReduceMotion.System,
+        }),
       },
     ],
   }));

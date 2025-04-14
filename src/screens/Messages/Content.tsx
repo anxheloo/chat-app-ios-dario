@@ -67,7 +67,7 @@ const Content = memo(() => {
     }
   };
 
-  if (!conversations.length) {
+  if (conversations.length === 0) {
     return <EmptyChat navigation={navigation} />;
   }
 

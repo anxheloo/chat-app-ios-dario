@@ -74,6 +74,9 @@ export type Conversation = {
   lastMessage?: LastMessage;
   lastMessageType?: string;
   lastMessageFileUrl?: string | null;
+  recipientUnread: number;
+  senderUnread?: number;
+  lastSender: string;
 };
 
 export type Call = {

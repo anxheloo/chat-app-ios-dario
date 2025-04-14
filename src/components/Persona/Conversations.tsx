@@ -1,7 +1,6 @@
 import React, {useCallback, useMemo, useState} from 'react';
 import {
   ActivityIndicator,
-  Alert,
   StyleSheet,
   Text,
   TouchableHighlight,
@@ -11,9 +10,6 @@ import {
 
 import Avatar from './Avatar';
 import {useAppStore} from '../../store';
-
-import {DELETE_CONVERSATION} from '../../api/apis';
-import {apiClient} from '../../api/apiClient';
 
 import {Conversation, NavigationProps} from '../../utils/types';
 import {COLORS, FONTSIZE} from '../../theme/theme';
@@ -25,7 +21,11 @@ import CameraIcon from '../../assets/icons/Chat/CameraIcon';
 import VideoIcon from '../../assets/icons/Chat/VideoIcon';
 import DeleteIcon from '../../assets/icons/Chat/DeleteIcon';
 import MicrophoneIcon from '../../assets/icons/Chat/MicrophoneIcon';
+
 import {navigate} from '../../navigation/navigationRef';
+
+import {deleteConversation} from '../../utils/message';
+import UnRead from './UnRead';
 
 type ConversationsProps = {
   conversation: Conversation;
@@ -37,7 +37,6 @@ type ConversationsProps = {
 const Conversations: React.FC<ConversationsProps> = React.memo(
   ({conversation, backgroundColor, cancel}) => {
     const {updateFuncChat, id: loggedInUserId} = useAppStore.getState();
-    const conversations = useAppStore(state => state.conversations);
     const [loading, setLoading] = useState(false);
 
     const recipient = useMemo(() => {
@@ -45,8 +44,6 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
         user => user._id !== loggedInUserId,
       );
     }, [conversation.participants, loggedInUserId]);
-
-    console.log('This is conversation: ', conversation);
 
     // Select contact to update chat
     const selectContact = useCallback(() => {
@@ -69,7 +66,7 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
         return null;
       }
 
-      const {messageType, content, fileUrl} = conversation?.lastMessage;
+      const {messageType, content} = conversation?.lastMessage;
 
       switch (messageType) {
         case 'text':
@@ -112,33 +109,10 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
       }
     }, [conversation.lastMessage]);
 
-    const deleteConversation = useCallback(async () => {
-      setLoading(true);
-
-      try {
-        const res = await apiClient.post(DELETE_CONVERSATION, {
-          conversationId: conversation._id,
-        });
-
-        if (res.status === 200) {
-          // Update the UI
-          updateFuncChat({
-            conversations: conversations.filter(
-              item => item._id !== conversation._id,
-            ),
-          });
-        }
-      } catch (error) {
-        Alert.alert('Could not delete the conversation. Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    }, [conversation._id, conversations, updateFuncChat]);
-
     const renderRightActions = useCallback(() => {
       return (
         <TouchableOpacity
-          onPress={deleteConversation}
+          onPress={() => deleteConversation(setLoading, conversation._id)}
           style={[styles.renderRightActions]}>
           {loading ? (
             <ActivityIndicator size="small" color="white" />
@@ -147,7 +121,7 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
           )}
         </TouchableOpacity>
       );
-    }, [deleteConversation, loading]);
+    }, [conversation._id, loading]);
 
     if (!recipient) {
       return null;
@@ -184,6 +158,10 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
             <Text style={[styles.messageDate]}>
               {moment(conversation?.lastMessageTime).format('H:mm')}
             </Text>
+
+            {conversation.lastSender !== loggedInUserId && (
+              <UnRead numberOfUnreadMessages={conversation.recipientUnread} />
+            )}
           </>
         </TouchableHighlight>
       </ReanimatedSwipeable>

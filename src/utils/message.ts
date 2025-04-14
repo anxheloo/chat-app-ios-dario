@@ -7,7 +7,7 @@ import {useAppStore} from '../store';
 import {Contact, Conversation, Message} from './types';
 import {ObjectId} from 'bson';
 
-import {UPLOAD_FILE} from '../api/apis';
+import {DELETE_CONVERSATION, DELETE_MESSAGE, UPLOAD_FILE} from '../api/apis';
 import {apiClient} from '../api/apiClient';
 import {checkPermissionStatus} from './helpers';
 import {permission} from './permissions';
@@ -18,14 +18,23 @@ type ImagePickerType = 'capture' | 'library';
 // ====================================================
 // Message Socket handlers
 // ====================================================
-export const handleReceiveMessage = (message: any) => {
+export const handleReceiveMessage = ({message, version}: any) => {
   const {
     conversations,
     selectedChatData,
     sortConversations,
     updateFuncChat,
+    updateConversations,
     updateSelectedChatMessages,
+    socket,
+    id,
   } = useAppStore.getState();
+
+  console.log('This is id:', id, 'this is message.sender:', message.sender);
+  console.log('This is version:', version);
+
+  const isRecipient = message.sender?._id !== id;
+  const isText = version === 'text';
 
   const tempConversations = [...conversations];
 
@@ -40,6 +49,10 @@ export const handleReceiveMessage = (message: any) => {
       ...conversations[existingConversationIndex],
       lastMessage: message,
       lastMessageTime: message.createdAt,
+      recipientUnread: isRecipient
+        ? conversations[existingConversationIndex].recipientUnread + 1
+        : 0,
+      lastSender: message.sender._id,
     };
   } else {
     // Add a new conversation if it doesn't exist
@@ -48,6 +61,8 @@ export const handleReceiveMessage = (message: any) => {
       participants: [message.sender, message.recipient],
       lastMessage: message,
       lastMessageTime: message.createdAt,
+      recipientUnread: 1,
+      lastSender: message.sender._id,
     });
   }
 
@@ -56,13 +71,14 @@ export const handleReceiveMessage = (message: any) => {
     conversations: tempConversations,
   });
 
-  // sortConversations();
-
   if (
-    selectedChatData?._id === message.recipient._id ||
-    selectedChatData?._id === message.sender._id ||
-    selectedChatData?.conversationId === message.conversationId
+    (selectedChatData?._id === message.recipient._id ||
+      selectedChatData?._id === message.sender._id ||
+      selectedChatData?.conversationId === message.conversationId) &&
+    (isRecipient || isText)
   ) {
+    console.log('Inside condition ');
+
     updateSelectedChatMessages(current => [
       ...current.filter(msg => msg._id !== message._id),
       {
@@ -74,7 +90,25 @@ export const handleReceiveMessage = (message: any) => {
       },
     ]);
 
-    // updateKeys({loading: false});
+    // Update the conversation where we are currently in
+    updateConversations(prev =>
+      prev.map(item => {
+        if (item._id === message.conversationId) {
+          return {
+            ...item,
+            recipientUnread: 0,
+          };
+        }
+        return item;
+      }),
+    );
+
+    if (isRecipient) {
+      socket?.emit('readMessage', {
+        id: message._id,
+        version: 1,
+      });
+    }
   }
 
   sortConversations();
@@ -110,13 +144,12 @@ export const handleMessageDeleted = ({messageId}: {messageId: string}) => {
   }
 };
 
+// ====================================================
+// Update conversation
+// ====================================================
+
 export const handleConversationUpdated = (conversation: Conversation) => {
   const {conversations, updateFuncChat} = useAppStore.getState();
-
-  console.log(
-    'This is conversation inside handleConversationUpdated:',
-    conversation,
-  );
 
   const existingConversations = conversations.map(item => {
     if (item._id === conversation._id) {
@@ -132,6 +165,46 @@ export const handleConversationUpdated = (conversation: Conversation) => {
 
   updateFuncChat({conversations: existingConversations});
 };
+
+export const updateCurrentConversation = async () => {
+  const {
+    selectedChatData,
+    updateConversations,
+    socket,
+    conversations,
+    id: loggedInUser,
+  } = useAppStore.getState();
+
+  const existingConversationIndex = conversations.find(
+    conversation => conversation._id === selectedChatData?.conversationId,
+  );
+
+  // Update conversation recipientUnRead property to 0 if we have a new message.
+  if (
+    existingConversationIndex &&
+    existingConversationIndex.recipientUnread > 0 &&
+    existingConversationIndex.lastSender !== loggedInUser
+  ) {
+    await socket?.emit('readMessage', {
+      id: selectedChatData?.conversationId,
+      version: 2,
+    });
+
+    updateConversations(prev =>
+      prev.map(item => {
+        if (item._id === selectedChatData?.conversationId) {
+          return {
+            ...item,
+            recipientUnread: 0,
+          };
+        }
+        return item;
+      }),
+    );
+  }
+};
+
+// ====================================================
 
 export const notifyReceiver = (friend: Contact) => {
   const {updateFriends} = useAppStore.getState();
@@ -263,6 +336,7 @@ export const sendMessage = async (
         conversationId: selectedChatData?.conversationId || '',
       },
     ],
+    version: 'text',
   });
 
   setMessage('');
@@ -405,16 +479,6 @@ export const postMediaMessages = async (
         }),
       );
 
-      // 4. Update UI with final URLs
-      // updateSelectedChatMessages(current =>
-      //   current.map(
-      //     msg =>
-      //       uploadedMessages.find(
-      //         (updated: Message) => updated._id === msg._id,
-      //       ) || msg,
-      //   ),
-      // );
-
       await socket?.emit('sendMessage', {messages: uploadedMessages});
     }
   } catch (error: any) {
@@ -427,4 +491,89 @@ export const postMediaMessages = async (
   } finally {
     setCameraOptions(false);
   }
+};
+
+// ====================================================
+// Delete Conversation
+// ====================================================
+export const deleteConversation = async (
+  setLoading: (loading: boolean) => void,
+  conversationId: string,
+) => {
+  const {updateFuncChat, conversations} = useAppStore.getState();
+
+  setLoading(true);
+
+  try {
+    const res = await apiClient.post(DELETE_CONVERSATION, {
+      conversationId: conversationId,
+    });
+
+    if (res.status === 200) {
+      // Update the UI
+      updateFuncChat({
+        conversations: conversations.filter(
+          item => item._id !== conversationId,
+        ),
+      });
+    }
+  } catch (error) {
+    Alert.alert('Could not delete the conversation. Please try again.');
+  } finally {
+    setLoading(false);
+  }
+};
+
+// ====================================================
+// Delete Message
+// ====================================================
+export const handleDelete = async () => {
+  // await onPlayPause(msgId);
+
+  const {
+    selectedMessageToDelete,
+    updateSelectedChatMessages,
+    socket,
+    id,
+    updateFuncChat,
+  } = useAppStore.getState();
+
+  try {
+    const res = await apiClient.post(DELETE_MESSAGE, {
+      msgId: selectedMessageToDelete?._id,
+    });
+
+    if (res.status === 200) {
+      console.log('This is the new conversation:', res.data.conversation);
+
+      updateSelectedChatMessages(current =>
+        current.map(msg => {
+          if (msg._id === selectedMessageToDelete?._id) {
+            return {
+              ...msg,
+              messageType: 'deleted',
+              content: 'Message deleted',
+            };
+          }
+          return msg;
+        }),
+      );
+
+      await socket?.emit('deleteSpecificMessage', {
+        messageId: selectedMessageToDelete?._id,
+        senderId: id,
+        recipientId: res.data.recipientId,
+        conversation: res.data.conversation,
+      });
+    }
+  } catch (error) {
+    Alert.alert('Error', 'Unable to delete the message. Please try again.');
+  } finally {
+    updateFuncChat({selectedMessageToDelete: null});
+  }
+};
+
+export const closeModal = () => {
+  const {updateFuncChat} = useAppStore.getState();
+  updateFuncChat({selectedMessageToDelete: null});
 };
