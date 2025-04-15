@@ -31,14 +31,20 @@ const Voice: React.FC<Props> = ({message, isSender}) => {
 
   return (
     <View style={styles.container}>
-      {message.uploading ? (
+      {message.uploading || message.downloading ? (
         <ActivityIndicator
           size={'small'}
           color={isSender ? 'white' : 'black'}
         />
       ) : (
         <TouchableOpacity
-          onPress={() => onPlayPause(message._id, message.fileUrl)}>
+          onPress={() =>
+            onPlayPause(
+              message._id,
+              message.fileUrl,
+              message.isLocalUri ?? false,
+            )
+          }>
           {isCurrentlyPlaying ? (
             <Pause color={isSender ? 'white' : 'black'} />
           ) : (

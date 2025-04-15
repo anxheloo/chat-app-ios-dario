@@ -231,20 +231,18 @@ export const uploadAudioMessage = async (fileUri: string) => {
   }
 };
 
-export const onPlayPause = async (messageId: string, filePath: string) => {
-  const {playingAudioId, isPlaying, updateMicSlice, selectedChatMessages} =
-    useAppStore.getState();
-
-  const message = selectedChatMessages.find(msg => msg._id === messageId);
-  if (!message) {
-    return;
-  }
+export const onPlayPause = async (
+  messageId: string,
+  filePath: string,
+  isLocalUri: boolean,
+) => {
+  const {playingAudioId, isPlaying, updateMicSlice} = useAppStore.getState();
 
   const audioRecorderPlayer = getAudioPlayer();
 
-  let playUrl = message?.isLocalUri ? message?.fileUrl : `${HOST}/${filePath}`;
-
-  console.log('This is message:', message);
+  let playUrl = isLocalUri
+    ? filePath
+    : await getOrDownloadFile(filePath, messageId);
 
   try {
     // If the same message is playing, toggle pause/play
@@ -285,19 +283,62 @@ export const onPlayPause = async (messageId: string, filePath: string) => {
   } catch (error) {
     console.error('Error playing voice message:', error);
   }
+};
 
-  // ReactNativeBlobUtil.config({
-  //   // add this option that makes response data to be stored as a file,
-  //   // this is much more performant.
-  //   fileCache: true,
-  // })
-  //   .fetch('GET', `${HOST}/${filePath}`, {
-  //     //some headers ..
-  //   })
-  //   .then(res => {
-  //     // the temp file path
-  //     console.log('The file saved to ', res.path());
-  //   });
+export const getOrDownloadFile = async (fileUrl: string, messageId: string) => {
+  const {updateSelectedChatMessages} = useAppStore.getState();
+
+  try {
+    const fileName = `${messageId}.m4a`;
+    // const localPath =
+    //   Platform.OS === 'ios' ? `${fileName}` : `${dirs.CacheDir}/${fileName}`;
+
+    const dirs = ReactNativeBlobUtil.fs.dirs;
+    const localPath = `${dirs.CacheDir}/${fileName}`;
+
+    const exists = await ReactNativeBlobUtil.fs.exists(localPath);
+
+    console.log('This file exists?', exists, 'localPath', localPath);
+    if (exists) {
+      return 'file://' + localPath;
+    }
+
+    console.log("After checking, file doesn't exist. Downloading...");
+
+    updateSelectedChatMessages(current =>
+      current.map(msg =>
+        msg._id === messageId
+          ? {
+              ...msg,
+              downloading: true,
+            }
+          : msg,
+      ),
+    );
+
+    const res = await ReactNativeBlobUtil.config({
+      fileCache: true,
+      path: localPath,
+    }).fetch('GET', `${HOST}/${fileUrl}`);
+
+    updateSelectedChatMessages(current =>
+      current.map(msg =>
+        msg._id === messageId
+          ? {
+              ...msg,
+              isLocalUri: true,
+              downloading: false,
+              fileUrl: 'file://' + localPath,
+            }
+          : msg,
+      ),
+    );
+
+    return 'file://' + res.path();
+  } catch (error) {
+    console.error('Download failed:', error);
+    throw error;
+  }
 };
 
 export const stopAndClearRecorder = async () => {
