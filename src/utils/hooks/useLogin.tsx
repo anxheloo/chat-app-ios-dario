@@ -11,7 +11,6 @@ import {replace} from '../../navigation/navigationRef';
 
 const useLogin = () => {
   const updateKeys = useAppStore(state => state.updateKeys);
-  const setToken = useAppStore(state => state.setToken);
 
   const [username, setUsername] = useState('');
   const [pin, setPin] = useState('');
@@ -34,26 +33,15 @@ const useLogin = () => {
   };
 
   const handleLogin = async () => {
-    console.log('Inside login');
-
     updateKeys({loading: true});
     try {
       const response = await apiClient.post(LOGIN_ROUTE, {username, pin});
 
       if (response.status === 200) {
-        console.log('This is response.status:', response.status);
-
         await saveToken(response.data.token);
-        setToken(response.data.token);
-
         replace('BottomTabNavigation');
       }
     } catch (error: any) {
-      console.log('This is error inside Login:', error);
-      console.log(
-        'This is error.response.data inside Login:',
-        error.response.data,
-      );
       Alert.alert('Login Error', error?.response.data.message);
       setUsername('');
       setPin('');

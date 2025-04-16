@@ -70,6 +70,7 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
 
       switch (messageType) {
         case 'text':
+        case 'deleted':
           return (
             <View style={styles.lastMessage}>
               <Text style={styles.lastMessage} numberOfLines={1}>

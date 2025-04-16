@@ -1,5 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import {Alert} from 'react-native';
+
 import {useAppStore} from '../store';
 
 const TOKEN_KEY = 'auth_token';
@@ -19,8 +21,12 @@ export const saveToken = async (token: string) => {
 
 // Get the token
 export const getToken = async () => {
+  const {setToken} = useAppStore.getState();
   try {
     const token = await AsyncStorage.getItem(TOKEN_KEY);
+    if (token) {
+      setToken(token);
+    }
     return token;
   } catch (error) {
     console.error('Error retrieving token', error);

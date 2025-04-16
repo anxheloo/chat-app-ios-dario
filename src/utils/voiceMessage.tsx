@@ -281,6 +281,7 @@ export const onPlayPause = async (
       }
     });
   } catch (error) {
+    stopAndClearRecorder();
     console.error('Error playing voice message:', error);
   }
 };
@@ -337,6 +338,7 @@ export const getOrDownloadFile = async (fileUrl: string, messageId: string) => {
     return 'file://' + res.path();
   } catch (error) {
     console.error('Download failed:', error);
+    stopAndClearRecorder();
     throw error;
   }
 };

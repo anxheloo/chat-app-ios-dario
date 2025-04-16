@@ -30,9 +30,6 @@ export const handleReceiveMessage = ({message, version}: any) => {
     id,
   } = useAppStore.getState();
 
-  console.log('This is id:', id, 'this is message.sender:', message.sender);
-  console.log('This is version:', version);
-
   const isRecipient = message.sender?._id !== id;
   const isText = version === 'text';
 
@@ -118,6 +115,8 @@ export const handleMessageDeleted = ({messageId}: {messageId: string}) => {
   const {selectedChatMessages, selectedChatData, updateFuncChat} =
     useAppStore.getState();
 
+  console.log('This is message id:', messageId);
+
   // Find the message in the current chat
   const messageToDelete = selectedChatMessages.find(
     (message: Message) => message._id === messageId,
@@ -149,21 +148,20 @@ export const handleMessageDeleted = ({messageId}: {messageId: string}) => {
 // ====================================================
 
 export const handleConversationUpdated = (conversation: Conversation) => {
-  const {conversations, updateFuncChat} = useAppStore.getState();
+  const {updateConversations} = useAppStore.getState();
 
-  const existingConversations = conversations.map(item => {
-    if (item._id === conversation._id) {
-      return {
-        ...item,
-        lastMessage: conversation?.lastMessage,
-        lastMessageTime: conversation.lastMessageTime,
-      };
-    }
-
-    return item;
-  });
-
-  updateFuncChat({conversations: existingConversations});
+  updateConversations(prev =>
+    prev.map(item => {
+      if (item._id === conversation._id) {
+        return {
+          ...item,
+          lastMessage: conversation?.lastMessage,
+          lastMessageTime: conversation.lastMessageTime,
+        };
+      }
+      return item;
+    }),
+  );
 };
 
 export const updateCurrentConversation = async () => {
@@ -536,6 +534,7 @@ export const handleDelete = async () => {
     socket,
     id,
     updateFuncChat,
+    updateConversations,
   } = useAppStore.getState();
 
   try {
@@ -556,6 +555,19 @@ export const handleDelete = async () => {
             };
           }
           return msg;
+        }),
+      );
+
+      updateConversations(current =>
+        current.map(conversation => {
+          if (conversation._id === res.data.conversation._id) {
+            return {
+              ...conversation,
+              lastMessage: res.data.conversation.lastMessage,
+              lastMessageTime: res.data.conversation.lastMessageTime,
+            };
+          }
+          return conversation;
         }),
       );
 

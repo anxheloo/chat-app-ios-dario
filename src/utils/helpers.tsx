@@ -133,7 +133,7 @@ export const checkPermissionStatus = async (permissionType: any) => {
 export const logout = async () => {
   const {
     updateFuncChat,
-    setUserInfoStatus,
+    setIsUserInfoFetched,
     setUserPersona,
     updateCalls,
     setCallsPagination,
@@ -161,7 +161,7 @@ export const logout = async () => {
     });
 
     // user info needes to be fetched again by the new user if app state stays active during logout/login
-    setUserInfoStatus(false);
+    setIsUserInfoFetched(false);
 
     // conversations, friends, paginations
     updateFuncChat({
@@ -203,7 +203,8 @@ export const openScanner = async () => {
 
 // Add Friend
 export const addFriend = async (scannedUser: Contact) => {
-  const {socket, id, setUserInfoStatus, updateFriends} = useAppStore.getState();
+  const {socket, id, setIsUserInfoFetched, updateFriends} =
+    useAppStore.getState();
 
   try {
     const res = await apiClient.post(ADD_FRIEND, {
@@ -217,7 +218,7 @@ export const addFriend = async (scannedUser: Contact) => {
         recipientId: scannedUser?._id,
         senderId: id,
       });
-      setUserInfoStatus(false);
+      setIsUserInfoFetched(false);
       reset('BottomTabNavigation');
       Alert.alert('Success', 'Friend successfully added!');
     }
