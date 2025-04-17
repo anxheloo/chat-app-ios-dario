@@ -14,6 +14,9 @@ import {saveToken} from './TokenStorage';
 import {reset} from '../navigation/navigationRef';
 import {logout} from './helpers';
 
+import {storeGeneratedPrivateKey} from './keys';
+import {generateKeys} from './encryption';
+
 export const getUserInfo = async () => {
   const {
     updateKeys,
@@ -323,24 +326,22 @@ export const handleRegister = async () => {
 
   updateKeys({loading: true});
 
-  //  const {public: publicKey, private: privateKey} = await generateRSAKeyPair();
+  // const {public: publicKey, private: privateKey} = await generateRSAKeyPair();
+
+  const keys = await generateKeys();
 
   try {
     const response = await apiClient.post(SIGNUP_ROUTES, {
       username,
       pin,
       avatar,
-      // publicKey,
+      publicKey: keys?.publicKey,
     });
-
     if (response.status === 201) {
       console.log('This is response success');
-
-      updateKeys({loading: false, message: 'Registered Successful'});
-      //  await savePrivateKey(privateKey);
-
       await saveToken(response.data.token);
-
+      await storeGeneratedPrivateKey(keys?.privateKey!, response.data.id);
+      updateKeys({loading: false, message: 'Registered Successful'});
       reset('BottomTabNavigation');
     }
   } catch (error: any) {

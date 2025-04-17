@@ -10,8 +10,6 @@ const useMessages = (flatListRef: any) => {
   );
   const selectedChatData = useAppStore(state => state.selectedChatData);
 
-  console.log('This are selectedChatData', selectedChatData);
-
   const [pagination, setPagination] = useState({
     isLoading: false,
     hasMore: true,

@@ -46,6 +46,7 @@ export type Message = {
   sender: string;
   recipient: string;
   content?: string;
+  iv?: string;
   createdAt: string;
   expiresAt: number | null;
   messageType: string;
@@ -65,6 +66,7 @@ export type Contact = {
   _id: string;
   username: string;
   avatar: number;
+  publicKey: string;
 };
 
 export type Conversation = {

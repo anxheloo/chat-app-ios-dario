@@ -1,3 +1,4 @@
+import {Buffer} from 'buffer';
 import {Alert} from 'react-native';
 
 import {Image, Video} from 'react-native-compressor';
@@ -13,12 +14,13 @@ import {checkPermissionStatus} from './helpers';
 import {permission} from './permissions';
 
 import * as ImagePicker from 'react-native-image-picker';
+import {decryptMessage, encryptMessage} from './encryption';
 type ImagePickerType = 'capture' | 'library';
 
 // ====================================================
 // Message Socket handlers
 // ====================================================
-export const handleReceiveMessage = ({message, version}: any) => {
+export const handleReceiveMessage = async ({message, version}: any) => {
   const {
     conversations,
     selectedChatData,
@@ -32,6 +34,16 @@ export const handleReceiveMessage = ({message, version}: any) => {
 
   const isRecipient = message.sender?._id !== id;
   const isText = version === 'text';
+
+  if (isText) {
+    const decrypted = await decryptMessage(
+      message.content,
+      message.iv,
+      isRecipient ? message.sender.publicKey : message.recipient.publicKey,
+    );
+
+    message.content = decrypted;
+  }
 
   const tempConversations = [...conversations];
 
@@ -321,19 +333,20 @@ export const sendMessage = async (
     return;
   }
 
-  // Emit the single text message wrapped in an array
-  await socket?.emit('sendMessage', {
-    messages: [
-      {
-        sender: id,
-        content: message.trim(),
-        recipient: selectedChatData?._id,
-        messageType: 'text',
-        fileUrl: undefined,
-        expiresAt: disappearingMessages.value,
-        conversationId: selectedChatData?.conversationId || '',
-      },
-    ],
+  const {encrypted, iv} = await encryptMessage(message.trim());
+
+  const messagePayload = {
+    sender: id,
+    recipient: selectedChatData?._id,
+    messageType: 'text',
+    conversationId: selectedChatData?.conversationId || '',
+    expiresAt: disappearingMessages.value,
+    content: encrypted,
+    iv,
+  };
+
+  socket?.emit('sendMessage', {
+    messages: [messagePayload],
     version: 'text',
   });
 
@@ -355,7 +368,7 @@ export const handleCameraUpload = async (
   if (res.assets?.length) {
     // 1.Check the total size of the selected images or videos
     let totalSize = res.assets.reduce(
-      (acc: any, file: any) => acc + file.fileSize,
+      (acc: number, file: any) => acc + file.fileSize,
       0,
     );
 

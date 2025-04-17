@@ -299,7 +299,6 @@ export const getOrDownloadFile = async (fileUrl: string, messageId: string) => {
 
     const exists = await ReactNativeBlobUtil.fs.exists(localPath);
 
-    console.log('This file exists?', exists, 'localPath', localPath);
     if (exists) {
       return 'file://' + localPath;
     }

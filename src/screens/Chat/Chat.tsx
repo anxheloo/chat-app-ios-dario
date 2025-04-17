@@ -20,19 +20,23 @@ import ChatFooter from './components/ChatFooter';
 
 import {stopAndClearRecorder} from '../../utils/voiceMessage';
 import {updateCurrentConversation} from '../../utils/message';
+import {getPrivateKey} from '../../utils/keys';
 
 const Chat = () => {
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
+  const setUserPersona = useAppStore(state => state.setUserPersona);
 
   useEffect(() => {
     console.log('✅ ChatContainer Mounted');
 
     updateCurrentConversation();
+    getPrivateKey().then(key => {
+      key && setUserPersona({privateKey: key});
+    });
 
     return () => {
       console.log('❌ ChatContainer Unmounted');
       updateFuncChat({selectedChatMessages: [], selectedChatData: null});
-
       stopAndClearRecorder();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -43,7 +47,8 @@ const Chat = () => {
       <KeyboardAvoidingView
         behavior="padding"
         style={styles.container}
-        keyboardVerticalOffset={-30}>
+        // keyboardVerticalOffset={-30}
+      >
         <View style={styles.container}>
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <>

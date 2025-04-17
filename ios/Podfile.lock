@@ -1312,6 +1312,8 @@ PODS:
     - Yoga
   - react-native-create-thumbnail (2.0.1):
     - React-Core
+  - react-native-get-random-values (1.11.0):
+    - React-Core
   - react-native-image-picker (7.2.3):
     - DoubleConversion
     - glog
@@ -2155,6 +2157,7 @@ DEPENDENCIES:
   - "react-native-blur (from `../node_modules/@react-native-community/blur`)"
   - react-native-compressor (from `../node_modules/react-native-compressor`)
   - react-native-create-thumbnail (from `../node_modules/react-native-create-thumbnail`)
+  - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-rsa-native (from `../node_modules/react-native-rsa-native`)
@@ -2295,6 +2298,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-compressor"
   react-native-create-thumbnail:
     :path: "../node_modules/react-native-create-thumbnail"
+  react-native-get-random-values:
+    :path: "../node_modules/react-native-get-random-values"
   react-native-image-picker:
     :path: "../node_modules/react-native-image-picker"
   react-native-netinfo:
@@ -2437,6 +2442,7 @@ SPEC CHECKSUMS:
   react-native-blur: 28b0a731ed804bed3e88757c2414305896e6b47e
   react-native-compressor: 995a3c29dd10628d5099f2c4ebec81123f96b2fa
   react-native-create-thumbnail: 4ffd51a6c02a9313edc74e2460cd07264221f554
+  react-native-get-random-values: 21325b2244dfa6b58878f51f9aa42821e7ba3d06
   react-native-image-picker: e7331948589e764ecd5a9c715c3fc14d4e6187e6
   react-native-netinfo: f0a9899081c185db1de5bb2fdc1c88c202a059ac
   react-native-rsa-native: 12132eb627797529fdb1f0d22fd0f8f9678df64a

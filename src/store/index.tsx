@@ -146,6 +146,8 @@ type PersonaSlice = {
   pin: string;
   id: string;
   disappearingMessages: {text: string; value: number | null};
+  publicKey: string | null;
+  privateKey: string | null;
   isUserInfoFetched: boolean;
   setIsUserInfoFetched: (status: boolean) => void;
   setUserPersona: (data: Partial<PersonaSlice>) => void;
@@ -156,6 +158,8 @@ const createPersonaSlice: StateCreator<PersonaSlice> = set => ({
   avatar: 0,
   pin: '',
   id: '',
+  publicKey: null,
+  privateKey: null,
   disappearingMessages: {text: 'None', value: null},
   isUserInfoFetched: false,
   setIsUserInfoFetched: (status: boolean) => set({isUserInfoFetched: status}),

@@ -1,38 +1,38 @@
-import {RSA} from 'react-native-rsa-native';
+// import {RSA} from 'react-native-rsa-native';
+import * as Keychain from 'react-native-keychain';
+import {useAppStore} from '../store';
 
-export const generateRSAKeyPair = async () => {
-  const keys = await RSA.generateKeys(4096);
-  // keys = { public: string, private: string }
-  return keys;
+// export const generateRSAKeyPair = async () => {
+//   const keys = await RSA.generateKeys(2048);
+//   return keys;
+// };
+
+export const storeGeneratedPrivateKey = async (
+  privateKey: string,
+  userId: string,
+) => {
+  await Keychain.setGenericPassword('private-key', privateKey, {
+    service: `private-key-${userId}`,
+  });
 };
 
-//   generateRSAKeyPair().then(keys => {
-//     const {public: publicKey, private: privateKey} = keys;
-//     console.log('These are the keys:', privateKey, publicKey);
-//   });
+export const getPrivateKey = async () => {
+  const {id: userId} = useAppStore.getState();
 
-//  1. Store the Private Key on Device (Securely)
-// export const savePrivateKey = async (privateKey: string) => {
-//   await Keychain.setGenericPassword('user', privateKey, {
-//     service: 'secure-private-key',
-//   });
+  const credentials = await Keychain.getGenericPassword({
+    service: `private-key-${userId}`,
+  });
+  if (credentials) {
+    return credentials.password;
+  } else {
+    console.log('No credentials stored');
+  }
+};
+
+// export const encryptMessage = async (message: string, publicKey: string) => {
+//   await RSA.encrypt(message, publicKey);
 // };
 
-// export const loadPrivateKey = async (): Promise<string | null> => {
-//   const result = await Keychain.getGenericPassword({
-//     service: 'secure-private-key',
-//   });
-//   return result ? result.password : null;
+// export const decyptMessage = async (message: string, privateKey: string) => {
+//   await RSA.decrypt(message, privateKey);
 // };
-
-//  3. Encrypt a Message
-// const encryptedForRecipient = await RSA.encrypt(
-//   'hello world',
-//   recipientPublicKey,
-// );
-
-// const encryptedForSelf = await RSA.encrypt('hello world', yourPublicKey);
-
-//  4. Decrypt a Message
-// const privateKey = await loadPrivateKey();
-// const decrypted = await RSA.decrypt(encryptedMessage, privateKey);

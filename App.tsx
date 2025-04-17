@@ -1,3 +1,14 @@
+import 'react-native-get-random-values';
+
+if (typeof global.crypto === 'undefined') {
+  global.crypto = {} as Crypto;
+}
+
+if (typeof global.crypto.getRandomValues === 'undefined') {
+  global.crypto.getRandomValues =
+    require('react-native-get-random-values').getRandomValues;
+}
+
 import React, {useEffect} from 'react';
 import {StatusBar} from 'react-native';
 
