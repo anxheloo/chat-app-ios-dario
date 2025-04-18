@@ -11,6 +11,7 @@ type Props = {
   message: Message;
   isSender: boolean;
   children?: React.ReactNode;
+  isDeleted?: boolean;
 };
 
 const MessageHOC = (Component: React.FC<Props>) => {

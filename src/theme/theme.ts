@@ -5,6 +5,7 @@ interface Color {
   White: string;
   IsDeleted: string;
   border: string;
+  newMessage: string;
 }
 
 export const COLORS: Color = {
@@ -14,6 +15,7 @@ export const COLORS: Color = {
   White: '#FFFFFF',
   IsDeleted: '#ACB9C7',
   border: '#E5E5E5',
+  newMessage: '#FF675C',
 };
 
 //   interface FontFamily {

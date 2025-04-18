@@ -12,7 +12,6 @@ import {BORDERRADIUS} from '../../../../theme/theme';
 
 import {Message, NavigationProps} from '../../../../utils/types';
 import MessageHOC from './MessageHOC';
-import {HOST} from '../../../../api/apis';
 
 type ImageProps = {
   message: Message;
@@ -26,9 +25,7 @@ const ImageComponent: React.FC<ImageProps> = ({message, isSender}) => {
   const openImage = useCallback(() => {
     if (!message.uploading) {
       navigation.navigate('FullScreenMedia', {
-        fileUrl: message?.isLocalUri
-          ? message.fileUrl
-          : `${HOST}/${message.fileUrl}`,
+        fileUrl: message.fileUrl,
         type: 'image',
       });
     }
@@ -39,7 +36,7 @@ const ImageComponent: React.FC<ImageProps> = ({message, isSender}) => {
       onPress={openImage}
       activeOpacity={0.9}
       style={styles.image}>
-      {message.uploading ? (
+      {message.uploading || message.downloading ? (
         <ActivityIndicator
           size="small"
           color={isSender ? '#fff' : '#000'}
@@ -49,15 +46,11 @@ const ImageComponent: React.FC<ImageProps> = ({message, isSender}) => {
         <Image
           width={220}
           height={150}
-          // source={{uri: `data:image/png;base64,${message.fileUrl}`}}
           source={{
-            uri: message?.isLocalUri
-              ? message.fileUrl
-              : `${HOST}/${message.fileUrl}`,
+            uri: message.fileUrl,
           }}
           style={styles.image}
           resizeMode="cover"
-          // onLoad={() => setUpload(false)}
           onError={error =>
             console.log('This is error inside ImageComponent:', error)
           }

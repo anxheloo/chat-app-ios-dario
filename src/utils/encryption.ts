@@ -5,6 +5,8 @@ import CryptoJS from 'crypto-js';
 import {Buffer} from 'buffer';
 import {useAppStore} from '../store';
 import {getPrivateKey} from './keys';
+import ReactNativeBlobUtil from 'react-native-blob-util';
+import {HOST} from '../api/apis';
 
 export const encryptMessage = async (
   plaintext: string,
@@ -13,7 +15,7 @@ export const encryptMessage = async (
 
   try {
     // 1️⃣ Load sender private key from Keychain
-    const senderBase64Pk = privateKey ? privateKey : await getPrivateKey();
+    const senderBase64Pk = privateKey ?? (await getPrivateKey());
 
     if (!senderBase64Pk) {
       throw new Error('Private key not found');
@@ -65,7 +67,7 @@ export const decryptMessage = async (
 
   try {
     // 1️⃣ Get private key from Keychain
-    const privateKeyBase64 = privateKey ? privateKey : await getPrivateKey();
+    const privateKeyBase64 = privateKey ?? (await getPrivateKey());
 
     if (!privateKeyBase64) {
       throw new Error('Private key not found');
@@ -105,46 +107,117 @@ export const decryptMessage = async (
   }
 };
 
-export const encryptFileBuffer = async (
+export const encryptFile = async (
   buffer: ArrayBuffer,
-): Promise<{encrypted: Uint8Array; iv: string}> => {
+): Promise<{encrypted: string; iv: string}> => {
   const {privateKey, selectedChatData} = useAppStore.getState();
 
-  const senderBase64Pk = privateKey ? privateKey : await getPrivateKey();
+  try {
+    const senderBase64Pk = privateKey ?? (await getPrivateKey());
 
-  const senderPrivateKey = Uint8Array.from(
-    Buffer.from(senderBase64Pk!, 'base64'),
-  );
+    console.log('This is senderBase64Pk', senderBase64Pk);
 
-  const recipientPublicKey = Uint8Array.from(
-    Buffer.from(selectedChatData?.publicKey!, 'base64'),
-  );
+    const senderPrivateKey = Uint8Array.from(
+      Buffer.from(senderBase64Pk!, 'base64'),
+    );
 
-  const sharedSecret = x25519.getSharedSecret(
-    senderPrivateKey,
-    recipientPublicKey,
-  );
-  const aesKey = CryptoJS.enc.Hex.parse(
-    Buffer.from(sha256(sharedSecret)).toString('hex'),
-  );
+    const recipientPublicKey = Uint8Array.from(
+      Buffer.from(selectedChatData?.publicKey!, 'base64'),
+    );
 
-  const wordArray = CryptoJS.lib.WordArray.create(buffer as any);
-  const iv = CryptoJS.lib.WordArray.random(16);
+    console.log('This is recipientPublicKey', recipientPublicKey);
 
-  const encrypted = CryptoJS.AES.encrypt(wordArray, aesKey, {
-    iv,
-    mode: CryptoJS.mode.CBC,
-    padding: CryptoJS.pad.Pkcs7,
-  });
+    const sharedSecret = x25519.getSharedSecret(
+      senderPrivateKey,
+      recipientPublicKey,
+    );
+    const aesKey = CryptoJS.enc.Hex.parse(
+      Buffer.from(sha256(sharedSecret)).toString('hex'),
+    );
 
-  const encryptedBytes = Uint8Array.from(
-    Buffer.from(encrypted.ciphertext.toString(CryptoJS.enc.Base64), 'base64'),
-  );
+    const wordArray = CryptoJS.lib.WordArray.create(buffer as any);
+    const iv = CryptoJS.lib.WordArray.random(16);
 
-  return {
-    encrypted: encryptedBytes,
-    iv: CryptoJS.enc.Base64.stringify(iv),
-  };
+    const encrypted = CryptoJS.AES.encrypt(wordArray, aesKey, {
+      iv,
+      mode: CryptoJS.mode.CBC,
+      padding: CryptoJS.pad.Pkcs7,
+    });
+
+    return {
+      encrypted: encrypted.ciphertext.toString(CryptoJS.enc.Base64),
+      iv: CryptoJS.enc.Base64.stringify(iv),
+    };
+  } catch (err) {
+    throw console.error('Encrypt files error:', err);
+  }
+};
+
+export const decryptFile = async (
+  fileUrl: string,
+  ivBase64: string,
+  otherUserPublicKeyBase64: string,
+  messageId: string,
+): Promise<string> => {
+  const {privateKey} = useAppStore.getState();
+
+  try {
+    const fileName = `${messageId}.${fileUrl.split('.').pop()}`;
+    const filePath = `${ReactNativeBlobUtil.fs.dirs.CacheDir}/${fileName}`;
+
+    const exists = await ReactNativeBlobUtil.fs.exists(filePath);
+    if (exists) {
+      return `file://${filePath}`;
+    }
+
+    await ReactNativeBlobUtil.config({
+      fileCache: true,
+      path: filePath,
+    }).fetch('GET', `${HOST}/${fileUrl}`);
+
+    const encryptedBase64 = await ReactNativeBlobUtil.fs.readFile(
+      filePath,
+      'base64',
+    );
+
+    const privateKeyBase64 = privateKey ?? (await getPrivateKey());
+    if (!privateKeyBase64) {
+      throw new Error('Private key not found');
+    }
+
+    const pk = Uint8Array.from(Buffer.from(privateKeyBase64, 'base64'));
+
+    // 2️⃣ Decode the other user's public key
+    const otherPublicKey = Uint8Array.from(
+      Buffer.from(otherUserPublicKeyBase64, 'base64'),
+    );
+
+    const sharedSecret = x25519.getSharedSecret(pk, otherPublicKey);
+    const aesKey = CryptoJS.enc.Hex.parse(
+      Buffer.from(sha256(sharedSecret)).toString('hex'),
+    );
+
+    const iv = CryptoJS.enc.Base64.parse(ivBase64);
+    const ciphertext = CryptoJS.enc.Base64.parse(encryptedBase64);
+
+    const decrypted = CryptoJS.AES.decrypt(
+      CryptoJS.lib.CipherParams.create({ciphertext}),
+      aesKey,
+      {
+        iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7,
+      },
+    );
+
+    const decryptedBase64 = decrypted.toString(CryptoJS.enc.Base64);
+    await ReactNativeBlobUtil.fs.writeFile(filePath, decryptedBase64, 'base64');
+
+    return `file://${filePath}`;
+  } catch (err) {
+    console.error('🧨 Failed to decrypt media:', err);
+    throw err;
+  }
 };
 
 export const generateKeys = async () => {

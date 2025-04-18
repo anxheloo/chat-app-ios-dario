@@ -1,5 +1,6 @@
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
+import {COLORS} from '../../theme/theme';
 
 const UnRead = ({numberOfUnreadMessages}: {numberOfUnreadMessages: number}) => {
   if (numberOfUnreadMessages === 0) {
@@ -18,7 +19,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 25,
     height: 25,
-    backgroundColor: 'black',
+    backgroundColor: COLORS.newMessage,
     borderRadius: 100,
     right: '20%',
     justifyContent: 'center',

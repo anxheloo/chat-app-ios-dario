@@ -181,6 +181,8 @@ export const uploadAudioMessage = async (fileUri: string) => {
     waveMetering: waveMetering,
   };
 
+  console.log('This is fileUri', fileUri);
+
   // Update UI with pending message
   updateSelectedChatMessages(current => [...current, tempMsg]);
 
@@ -291,8 +293,6 @@ export const getOrDownloadFile = async (fileUrl: string, messageId: string) => {
 
   try {
     const fileName = `${messageId}.m4a`;
-    // const localPath =
-    //   Platform.OS === 'ios' ? `${fileName}` : `${dirs.CacheDir}/${fileName}`;
 
     const dirs = ReactNativeBlobUtil.fs.dirs;
     const localPath = `${dirs.CacheDir}/${fileName}`;

@@ -1,20 +1,29 @@
 import {Buffer} from 'buffer';
-import {Alert} from 'react-native';
-
-import {Image, Video} from 'react-native-compressor';
+import {Alert, Platform} from 'react-native';
 
 import {useAppStore} from '../store';
 
 import {Contact, Conversation, Message} from './types';
-import {ObjectId} from 'bson';
 
 import {DELETE_CONVERSATION, DELETE_MESSAGE, UPLOAD_FILE} from '../api/apis';
 import {apiClient} from '../api/apiClient';
 import {checkPermissionStatus} from './helpers';
+
 import {permission} from './permissions';
 
+import {Image, Video} from 'react-native-compressor';
+import {ObjectId} from 'bson';
 import * as ImagePicker from 'react-native-image-picker';
-import {decryptMessage, encryptMessage} from './encryption';
+
+import {
+  decryptFile,
+  decryptMessage,
+  encryptFile,
+  encryptMessage,
+} from './encryption';
+
+import ReactNativeBlobUtil from 'react-native-blob-util';
+
 type ImagePickerType = 'capture' | 'library';
 
 // ====================================================
@@ -86,14 +95,53 @@ export const handleReceiveMessage = async ({message, version}: any) => {
       selectedChatData?.conversationId === message.conversationId) &&
     (isRecipient || isText)
   ) {
-    console.log('Inside condition ');
+    const mediaTypes = ['image', 'video'];
+    const isMedia = mediaTypes.includes(message.messageType);
+
+    // if (isMedia) {
+    //   try {
+    //     const localPath = await decryptFile(
+    //       message.fileUrl,
+    //       message.iv,
+    //       message.sender.publicKey, // public key of the other user
+    //       message._id, // for cache filename
+    //     );
+
+    //     message.fileUrl = localPath;
+    //   } catch (e) {
+    //     console.log(e);
+    //   }
+    // }
+
+    if (isMedia) {
+      try {
+        decryptFile(
+          message.fileUrl,
+          message.iv,
+          message.sender.publicKey, // public key of the other user
+          message._id, // for cache filename
+        ).then(res => {
+          updateSelectedChatMessages(messages => {
+            return messages.map(msg => {
+              if (msg._id === message._id) {
+                return {...msg, fileUrl: res, downloading: false};
+              } else {
+                return msg;
+              }
+            });
+          });
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    }
 
     updateSelectedChatMessages(current => [
       ...current.filter(msg => msg._id !== message._id),
       {
         ...message,
         seen: true,
-        uploading: false,
+        downloading: true,
         recipient: message.recipient._id,
         sender: message.sender._id,
       },
@@ -296,7 +344,7 @@ export const compressImage = async (uri: string) => {
   try {
     const compressedUri = await Image.compress(uri, {
       compressionMethod: 'auto',
-      maxWidth: 1000,
+      maxWidth: 800,
       quality: 0.5,
       returnableOutputType: 'uri',
     });
@@ -365,7 +413,14 @@ export const handleCameraUpload = async (
     id,
   } = useAppStore.getState();
 
-  if (res.assets?.length) {
+  if (!res.assets?.length) {
+    return;
+  }
+
+  const formData = new FormData();
+  const ivList: string[] = [];
+
+  try {
     // 1.Check the total size of the selected images or videos
     let totalSize = res.assets.reduce(
       (acc: number, file: any) => acc + file.fileSize,
@@ -387,15 +442,10 @@ export const handleCameraUpload = async (
       res.assets.map(async (media: any) => {
         const tempId = new ObjectId().toString();
         const isVideo = media.type.startsWith('video');
-        // let thumbnail = '';
-        // if (isVideo) {
-        //   const thumbnailResponse = await createThumbnail({
-        //     url: media.uri,
-        //   });
-        //   thumbnail = thumbnailResponse.path; // Thumbnail path
-        // }
-
-        console.log('This is media.duration', media.duration);
+        const fileName =
+          Platform.OS === 'ios'
+            ? media.fileName
+            : media.fileName.split('_').pop();
 
         return {
           _id: tempId,
@@ -405,13 +455,12 @@ export const handleCameraUpload = async (
           createdAt: new Date().toISOString(),
           messageType: isVideo ? 'video' : 'image',
           fileUrl: media.uri,
-          // fileUrl: compressedUri,
-          // thumbnailUrl: thumbnail, // Save thumbnail
-          thumbnailUrl: null, // Save thumbnail
+          thumbnailUrl: null,
           expiresAt: disappearingMessages.value,
           uploading: true,
           duration: isVideo ? media.duration : null,
           seen: false,
+          fileName: fileName,
         };
       }),
     );
@@ -419,27 +468,37 @@ export const handleCameraUpload = async (
     // 4.Update created messages in UI
     updateSelectedChatMessages(current => [...current, ...tempMsgs]);
 
-    //5. Create a FormData object and compress files
-    const formData = new FormData();
-
     await Promise.all(
-      res.assets.map(async (file: any) => {
-        const isVideo = file.type.startsWith('video');
+      tempMsgs.map(async (msg: any) => {
+        const compressedUri =
+          msg.messageType === 'video'
+            ? await compressVideo(msg.fileUrl)
+            : await compressImage(msg.fileUrl);
 
-        const compressedUri = isVideo
-          ? await compressVideo(file.uri)
-          : await compressImage(file.uri);
+        const filePath = compressedUri.replace('file://', '');
+        const base64File = await ReactNativeBlobUtil.fs.readFile(
+          filePath,
+          'base64',
+        );
+
+        const {encrypted, iv} = await encryptFile(
+          Buffer.from(base64File, 'base64').buffer,
+        );
+        ivList.push(iv);
 
         formData.append('files', {
-          uri: compressedUri,
-          name: file.fileName,
-          type: file.type,
-        });
+          uri: `data:${msg.messageType};base64,${encrypted}`,
+          name: msg.fileName,
+          type: msg.messageType,
+        } as any);
       }),
     );
 
-    // 6. Send the compressed file
-    await postMediaMessages(formData, tempMsgs, setCameraOptions);
+    // // 6. Send the compressed file
+    await postMediaMessages(formData, tempMsgs, ivList, setCameraOptions);
+  } catch (error) {
+    console.error('THis is camera upload error:', error);
+    throw error;
   }
 };
 
@@ -449,25 +508,29 @@ export const handleCameraUpload = async (
 export const postMediaMessages = async (
   formData: FormData,
   tempMsgs: Message[],
+  ivList: string[],
   setCameraOptions: (data: boolean) => void,
 ) => {
   const {updateSelectedChatMessages, socket} = useAppStore.getState();
 
   try {
+    console.log('Ready to post');
     //1. Post the compressed file to store on the server
     const uploadResponse = await apiClient.post(UPLOAD_FILE, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+      // headers: {
+      //   'Content-Type': 'multipart/form-data',
+      // },
     });
 
-    //2. Emit the event when upload is successful
+    // //2. Emit the event when upload is successful
     if (uploadResponse.status === 200) {
+      console.log('This is response 200');
+      // Get the correct file paths from backend
       const uploadedFilePaths = uploadResponse.data.filePaths;
 
+      //3. Update UI of the sender when upload is successful
       const temporaryUiMessages = tempMsgs.map((tempMsg: Message) => ({
         ...tempMsg,
-        isLocalUri: true,
         uploading: false,
       }));
 
@@ -480,13 +543,14 @@ export const postMediaMessages = async (
         ),
       );
 
-      // 3. Construct the final message objects
+      // 4. Construct the final message objects
       const uploadedMessages = tempMsgs.map(
         (tempMsg: Message, index: number) => ({
           ...tempMsg,
-          uploading: false,
-          isLocalUri: false,
+          // uploading: false,
+          // isLocalUri: false,
           fileUrl: uploadedFilePaths[index],
+          iv: ivList[index],
         }),
       );
 
@@ -498,6 +562,8 @@ export const postMediaMessages = async (
         msg => !tempMsgs.some((tempMsg: Message) => tempMsg._id === msg._id),
       ),
     );
+    console.error('Error uploading file:', error);
+    console.log('this is error.response', error.response);
     Alert.alert('Error', 'Failed to upload media');
   } finally {
     setCameraOptions(false);
@@ -556,7 +622,24 @@ export const handleDelete = async () => {
     });
 
     if (res.status === 200) {
-      console.log('This is the new conversation:', res.data.conversation);
+      if (selectedMessageToDelete) {
+        console.log('This is the file url:', selectedMessageToDelete?.fileUrl);
+
+        const path = selectedMessageToDelete.fileUrl.startsWith('file://')
+          ? selectedMessageToDelete.fileUrl.replace('file://', '')
+          : selectedMessageToDelete.fileUrl;
+
+        console.log('This is path:', path);
+
+        const exists = await ReactNativeBlobUtil.fs.exists(path);
+        if (exists) {
+          console.log('file exists:', exists);
+
+          await ReactNativeBlobUtil.fs
+            .unlink(path)
+            .catch(error => console.log(error));
+        }
+      }
 
       updateSelectedChatMessages(current =>
         current.map(msg => {

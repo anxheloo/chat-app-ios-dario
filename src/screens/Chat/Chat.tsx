@@ -1,11 +1,5 @@
 import React, {useEffect} from 'react';
-import {
-  Keyboard,
-  KeyboardAvoidingView,
-  StyleSheet,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
+import {KeyboardAvoidingView, StyleSheet} from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -31,7 +25,9 @@ const Chat = () => {
 
     updateCurrentConversation();
     getPrivateKey().then(key => {
-      key && setUserPersona({privateKey: key});
+      if (key) {
+        setUserPersona({privateKey: key});
+      }
     });
 
     return () => {
@@ -44,20 +40,10 @@ const Chat = () => {
 
   return (
     <SafeAreaView style={styles.safeAreaView}>
-      <KeyboardAvoidingView
-        behavior="padding"
-        style={styles.container}
-        // keyboardVerticalOffset={-30}
-      >
-        <View style={styles.container}>
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <>
-              <ChatHeader />
-              <ChatContainer />
-            </>
-          </TouchableWithoutFeedback>
-          <ChatFooter />
-        </View>
+      <KeyboardAvoidingView behavior="padding" style={styles.container}>
+        <ChatHeader />
+        <ChatContainer />
+        <ChatFooter />
       </KeyboardAvoidingView>
       <FullScreenLoader version={'absolute'} />
       <DeleteMsg />

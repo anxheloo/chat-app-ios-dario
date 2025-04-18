@@ -18,7 +18,7 @@ import {BORDERRADIUS} from '../../../../theme/theme';
 
 import PlayIcon from '../../../../assets/icons/messages/PlayIcon';
 import MessageHOC from './MessageHOC';
-import {HOST} from '../../../../api/apis';
+// import {HOST} from '../../../../api/apis';
 
 type VideoProps = {
   message: Message;
@@ -32,9 +32,7 @@ const VideoComponent: React.FC<VideoProps> = memo(({message, isSender}) => {
   const openVideo = useCallback(() => {
     if (!message.uploading) {
       navigation.navigate('FullScreenMedia', {
-        fileUrl: message?.isLocalUri
-          ? message.fileUrl
-          : `${HOST}/${message.fileUrl}`,
+        fileUrl: message.fileUrl,
         type: 'video',
       });
     }
@@ -44,7 +42,7 @@ const VideoComponent: React.FC<VideoProps> = memo(({message, isSender}) => {
 
   return (
     <View style={styles.container}>
-      {message.uploading ? (
+      {message.uploading || message.downloading ? (
         <ActivityIndicator
           size="small"
           color={isSender ? '#fff' : '#000'}
@@ -54,16 +52,12 @@ const VideoComponent: React.FC<VideoProps> = memo(({message, isSender}) => {
         <Video
           fullscreenOrientation="all"
           source={{
-            // uri: message.fileUrl
-            uri: message?.isLocalUri
-              ? message.fileUrl
-              : `${HOST}/${message.fileUrl}`,
+            uri: message.fileUrl,
           }}
           style={styles.video}
           resizeMode="cover"
           paused={true}
           useTextureView={false}
-          // onLoad={() => setUpload(false)}
           onError={error =>
             console.log('This is error inside video component:', error)
           }
@@ -74,7 +68,7 @@ const VideoComponent: React.FC<VideoProps> = memo(({message, isSender}) => {
         <Text style={styles.durationText}>{format}</Text>
       </View>
 
-      {!message.uploading && (
+      {!message.uploading && !message.downloading && (
         <TouchableOpacity style={styles.playButton} onPress={openVideo}>
           <PlayIcon width={24} height={24} />
         </TouchableOpacity>

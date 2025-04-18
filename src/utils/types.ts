@@ -59,6 +59,7 @@ export type Message = {
   showDate?: boolean;
   waveMetering?: number[] | null;
   seen?: boolean;
+  fileName?: string;
 };
 
 export type Contact = {
