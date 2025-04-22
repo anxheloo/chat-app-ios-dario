@@ -23,6 +23,8 @@ import {ObjectId} from 'bson';
 
 import {HOST, UPLOAD_FILE} from '../api/apis';
 import {apiClient} from '../api/apiClient';
+import {Buffer} from 'buffer';
+import {encryptFile} from './encryption';
 
 declare global {
   interface FormData {
@@ -165,9 +167,13 @@ export const uploadAudioMessage = async (fileUri: string) => {
     updateMicSlice,
   } = useAppStore.getState();
 
+  const formData = new FormData();
+  let ivCode: string | null = null;
+
+  const tempId = new ObjectId().toString();
   // Create a temporary message object
   const tempMsg = {
-    _id: new ObjectId().toString(),
+    _id: tempId,
     conversationId: selectedChatData?.conversationId || '',
     sender: id,
     recipient: selectedChatData?._id || '',
@@ -188,9 +194,25 @@ export const uploadAudioMessage = async (fileUri: string) => {
 
   try {
     // Prepare the FormData for upload
-    const formData = new FormData();
+
+    const base64File = await ReactNativeBlobUtil.fs.readFile(
+      fileUri.replace('file://', ''),
+      'base64',
+    );
+    const binary = Buffer.from(base64File, 'base64').buffer;
+    const {encrypted, iv} = await encryptFile(binary);
+    if (iv) {
+      ivCode = iv;
+    }
+    let encryptedFilePath = `${ReactNativeBlobUtil.fs.dirs.CacheDir}/encrypted/${tempId}.enc`;
+    await ReactNativeBlobUtil.fs.writeFile(
+      encryptedFilePath,
+      encrypted,
+      'base64',
+    );
+
     formData.append('files', {
-      uri: fileUri,
+      uri: 'file://' + encryptedFilePath,
       name: `audio-${Date.now()}.m4a`,
       type: 'audio/m4a',
     });
@@ -216,9 +238,13 @@ export const uploadAudioMessage = async (fileUri: string) => {
         ...tempMsg,
         uploading: false,
         fileUrl: uploadedFilePath,
+        iv: ivCode,
       };
 
       socket?.emit('sendMessage', {messages: [uploadedVoice]});
+      await ReactNativeBlobUtil.fs
+        .unlink(encryptedFilePath)
+        .catch(error => console.log('Error deleting file:', error));
     }
   } catch (error) {
     console.error('Failed to upload audio message:', error);

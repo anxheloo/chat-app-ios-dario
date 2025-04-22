@@ -1,8 +1,12 @@
 import {useCallback, useEffect, useState} from 'react';
 import {Alert} from 'react-native';
+
 import {apiClient} from '../../api/apiClient';
 import {GET_ALL_MESSAGES} from '../../api/apis';
+
 import {useAppStore} from '../../store';
+
+import {decryptFile, decryptMessage} from '../encryption';
 
 const useMessages = (flatListRef: any) => {
   const updateSelectedChatMessages = useAppStore(
@@ -36,10 +40,50 @@ const useMessages = (flatListRef: any) => {
         const {messages, hasMore: updatedHasMore} = response.data;
 
         if (messages.length > 0) {
+          const decryptedMessages = await Promise.all(
+            messages.map(async (msg: any) => {
+              const isMedia = ['image', 'video', 'audio'].includes(
+                msg.messageType,
+              );
+              const isText = msg.messageType === 'text';
+
+              if (isText) {
+                const decryptedText = await decryptMessage(
+                  msg.content,
+                  msg.iv,
+                  selectedChatData?.publicKey!,
+                );
+
+                console.log('This is decrypted text', decryptedText);
+
+                return {
+                  ...msg,
+                  content: decryptedText,
+                };
+              } else if (isMedia) {
+                const fileUrl = await decryptFile(
+                  msg.fileUrl,
+                  msg.iv,
+                  selectedChatData?.publicKey!,
+                  msg._id,
+                );
+
+                console.log('This is fileUrl', fileUrl);
+
+                return {
+                  ...msg,
+                  fileUrl,
+                };
+              } else {
+                return msg;
+              }
+            }),
+          );
+
           updateSelectedChatMessages(current => [
-            ...messages,
+            ...decryptedMessages,
             ...current.filter(
-              msg => !messages.some((m: any) => m._id === msg._id),
+              msg => !decryptedMessages.some((m: any) => m._id === msg._id),
             ),
           ]);
 

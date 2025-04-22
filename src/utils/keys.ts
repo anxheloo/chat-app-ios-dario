@@ -2,16 +2,12 @@
 import * as Keychain from 'react-native-keychain';
 import {useAppStore} from '../store';
 
-// export const generateRSAKeyPair = async () => {
-//   const keys = await RSA.generateKeys(2048);
-//   return keys;
-// };
-
 export const storeGeneratedPrivateKey = async (
   privateKey: string,
   userId: string,
 ) => {
   await Keychain.setGenericPassword('private-key', privateKey, {
+    accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
     service: `private-key-${userId}`,
   });
 };
@@ -28,11 +24,3 @@ export const getPrivateKey = async () => {
     console.log('No credentials stored');
   }
 };
-
-// export const encryptMessage = async (message: string, publicKey: string) => {
-//   await RSA.encrypt(message, publicKey);
-// };
-
-// export const decyptMessage = async (message: string, privateKey: string) => {
-//   await RSA.decrypt(message, privateKey);
-// };

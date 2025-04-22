@@ -60,6 +60,7 @@ export type Message = {
   waveMetering?: number[] | null;
   seen?: boolean;
   fileName?: string;
+  encryptedFilePath?: string;
 };
 
 export type Contact = {

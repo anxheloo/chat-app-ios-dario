@@ -50,7 +50,6 @@ export const handleReceiveMessage = async ({message, version}: any) => {
       message.iv,
       isRecipient ? message.sender.publicKey : message.recipient.publicKey,
     );
-
     message.content = decrypted;
   }
 
@@ -64,11 +63,11 @@ export const handleReceiveMessage = async ({message, version}: any) => {
   // Update the existing conversation
   if (existingConversationIndex !== -1) {
     tempConversations[existingConversationIndex] = {
-      ...conversations[existingConversationIndex],
+      ...tempConversations[existingConversationIndex],
       lastMessage: message,
       lastMessageTime: message.createdAt,
       recipientUnread: isRecipient
-        ? conversations[existingConversationIndex].recipientUnread + 1
+        ? tempConversations[existingConversationIndex].recipientUnread + 1
         : 0,
       lastSender: message.sender._id,
     };
@@ -95,23 +94,8 @@ export const handleReceiveMessage = async ({message, version}: any) => {
       selectedChatData?.conversationId === message.conversationId) &&
     (isRecipient || isText)
   ) {
-    const mediaTypes = ['image', 'video'];
+    const mediaTypes = ['image', 'video', 'audio'];
     const isMedia = mediaTypes.includes(message.messageType);
-
-    // if (isMedia) {
-    //   try {
-    //     const localPath = await decryptFile(
-    //       message.fileUrl,
-    //       message.iv,
-    //       message.sender.publicKey, // public key of the other user
-    //       message._id, // for cache filename
-    //     );
-
-    //     message.fileUrl = localPath;
-    //   } catch (e) {
-    //     console.log(e);
-    //   }
-    // }
 
     if (isMedia) {
       try {
@@ -437,7 +421,6 @@ export const handleCameraUpload = async (
       );
     }
 
-    // 3. Create Message objects from media selected
     const tempMsgs = await Promise.all(
       res.assets.map(async (media: any) => {
         const tempId = new ObjectId().toString();
@@ -474,27 +457,31 @@ export const handleCameraUpload = async (
           msg.messageType === 'video'
             ? await compressVideo(msg.fileUrl)
             : await compressImage(msg.fileUrl);
-
         const filePath = compressedUri.replace('file://', '');
         const base64File = await ReactNativeBlobUtil.fs.readFile(
           filePath,
           'base64',
         );
-
-        const {encrypted, iv} = await encryptFile(
-          Buffer.from(base64File, 'base64').buffer,
+        const binary = Buffer.from(base64File, 'base64').buffer;
+        const {encrypted, iv} = await encryptFile(binary);
+        let encryptedFilePath = `${ReactNativeBlobUtil.fs.dirs.CacheDir}/encrypted/${msg._id}.enc`;
+        await ReactNativeBlobUtil.fs.writeFile(
+          encryptedFilePath,
+          encrypted,
+          'base64',
         );
         ivList.push(iv);
-
         formData.append('files', {
-          uri: `data:${msg.messageType};base64,${encrypted}`,
+          uri: 'file://' + encryptedFilePath,
           name: msg.fileName,
           type: msg.messageType,
         } as any);
+
+        msg.encryptedFilePath = encryptedFilePath;
       }),
     );
 
-    // // 6. Send the compressed file
+    // 6. Send the compressed file
     await postMediaMessages(formData, tempMsgs, ivList, setCameraOptions);
   } catch (error) {
     console.error('THis is camera upload error:', error);
@@ -517,14 +504,15 @@ export const postMediaMessages = async (
     console.log('Ready to post');
     //1. Post the compressed file to store on the server
     const uploadResponse = await apiClient.post(UPLOAD_FILE, formData, {
-      // headers: {
-      //   'Content-Type': 'multipart/form-data',
-      // },
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     });
 
     // //2. Emit the event when upload is successful
     if (uploadResponse.status === 200) {
       console.log('This is response 200');
+
       // Get the correct file paths from backend
       const uploadedFilePaths = uploadResponse.data.filePaths;
 
@@ -555,6 +543,13 @@ export const postMediaMessages = async (
       );
 
       await socket?.emit('sendMessage', {messages: uploadedMessages});
+
+      tempMsgs.forEach(async (tempMsg: Message) => {
+        // Remove the temporary file from the local storage
+        await ReactNativeBlobUtil.fs
+          .unlink(tempMsg?.encryptedFilePath!)
+          .catch(error => console.log('Error deleting file:', error));
+      });
     }
   } catch (error: any) {
     updateSelectedChatMessages(currentMessages =>
@@ -563,7 +558,6 @@ export const postMediaMessages = async (
       ),
     );
     console.error('Error uploading file:', error);
-    console.log('this is error.response', error.response);
     Alert.alert('Error', 'Failed to upload media');
   } finally {
     setCameraOptions(false);
