@@ -15,20 +15,11 @@ import {reset} from '../navigation/navigationRef';
 import {logout} from './helpers';
 
 import {storeGeneratedPrivateKey} from './keys';
-import {generateKeys} from './encryption';
+import {decryptMessage, generateKeys} from './encryption';
 
 export const getUserInfo = async () => {
-  const {
-    updateKeys,
-    updateFuncChat,
-    setIsUserInfoFetched,
-    setUserPersona,
-    isUserInfoFetched,
-    setConversationPagination,
-    setFriendsPagination,
-    setCallsPagination,
-    updateCalls,
-  } = useAppStore.getState();
+  const {updateKeys, setIsUserInfoFetched, setUserPersona, isUserInfoFetched} =
+    useAppStore.getState();
 
   if (isUserInfoFetched) {
     return;
@@ -37,49 +28,16 @@ export const getUserInfo = async () => {
   updateKeys({loading: true});
 
   try {
-    const [userRes, friendsRes, conversationsRes, callsRes] = await Promise.all(
-      [
-        apiClient.get(GET_USER_INFO),
-        apiClient.post(GET_ALL_FRIENDS, {page: 0}),
-        apiClient.post(GET_CONVERSATIONS, {page: 0}),
-        apiClient.post(GET_ALL_CALLS, {page: 0}),
-      ],
-    );
+    const userRes = await apiClient.get(GET_USER_INFO);
 
-    if (
-      userRes.status === 200 &&
-      friendsRes.status === 200 &&
-      conversationsRes.status === 200 &&
-      callsRes.status === 200
-    ) {
-      console.log('Status 200 of userInfo');
-      setIsUserInfoFetched(true);
-      setUserPersona(userRes.data);
-      updateFuncChat({
-        conversations: conversationsRes.data.conversations,
-        friends: friendsRes.data.friends,
-      });
-
-      updateCalls(() => [...callsRes.data.calls]);
-
-      setConversationPagination({
-        page: 1,
-        hasMore: conversationsRes.data.hasMore,
-        isLoading: false,
-      });
-
-      setFriendsPagination({
-        page: 1,
-        hasMore: friendsRes.data.hasMore,
-        isLoading: false,
-      });
-
-      setCallsPagination({
-        page: 1,
-        hasMore: callsRes.data.hasMore,
-        isLoading: false,
-      });
+    if (userRes.status !== 200) {
+      throw new Error('Failed to get user info');
     }
+
+    setUserPersona(userRes.data);
+    setIsUserInfoFetched(true);
+
+    await Promise.all([getConversations(), getFriends(), getCalls()]);
   } catch (error: any) {
     Alert.alert(
       'Error',
@@ -99,6 +57,7 @@ export const getConversations = async () => {
     updateConversations,
     conversationPagination: pagination,
     setConversationPagination: setPagination,
+    id,
   } = useAppStore.getState();
 
   const {isLoading, hasMore, page} = pagination;
@@ -119,12 +78,36 @@ export const getConversations = async () => {
     if (response.status === 200) {
       const {conversations, hasMore: updatedHasMore} = response.data;
 
+      console.log('This is conversations', conversations);
+
       if (conversations.length > 0) {
+        const tempConversations = [...conversations];
+
+        await Promise.all(
+          tempConversations.map(async (conversation: any) => {
+            if (conversation.lastMessage.content) {
+              const otherParticipant = conversation.participants.find(
+                (p: any) => p._id !== id,
+              );
+              const decryptedText = await decryptMessage(
+                conversation.lastMessage.content,
+                conversation.lastMessage.iv,
+                otherParticipant?.publicKey!,
+              );
+              console.log('This is decrypted text', decryptedText);
+              conversation.lastMessage.content = decryptedText;
+            }
+            return conversation;
+          }),
+        );
+
+        console.log('These are tempConversations', tempConversations);
+
         updateConversations(current => [
           ...current.filter(
-            c => !conversations.some((m: any) => m._id === c._id),
+            c => !tempConversations.some((m: any) => m._id === c._id),
           ),
-          ...conversations,
+          ...tempConversations,
         ]);
 
         setPagination({

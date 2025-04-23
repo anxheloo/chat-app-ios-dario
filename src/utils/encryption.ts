@@ -161,25 +161,12 @@ export const decryptFile = async (
 ): Promise<string> => {
   const {privateKey} = useAppStore.getState();
 
-  console.log('This is fileUrl', fileUrl);
-
   try {
-    // if (fileUrl.startsWith('file://')) {
-    //   const exists = await ReactNativeBlobUtil.fs.exists(
-    //     fileUrl.replace('file://', ''),
-    //   );
-    //   if (exists) {
-    //     console.log('Local file exists:', fileUrl);
-    //     return fileUrl;
-    //   }
-    // }
-
     const fileName = `${messageId}.${fileUrl.split('.').pop()}`;
     const filePath = `${ReactNativeBlobUtil.fs.dirs.CacheDir}/${fileName}`;
 
     const exists = await ReactNativeBlobUtil.fs.exists(filePath);
     if (exists) {
-      console.log('File exists:', filePath);
       return `file://${filePath}`;
     }
     console.log('encryptMessage function called');

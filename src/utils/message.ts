@@ -474,15 +474,18 @@ export const handleCameraUpload = async (
         formData.append('files', {
           uri: 'file://' + encryptedFilePath,
           name: msg.fileName,
-          type: msg.messageType,
+          type: msg.messageType === 'video' ? 'video/mp4' : 'image/jpeg',
         } as any);
 
         msg.encryptedFilePath = encryptedFilePath;
+        msg.iv = iv;
       }),
     );
 
+    console.log('This is tempMsgs:', tempMsgs);
+
     // 6. Send the compressed file
-    await postMediaMessages(formData, tempMsgs, ivList, setCameraOptions);
+    await postMediaMessages(formData, tempMsgs, setCameraOptions);
   } catch (error) {
     console.error('THis is camera upload error:', error);
     throw error;
@@ -495,7 +498,6 @@ export const handleCameraUpload = async (
 export const postMediaMessages = async (
   formData: FormData,
   tempMsgs: Message[],
-  ivList: string[],
   setCameraOptions: (data: boolean) => void,
 ) => {
   const {updateSelectedChatMessages, socket} = useAppStore.getState();
@@ -538,7 +540,6 @@ export const postMediaMessages = async (
           // uploading: false,
           // isLocalUri: false,
           fileUrl: uploadedFilePaths[index],
-          iv: ivList[index],
         }),
       );
 
@@ -627,8 +628,6 @@ export const handleDelete = async () => {
 
         const exists = await ReactNativeBlobUtil.fs.exists(path);
         if (exists) {
-          console.log('file exists:', exists);
-
           await ReactNativeBlobUtil.fs
             .unlink(path)
             .catch(error => console.log(error));

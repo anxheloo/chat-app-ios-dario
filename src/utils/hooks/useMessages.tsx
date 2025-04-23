@@ -68,8 +68,6 @@ const useMessages = (flatListRef: any) => {
                   msg._id,
                 );
 
-                console.log('This is fileUrl', fileUrl);
-
                 return {
                   ...msg,
                   fileUrl,
