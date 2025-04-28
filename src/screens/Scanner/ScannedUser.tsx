@@ -28,8 +28,8 @@ const ScannedUser: React.FC<ScannedUserProps> = ({route}) => {
 
   return (
     <ImageBackground
-      style={{flex: 1}}
-      source={require('../../assets/appBackground/app_background 1.png')}>
+      style={styles.imageBackground}
+      source={require('../../assets/appBackground/app_background1.png')}>
       <SafeAreaView style={styles.content}>
         <Avatar
           backgroundColor={COLORS.LightGray2}
@@ -37,7 +37,8 @@ const ScannedUser: React.FC<ScannedUserProps> = ({route}) => {
           height={70}
           avatarWidth={52.5}
           avatarHeight={52.5}
-          src={Number(scannedUser?.avatar)}
+          // src={Number(scannedUser?.avatar)}
+          src={scannedUser?.avatar}
         />
         <ReusableText fontSize={26} fontWeight={700} color="black">
           @{scannedUser?.username}
@@ -50,7 +51,7 @@ const ScannedUser: React.FC<ScannedUserProps> = ({route}) => {
           This persona will be notified if you choose to send a friend request
         </ReusableText>
         <ReusableText
-          style={{paddingTop: 20}}
+          style={styles.addFriendText}
           fontSize={16}
           fontWeight={400}
           color="black"
@@ -68,9 +69,12 @@ const ScannedUser: React.FC<ScannedUserProps> = ({route}) => {
 };
 
 const styles = StyleSheet.create({
+  imageBackground: {
+    flex: 1,
+  },
+
   content: {
     flex: 1,
-    // backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
     gap: 20,
@@ -80,7 +84,11 @@ const styles = StyleSheet.create({
   backButton: {
     position: 'absolute',
     left: 20,
-    top: 50,
+    top: 40,
+  },
+
+  addFriendText: {
+    paddingTop: 20,
   },
 });
 

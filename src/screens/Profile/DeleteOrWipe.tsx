@@ -1,9 +1,8 @@
 import React from 'react';
 import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
 import {useAppStore} from '../../store';
-import {COLORS} from '../../theme/theme';
 
-const LogoutComponent = ({text}: {text: string}) => {
+const DeleteOrWipe = ({text}: {text: string}) => {
   const loading = useAppStore(state => state.loading);
 
   return (
@@ -26,8 +25,8 @@ const styles = StyleSheet.create({
 
   username: {
     fontWeight: '300',
-    color: COLORS.Black,
+    color: 'red',
   },
 });
 
-export default LogoutComponent;
+export default DeleteOrWipe;

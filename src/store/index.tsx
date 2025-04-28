@@ -290,10 +290,13 @@ type StatusSlice = {
   message: string | null;
   isUploading: boolean;
   fileUploadProgress: number;
-  updateKeys: (data: Partial<StatusSlice>) => void;
+  pinModal: boolean;
 
   bottomSheetType: string | null;
   navigation: NavigationProps | null;
+
+  askingPermission: boolean;
+  updateKeys: (data: Partial<StatusSlice>) => void;
 };
 // Status Slice
 const createStatusSlice: StateCreator<StatusSlice> = set => ({
@@ -302,8 +305,10 @@ const createStatusSlice: StateCreator<StatusSlice> = set => ({
   isUploading: false,
   fileUploadProgress: 0,
   bottomSheetType: null,
-
+  pinModal: false,
   navigation: null,
+
+  askingPermission: false,
   updateKeys: set,
 });
 

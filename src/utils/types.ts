@@ -34,10 +34,13 @@ export const MessageFromServer = {};
 
 export type LastMessage = {
   _id: string;
+  sender?: Contact;
+  recipient?: Contact;
   content: string | null;
   messageType: string;
   fileUrl?: string | null;
   createdAt: string;
+  iv?: string;
 };
 
 export type Message = {
@@ -91,7 +94,13 @@ export type Call = {
   createdAt: string;
 };
 
-export type SettingType = 'username' | 'qr-code' | 'pin' | 'clock' | 'logout';
+export type SettingType =
+  | 'username'
+  | 'qr-code'
+  | 'pin'
+  | 'clock'
+  | 'delete'
+  | 'wipe';
 
 declare module 'react-native-webrtc' {
   interface RTCPeerConnection {

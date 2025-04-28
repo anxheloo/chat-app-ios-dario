@@ -25,13 +25,55 @@ import {UPDATE_CALL, START_CALL} from '../api/apis';
 // ICE servers
 // ====================================================================
 
-export const servers = {
+export const servers: RTCConfiguration = {
   iceServers: [
     {urls: 'stun:stun.l.google.com:19302'},
     {urls: 'stun:stun1.l.google.com:19302'},
     {urls: 'stun:stun2.l.google.com:19302'},
+    // {
+    //   urls: 'turn:openrelay.metered.ca:80',
+    //   username: 'openrelayproject',
+    //   credential: 'openrelayproject',
+    // },
+    // {
+    //   urls: 'turn:openrelay.metered.ca:443',
+    //   username: 'openrelayproject',
+    //   credential: 'openrelayproject',
+    // },
+    // {
+    //   urls: 'turn:numb.viagenie.ca',
+    //   credential: 'muazkh',
+    //   username: 'webrtc@live.com',
+    // },
   ],
+  iceCandidatePoolSize: 10,
+  bundlePolicy: 'max-bundle',
+  rtcpMuxPolicy: 'require',
+  iceTransportPolicy: 'all',
 };
+
+// export const servers = {
+//   iceServers: [
+//     {urls: 'stun:stun.l.google.com:19302'},
+//     {urls: 'stun:stun1.l.google.com:19302'},
+//     {urls: 'stun:stun2.l.google.com:19302'},
+//     {
+//       urls: 'turn:openrelay.metered.ca:80',
+//       username: 'openrelayproject',
+//       credential: 'openrelayproject',
+//     },
+//     {
+//       urls: 'turn:openrelay.metered.ca:443',
+//       username: 'openrelayproject',
+//       credential: 'openrelayproject',
+//     },
+//   ],
+//   iceCandidatePoolSize: 10,
+//   sdpSemantics: 'unified-plan', // Improves iOS-Android compatibility
+//   bundlePolicy: 'max-bundle', // Optimizes media bundling
+//   rtcpMuxPolicy: 'require', // Enforces RTCP multiplexing
+//   iceTransportPolicy: 'all', // Allows relay (TURN) if needed
+// };
 
 // export const servers = {
 //   iceServers: [
@@ -65,20 +107,24 @@ export const endCall = async () => {
   const {selectedChatData, caller, socket, callState, updateWebRTCState} =
     useAppStore.getState();
 
-  updateWebRTCState({disabledButtons: true});
+  try {
+    updateWebRTCState({disabledButtons: true});
 
-  const receiverId = caller?._id ? caller?._id : selectedChatData?._id;
+    const receiverId = caller?._id ? caller?._id : selectedChatData?._id;
 
-  let callStatus: 'missed' | 'answered' | 'pending' | 'ended' = 'ended';
+    let callStatus: 'missed' | 'answered' | 'pending' | 'ended' = 'ended';
 
-  if (callState !== 'active') {
-    callStatus = 'missed';
+    if (callState !== 'active') {
+      callStatus = 'missed';
+    }
+
+    await socket.emit('notifyEndCall', {to: receiverId, callStatus});
+    closePeerConnection();
+    goBack();
+    await callUpdate(callStatus);
+  } catch (error) {
+    console.log('Error in endCall:', error);
   }
-
-  await socket.emit('notifyEndCall', {to: receiverId, callStatus});
-  closePeerConnection();
-  goBack();
-  await callUpdate(callStatus);
 };
 
 export const notifyEndCall = async ({
@@ -105,20 +151,24 @@ export const notifyEndCall = async ({
 export const closePeerConnection = () => {
   const {peerConnection, localStream, resetCallState} = useAppStore.getState();
 
-  if (peerConnection) {
-    peerConnection?.getSenders().forEach((sender: any) => {
-      peerConnection.removeTrack(sender);
-    });
-    localStream?.getTracks().forEach(track => track.stop());
-    peerConnection?.close();
-  }
+  try {
+    InCallManager.stop();
+    InCallManager.stopRingtone();
+    InCallManager.stopRingback();
+    InCallManager.setSpeakerphoneOn(false);
+    InCallManager.setKeepScreenOn(false);
 
-  InCallManager.stop();
-  InCallManager.stopRingtone();
-  InCallManager.stopRingback();
-  InCallManager.setSpeakerphoneOn(false);
-  InCallManager.setKeepScreenOn(false);
-  resetCallState();
+    if (peerConnection) {
+      peerConnection?.getSenders().forEach((sender: any) => {
+        peerConnection.removeTrack(sender);
+      });
+      localStream?.getTracks().forEach(track => track.stop());
+      peerConnection?.close();
+    }
+    resetCallState();
+  } catch (e) {
+    console.error('Error stopping InCallManager:', e);
+  }
 };
 
 // ====================================================================
@@ -229,22 +279,43 @@ export const toggleCameraEvent = ({
   updateWebRTCState({isRemoteVideoEnabled: isVideoEnabled});
 };
 
-export const setUpCallManager = async (
-  callType: 'audio' | 'video',
-  isCaller: boolean,
-) => {
-  if (callType === 'video') {
-    InCallManager.setSpeakerphoneOn(true);
-    InCallManager.setKeepScreenOn(true);
-  }
+// export const setUpCallManager = async (
+//   callType: 'audio' | 'video' | null,
+//   isCaller: boolean,
+// ) => {
+//   try {
+//     // InCallManager.start({media: callType!, auto: true});
 
-  if (isCaller) {
-    InCallManager.start({
-      media: callType,
-      ringback: '_BUNDLE_',
-    });
-  }
-};
+//     if (callType === 'video') {
+//       InCallManager.setSpeakerphoneOn(true);
+//       InCallManager.setKeepScreenOn(true);
+//     } else {
+//       InCallManager.setSpeakerphoneOn(false);
+//     }
+
+//     // if (isCaller) {
+//     //   InCallManager.start({
+//     //     media: callType,
+//     //     ringback: '_BUNDLE_',
+//     //   });
+//     // }
+
+//     // if (isCaller) {
+//     //   // Start ringback tone for the caller
+//     //   InCallManager.startRingback('_DEFAULT_');
+//     // } else {
+//     //   // Start ringtone for the receiver
+//     //   InCallManager.startRingtone(
+//     //     '_BUNDLE_',
+//     //     [1000, 1000, 1000, 1000, 1000],
+//     //     '_BUNDLE_',
+//     //     15,
+//     //   );
+//     // }
+//   } catch (e) {
+//     console.log('Error in setUpCallManager:', e);
+//   }
+// };
 
 export const permissions = async (
   callType: 'audio' | 'video' | null = 'audio',
@@ -321,6 +392,9 @@ export const startCall = async () => {
       localStream,
       isVideoEnabled: callType === 'video',
     });
+
+    InCallManager.start({media: callType!, ringback: '_BUNDLE_', auto: true});
+
     const peerConnection = new RTCPeerConnection(servers);
     updateWebRTCState({peerConnection});
 
@@ -337,6 +411,7 @@ export const startCall = async () => {
         });
       }
     };
+
     peerConnection.ontrack = event => {
       // When remote stream arrives, save it in state for rendering video
       if (event.streams && event.streams[0]) {
@@ -362,14 +437,9 @@ export const startCall = async () => {
       callType: callType,
       currentCall,
     });
-
-    if (callType) {
-      setUpCallManager(callType, true);
-    }
   } catch (e) {
     console.log('Error in get user media:', e);
-    closePeerConnection();
-    goBack();
+    Alert.alert('Error', 'Failed to start call. Please try again.');
   }
 };
 // Create call on backend and update UI
@@ -430,16 +500,20 @@ export const handleRemoteCandidate = ({candidate}: {candidate: any}) => {
 
 // Answer socket event main
 export const answer = async ({answer}: {answer: any}) => {
-  const {peerConnection, updateWebRTCState} = useAppStore.getState();
+  const {peerConnection, updateWebRTCState, callType} = useAppStore.getState();
 
   if (peerConnection) {
     try {
       const remoteDesc = new RTCSessionDescription(answer);
       await peerConnection.setRemoteDescription(remoteDesc);
       await processCandidates();
+      updateWebRTCState({isRemoteVideoEnabled: true, callState: 'active'});
 
       InCallManager.stopRingback();
-      updateWebRTCState({isRemoteVideoEnabled: true, callState: 'active'});
+      if (callType === 'video') {
+        InCallManager.setSpeakerphoneOn(true);
+        InCallManager.setKeepScreenOn(true);
+      }
     } catch (err) {
       console.error('Answer error:', err);
     }
@@ -482,15 +556,18 @@ export const incomingCall = async ({
       currentCall,
     });
 
+    navigate('JoinScreen');
+
+    InCallManager.stopRingback();
+    InCallManager.start({media: callType, auto: true});
     InCallManager.startRingtone(
       '_BUNDLE_',
       [1000, 1000, 1000, 1000, 1000],
       '_BUNDLE_',
       15,
     );
-
-    navigate('JoinScreen');
   } catch (err) {
+    Alert.alert('Error', 'Failed to process incoming call.');
     console.log(err);
   }
 };
@@ -513,16 +590,15 @@ export const acceptCall = async () => {
   };
 
   try {
-    InCallManager.stopRingtone();
-    if (callType) {
-      await setUpCallManager(callType, false);
-    }
-
     const localStream = await mediaDevices.getUserMedia(mediaConstraints);
     updateWebRTCState({
       localStream,
       isVideoEnabled: callType === 'video',
     });
+
+    InCallManager.stopRingtone();
+
+    // await setUpCallManager(callType, false);
 
     const peerConnection = new RTCPeerConnection(servers);
     updateWebRTCState({peerConnection});
@@ -551,6 +627,11 @@ export const acceptCall = async () => {
     const answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
 
+    if (callType === 'video') {
+      InCallManager.setSpeakerphoneOn(true);
+      InCallManager.setKeepScreenOn(true);
+    }
+
     processCandidates();
 
     socket.emit('answer', {to: caller?._id, answer: answer});
@@ -559,10 +640,12 @@ export const acceptCall = async () => {
       isRemoteVideoEnabled: true,
       callState: 'active',
     });
+
+    // setUpCallManager( callType!, false);
   } catch (err) {
     console.log('Error in acceptCall :', err);
-    closePeerConnection();
-    goBack();
+    // closePeerConnection();
+    // goBack();
   }
 };
 

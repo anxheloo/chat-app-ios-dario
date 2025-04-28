@@ -1,13 +1,17 @@
 import React, {memo} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+
 import {BORDERRADIUS, COLORS} from '../../theme/theme';
+
 import ScanIcon from '../../assets/icons/messages/ScanIcon';
 import LockIcon from '../../assets/icons/profile/LockIcon';
 import ClockIcon from '../../assets/icons/profile/ClockIcon';
 import RightIcon from '../../assets/icons/profile/RighArrow';
+
 import {useAppStore} from '../../store';
 import {SettingType} from '../../utils/types';
-import LogoutComponent from './LogoutComponent';
+
+import DeleteOrWipe from './DeleteOrWipe';
 
 type SettingProps = {
   type: SettingType;
@@ -34,10 +38,14 @@ const SettingElement: React.FC<SettingProps> = memo(({type, onPress}) => {
       icon: <ClockIcon width={16} height={16} />,
       text: 'Disappearing Messages',
     },
-    logout: {
+    delete: {
       icon: null, // No icon for logout
-      text: 'Logout',
+      text: 'Delete Account',
       // action: handleLogout,
+    },
+    wipe: {
+      icon: null, // No icon for logout
+      text: 'Wipe Data',
     },
   };
 
@@ -47,8 +55,8 @@ const SettingElement: React.FC<SettingProps> = memo(({type, onPress}) => {
     <TouchableOpacity style={styles.container} onPress={onPress}>
       <View style={styles.conditionalView}>
         {icon}
-        {type === 'logout' ? (
-          <LogoutComponent text={text} />
+        {type === 'delete' || type === 'wipe' ? (
+          <DeleteOrWipe text={text} />
         ) : (
           <Text style={styles.username}>{text}</Text>
         )}

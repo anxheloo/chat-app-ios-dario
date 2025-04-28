@@ -5,31 +5,28 @@ import {apiClient} from '../../api/apiClient';
 import {GET_SCANNED_USER} from '../../api/apis';
 
 import {useAppStore} from '../../store';
+import {Contact} from '../types';
 
 const useScannedUser = (scannedUserId: string) => {
   const updateKeys = useAppStore(state => state.updateKeys);
+  const [scannedUser, setScannedUser] = useState<Contact | null>(null);
 
-  const [scannedUser, setScannedUser] = useState({
-    username: '',
-    avatar: 0,
-    _id: '',
-  });
+  console.log('This is the scannedUserId', scannedUserId);
 
   const getScannedUserDetails = async (recipientId: string) => {
     updateKeys({loading: true});
-    // Fetch user details from server
+
     try {
       const response = await apiClient.get(
         `${GET_SCANNED_USER}/${recipientId}`,
       );
 
       if (response.status === 200) {
-        const {username, avatar, _id} = response.data;
-        setScannedUser({username, avatar, _id});
+        const {username, avatar, _id, publicKey} = response.data;
+        setScannedUser({username, avatar, _id, publicKey});
       }
     } catch (error) {
       Alert.alert('Error', 'Failed to get user details');
-      console.log(error);
     } finally {
       updateKeys({loading: false});
     }

@@ -1,11 +1,13 @@
+import React, {forwardRef, memo, useCallback, useEffect, useMemo} from 'react';
+import {Keyboard, StyleSheet} from 'react-native';
+
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import React, {forwardRef, memo, useCallback, useEffect, useMemo} from 'react';
-import {Keyboard, StyleSheet, View} from 'react-native';
-import {COLORS} from '../../theme/theme';
 import {Portal} from '@gorhom/portal';
+
+import {COLORS} from '../../theme/theme';
 import {useAppStore} from '../../store';
 
 type BottomSheetProps = {

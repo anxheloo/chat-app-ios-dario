@@ -9,7 +9,7 @@ import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 
 import {useAppStore} from '../../store';
 import {NavigationProps, SettingType} from '../../utils/types';
-import {logout} from '../../utils/helpers';
+import {deleteAccount} from '../../utils/helpers';
 
 type ProfileProps = {
   navigation: NavigationProps;
@@ -20,12 +20,16 @@ const Profile: React.FC<ProfileProps> = () => {
 
   const settings = useMemo(
     () =>
-      ['username', 'qr-code', 'pin', 'clock', 'logout'].map(type => (
+      ['username', 'qr-code', 'pin', 'clock', 'delete', 'wipe'].map(type => (
         <SettingElement
           key={type}
           type={type as SettingType}
           onPress={() =>
-            type === 'logout' ? logout() : updateKeys({bottomSheetType: type})
+            type === 'delete'
+              ? deleteAccount()
+              : type === 'wipe'
+              ? deleteAccount()
+              : updateKeys({bottomSheetType: type})
           }
         />
       )),

@@ -1,8 +1,12 @@
 import React, {memo} from 'react';
 import {StyleSheet, View} from 'react-native';
+
 import {useAppStore} from '../../store';
+
 import {avatarUrls} from '../../utils/constants';
+
 import {BORDERRADIUS, COLORS} from '../../theme/theme';
+
 import EditIcon from '../../assets/icons/profile/EditIcon';
 
 type AvatarProps = {
@@ -52,7 +56,6 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    // borderRadius: BORDERRADIUS.radius_14,
     position: 'relative',
   },
 

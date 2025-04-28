@@ -1,11 +1,13 @@
-import React, {useCallback, useEffect} from 'react';
-import {StatusBar, StyleSheet, TouchableOpacity, View} from 'react-native';
+import React, {useCallback} from 'react';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {
   useCameraDevice,
   useCodeScanner,
   Camera,
   Code,
 } from 'react-native-vision-camera';
+
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import {useIsFocused} from '@react-navigation/native';
 // import {BlurView} from '@react-native-community/blur';
@@ -26,6 +28,8 @@ type ScannerScreenProps = {
 const ScannerScreen = ({
   navigation,
 }: ScannerScreenProps): React.ReactElement => {
+  const insets = useSafeAreaInsets();
+
   // 1. Use a simple default back camera
   const device = useCameraDevice('back');
 
@@ -54,18 +58,8 @@ const ScannerScreen = ({
     onCodeScanned: onCodeScanned,
   });
 
-  useEffect(() => {
-    console.log('✅ Scanner Mounted');
-
-    return () => {
-      console.log('❌ Scanner Unmounted');
-    };
-  }, []);
-
   return (
-    <View style={styles.container}>
-      <StatusBar hidden />
-
+    <View style={[styles.container, {paddingTop: insets.top}]}>
       <View style={styles.textContainer}>
         <ReusableText
           fontSize={26}

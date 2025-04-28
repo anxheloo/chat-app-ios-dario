@@ -1,29 +1,33 @@
 import {useEffect, useRef} from 'react';
 import {AppState} from 'react-native';
+import {useAppStore} from '../../store';
 
 const useAppState = (onForeground?: () => void) => {
   const appState = useRef(AppState.currentState);
-  // const [appStateVisible, setAppStateVisible] = useState(appState.current);
+  const {updateKeys} = useAppStore.getState();
+  const askingPermission = useAppStore(state => state.askingPermission);
 
   useEffect(() => {
     const subscription = AppState.addEventListener('change', state => {
       if (appState.current.match(/inactive|background/) && state === 'active') {
-        console.log('App has come to the foreground!');
+        if (!askingPermission) {
+          updateKeys({pinModal: true});
+        } else {
+          updateKeys({askingPermission: false});
+        }
+
         if (onForeground) {
           onForeground(); // Trigger function when app becomes active
         }
       }
 
       appState.current = state;
-      // setAppStateVisible(appState.current);
     });
 
     return () => {
       subscription.remove();
     };
-  }, [onForeground]);
-
-  // return appStateVisible;
+  }, [askingPermission, onForeground, updateKeys]);
 };
 
 export default useAppState;

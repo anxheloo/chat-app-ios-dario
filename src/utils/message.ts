@@ -29,7 +29,7 @@ type ImagePickerType = 'capture' | 'library';
 // ====================================================
 // Message Socket handlers
 // ====================================================
-export const handleReceiveMessage = async ({message, version}: any) => {
+export const handleReceiveMessage = async ({message}: any) => {
   const {
     conversations,
     selectedChatData,
@@ -41,10 +41,11 @@ export const handleReceiveMessage = async ({message, version}: any) => {
     id,
   } = useAppStore.getState();
 
-  const isRecipient = message.sender?._id !== id;
-  const isText = version === 'text';
+  console.log('This is message:', message);
 
-  if (isText) {
+  const isRecipient = message.sender?._id !== id;
+
+  if (message.messageType === 'text') {
     const decrypted = await decryptMessage(
       message.content,
       message.iv,
@@ -78,7 +79,7 @@ export const handleReceiveMessage = async ({message, version}: any) => {
       participants: [message.sender, message.recipient],
       lastMessage: message,
       lastMessageTime: message.createdAt,
-      recipientUnread: 1,
+      recipientUnread: isRecipient ? 1 : 0,
       lastSender: message.sender._id,
     });
   }
@@ -92,7 +93,7 @@ export const handleReceiveMessage = async ({message, version}: any) => {
     (selectedChatData?._id === message.recipient._id ||
       selectedChatData?._id === message.sender._id ||
       selectedChatData?.conversationId === message.conversationId) &&
-    (isRecipient || isText)
+    (isRecipient || message.messageType === 'text')
   ) {
     const mediaTypes = ['image', 'video', 'audio'];
     const isMedia = mediaTypes.includes(message.messageType);
@@ -148,6 +149,7 @@ export const handleReceiveMessage = async ({message, version}: any) => {
       socket?.emit('readMessage', {
         id: message._id,
         version: 1,
+        expiresAt: message.expiresAt,
       });
     }
   }
@@ -191,15 +193,31 @@ export const handleMessageDeleted = ({messageId}: {messageId: string}) => {
 // Update conversation
 // ====================================================
 
-export const handleConversationUpdated = (conversation: Conversation) => {
-  const {updateConversations} = useAppStore.getState();
+// When we receive a new message, we need to update the conversation list
+export const handleConversationUpdated = async (conversation: Conversation) => {
+  const {updateConversations, id: loggedInUserId} = useAppStore.getState();
+
+  const lastMessage = conversation.lastMessage;
+  const otherParticipant =
+    lastMessage?.sender?._id === loggedInUserId
+      ? lastMessage?.recipient
+      : lastMessage?.sender;
+
+  if (lastMessage && lastMessage?.messageType === 'text') {
+    const decrypted = await decryptMessage(
+      lastMessage.content!,
+      lastMessage.iv!,
+      otherParticipant?.publicKey!,
+    );
+    lastMessage.content = decrypted;
+  }
 
   updateConversations(prev =>
     prev.map(item => {
       if (item._id === conversation._id) {
         return {
           ...item,
-          lastMessage: conversation?.lastMessage,
+          lastMessage: conversation.lastMessage,
           lastMessageTime: conversation.lastMessageTime,
         };
       }
@@ -208,6 +226,7 @@ export const handleConversationUpdated = (conversation: Conversation) => {
   );
 };
 
+// When we click to enter a conversation, we need to update the unread messages
 export const updateCurrentConversation = async () => {
   const {
     selectedChatData,
@@ -217,24 +236,45 @@ export const updateCurrentConversation = async () => {
     id: loggedInUser,
   } = useAppStore.getState();
 
-  const existingConversationIndex = conversations.find(
-    conversation => conversation._id === selectedChatData?.conversationId,
-  );
+  if (!selectedChatData) {
+    return;
+  }
+
+  let existingConversation;
+
+  // IF conversation id exists means we have clicked on the conversation list
+  // else we have clicked on the contact list
+  if (selectedChatData.conversationId) {
+    existingConversation = conversations.find(
+      conversation => conversation._id === selectedChatData.conversationId,
+    );
+  } else {
+    existingConversation = conversations.find(conversation =>
+      conversation.participants.some(
+        participant => participant._id === selectedChatData._id,
+      ),
+    );
+  }
 
   // Update conversation recipientUnRead property to 0 if we have a new message.
   if (
-    existingConversationIndex &&
-    existingConversationIndex.recipientUnread > 0 &&
-    existingConversationIndex.lastSender !== loggedInUser
+    existingConversation &&
+    existingConversation.lastSender !== loggedInUser
   ) {
     await socket?.emit('readMessage', {
-      id: selectedChatData?.conversationId,
+      id: existingConversation?._id,
       version: 2,
     });
 
     updateConversations(prev =>
       prev.map(item => {
-        if (item._id === selectedChatData?.conversationId) {
+        console.log(
+          'Inside updateCurrentConversation',
+          item._id,
+          selectedChatData?.conversationId,
+        );
+
+        if (item._id === existingConversation?._id) {
           return {
             ...item,
             recipientUnread: 0,
@@ -292,7 +332,6 @@ export const onButtonPress = async (
         } else {
           updateKeys({loading: false});
           setCameraOptions(false);
-          Alert.alert('Camera error or cancelled:', res.error || 'Cancelled');
         }
       });
     }
@@ -485,7 +524,7 @@ export const handleCameraUpload = async (
     console.log('This is tempMsgs:', tempMsgs);
 
     // 6. Send the compressed file
-    await postMediaMessages(formData, tempMsgs, setCameraOptions);
+    // await postMediaMessages(formData, tempMsgs, setCameraOptions);
   } catch (error) {
     console.error('THis is camera upload error:', error);
     throw error;
@@ -574,6 +613,8 @@ export const deleteConversation = async (
 ) => {
   const {updateFuncChat, conversations} = useAppStore.getState();
 
+  console.log('This is conversationId:', conversationId);
+
   setLoading(true);
 
   try {
@@ -611,26 +652,35 @@ export const handleDelete = async () => {
     updateConversations,
   } = useAppStore.getState();
 
+  console.log('selectedMessageToDelete', selectedMessageToDelete);
+
   try {
     const res = await apiClient.post(DELETE_MESSAGE, {
       msgId: selectedMessageToDelete?._id,
     });
 
     if (res.status === 200) {
-      if (selectedMessageToDelete) {
-        console.log('This is the file url:', selectedMessageToDelete?.fileUrl);
+      if (
+        selectedMessageToDelete?.messageType === 'image' ||
+        selectedMessageToDelete?.messageType === 'video' ||
+        selectedMessageToDelete?.messageType === 'audio' ||
+        selectedMessageToDelete?.messageType === 'file'
+      ) {
+        try {
+          const path = selectedMessageToDelete?.fileUrl.startsWith('file://')
+            ? selectedMessageToDelete.fileUrl.replace('file://', '')
+            : selectedMessageToDelete?.fileUrl;
 
-        const path = selectedMessageToDelete.fileUrl.startsWith('file://')
-          ? selectedMessageToDelete.fileUrl.replace('file://', '')
-          : selectedMessageToDelete.fileUrl;
+          console.log('This is path:', path);
 
-        console.log('This is path:', path);
-
-        const exists = await ReactNativeBlobUtil.fs.exists(path);
-        if (exists) {
-          await ReactNativeBlobUtil.fs
-            .unlink(path)
-            .catch(error => console.log(error));
+          const exists = await ReactNativeBlobUtil.fs.exists(path!);
+          if (exists) {
+            await ReactNativeBlobUtil.fs
+              .unlink(path!)
+              .catch(error => console.log(error));
+          }
+        } catch (error) {
+          console.log('Error deleting file:', error);
         }
       }
 

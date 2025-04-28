@@ -1,9 +1,16 @@
 import {Alert} from 'react-native';
+
 import {apiClient} from '../api/apiClient';
-import {SIGNUP_ROUTES, UPDATE_USER_PROFILE_PIC} from '../api/apis';
+import {UPDATE_USER_PROFILE_PIC} from '../api/apis';
+
 import {useAppStore} from '../store';
-import {navigate, reset} from '../navigation/navigationRef';
-import {saveToken} from './TokenStorage';
+
+import {navigate, replace, reset} from '../navigation/navigationRef';
+
+// import {saveToken} from './TokenStorage';
+
+import {jwtDecode} from 'jwt-decode';
+import {decryptPrivateKey} from './encryption';
 
 export const updateProfilePic = async (avatar: number): Promise<void> => {
   const {setUserPersona, updateKeys} = useAppStore.getState();
@@ -34,32 +41,66 @@ export const selectAvatar = (avatar: number): void => {
 };
 
 // REGISTER
-export const handleRegister = async () => {
-  console.log('Inside Handle Register');
+// export const handleRegister = async () => {
+//   console.log('Inside Handle Register');
 
-  const {updateKeys, username, pin, avatar} = useAppStore.getState();
+//   const {updateKeys, username, pin, avatar} = useAppStore.getState();
 
-  updateKeys({loading: true});
+//   updateKeys({loading: true});
+//   try {
+//     const response = await apiClient.post(SIGNUP_ROUTES, {
+//       username,
+//       pin,
+//       avatar,
+//     });
+
+//     if (response.status === 201) {
+//       console.log('This is response success');
+
+//       updateKeys({loading: false, message: 'Registered Successful'});
+
+//       await saveToken(response.data.token);
+
+//       reset('BottomTabNavigation');
+//     }
+//   } catch (error: any) {
+//     //   setUserPersona({username: '', pin: '', avatar: 0});
+//     Alert.alert('Register Error', error?.response.data.message);
+//   } finally {
+//     updateKeys({loading: false});
+//   }
+// };
+
+export const handleLogin = async (
+  pin: string,
+  setPin: (pin: string) => void,
+) => {
+  const {token, setUserPersona, updateKeys, isUserInfoFetched} =
+    useAppStore.getState();
+
   try {
-    const response = await apiClient.post(SIGNUP_ROUTES, {
-      username,
-      pin,
-      avatar,
-    });
+    // 1.Extract userId from token
+    const {userId} = jwtDecode<{userId: string; username: string}>(token!);
+    // 2. Decrypt private key using the pin
+    const decryptedPrivateKey = await decryptPrivateKey(pin, userId);
 
-    if (response.status === 201) {
-      console.log('This is response success');
-
-      updateKeys({loading: false, message: 'Registered Successful'});
-
-      await saveToken(response.data.token);
-
-      reset('BottomTabNavigation');
+    if (decryptedPrivateKey && userId) {
+      // If user info is already fetched means the app is coming from background, so we don't need to reset the navigation but show the actual screen
+      if (!isUserInfoFetched) {
+        replace('BottomTabNavigation');
+      }
+      // 3. Store the decrypted private key in the app state in memory
+      setUserPersona({privateKey: decryptedPrivateKey});
+      updateKeys({pinModal: false});
+    } else {
+      Alert.alert('Incorrect PIN', 'Please try again');
+      return;
     }
-  } catch (error: any) {
-    //   setUserPersona({username: '', pin: '', avatar: 0});
-    Alert.alert('Register Error', error?.response.data.message);
+  } catch (error) {
+    reset('CreatePersona');
+    console.error('Login error:', error);
+    Alert.alert('Login failed', 'Please try again');
   } finally {
-    updateKeys({loading: false});
+    setPin('');
   }
 };

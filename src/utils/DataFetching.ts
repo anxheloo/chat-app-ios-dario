@@ -12,10 +12,13 @@ import {
 import {useAppStore} from '../store';
 import {saveToken} from './TokenStorage';
 import {reset} from '../navigation/navigationRef';
-import {logout} from './helpers';
 
-import {storeGeneratedPrivateKey} from './keys';
-import {decryptMessage, generateKeys} from './encryption';
+import {
+  decryptMessage,
+  encryptPrivateKey,
+  generateKeys,
+  storeEncryptedPrivateKey,
+} from './encryption';
 
 export const getUserInfo = async () => {
   const {updateKeys, setIsUserInfoFetched, setUserPersona, isUserInfoFetched} =
@@ -43,7 +46,6 @@ export const getUserInfo = async () => {
       'Error',
       error.response?.data?.message || 'Failed to get user datas.',
     );
-    logout();
   } finally {
     updateKeys({loading: false});
   }
@@ -82,24 +84,30 @@ export const getConversations = async () => {
 
       if (conversations.length > 0) {
         const tempConversations = [...conversations];
-
-        await Promise.all(
-          tempConversations.map(async (conversation: any) => {
-            if (conversation.lastMessage.content) {
-              const otherParticipant = conversation.participants.find(
-                (p: any) => p._id !== id,
-              );
-              const decryptedText = await decryptMessage(
-                conversation.lastMessage.content,
-                conversation.lastMessage.iv,
-                otherParticipant?.publicKey!,
-              );
-              console.log('This is decrypted text', decryptedText);
-              conversation.lastMessage.content = decryptedText;
-            }
-            return conversation;
-          }),
-        );
+        try {
+          await Promise.all(
+            tempConversations.map(async (conversation: any) => {
+              if (
+                conversation.lastMessage &&
+                conversation.lastMessage.content
+              ) {
+                const otherParticipant = conversation.participants.find(
+                  (p: any) => p._id !== id,
+                );
+                const decryptedText = await decryptMessage(
+                  conversation.lastMessage.content,
+                  conversation.lastMessage.iv,
+                  otherParticipant?.publicKey!,
+                );
+                console.log('This is decrypted text', decryptedText);
+                conversation.lastMessage.content = decryptedText;
+              }
+              return conversation;
+            }),
+          );
+        } catch (error) {
+          console.log('This is error inside getConversations', error);
+        }
 
         console.log('These are tempConversations', tempConversations);
 
@@ -118,11 +126,10 @@ export const getConversations = async () => {
       }
     }
   } catch (error) {
+    setPagination({isLoading: false});
     Alert.alert('Error', 'Failed to get conversations', [
       {text: 'Try again', onPress: refetchConversations},
     ]);
-  } finally {
-    setPagination({isLoading: false});
   }
 };
 
@@ -192,11 +199,10 @@ export const getFriends = async () => {
       }
     }
   } catch (error) {
+    setPagination({isLoading: false});
     Alert.alert('Error', 'Failed to get friends', [
       {text: 'Try again', onPress: refetchFriends},
     ]);
-  } finally {
-    setPagination({isLoading: false});
   }
 };
 
@@ -267,11 +273,10 @@ export const getCalls = async () => {
       }
     }
   } catch (error) {
+    setPagination({isLoading: false});
     Alert.alert('Error', 'Failed to get calls', [
       {text: 'Try again', onPress: refetchFriends},
     ]);
-  } finally {
-    setPagination({isLoading: false});
   }
 };
 
@@ -302,18 +307,17 @@ export const loadMoreCalls = () => {
 // =====================================================================
 // Register user
 // =====================================================================
-
 export const handleRegister = async () => {
   const {setUserPersona, updateKeys, username, avatar, pin} =
     useAppStore.getState();
 
   updateKeys({loading: true});
 
-  // const {public: publicKey, private: privateKey} = await generateRSAKeyPair();
-
+  // 1. Generate keys
   const keys = await generateKeys();
 
   try {
+    // 2. Register user
     const response = await apiClient.post(SIGNUP_ROUTES, {
       username,
       pin,
@@ -322,9 +326,20 @@ export const handleRegister = async () => {
     });
     if (response.status === 201) {
       console.log('This is response success');
+
+      // 3. Encrypt private key
+      const encryptedPrivateKey = encryptPrivateKey(keys?.privateKey!, pin);
+
+      console.log('This is encryptedPrivateKey', encryptedPrivateKey);
+
+      // 4. Store encrypted private key
+      await storeEncryptedPrivateKey(encryptedPrivateKey, response.data.id);
+      // 5. Save token locally and in memory
       await saveToken(response.data.token);
-      await storeGeneratedPrivateKey(keys?.privateKey!, response.data.id);
+      // 6. Update users private key in memory for later use
+      setUserPersona({privateKey: keys?.privateKey!});
       updateKeys({loading: false, message: 'Registered Successful'});
+      // 7. Reset navigation to BottomTabNavigation
       reset('BottomTabNavigation');
     }
   } catch (error: any) {

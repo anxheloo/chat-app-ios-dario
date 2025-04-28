@@ -25,7 +25,7 @@ type CreatePersonaScreenProps = {
   navigation: NavigationProps;
 };
 
-const CreatePersona: React.FC<CreatePersonaScreenProps> = ({navigation}) => {
+const CreatePersona: React.FC<CreatePersonaScreenProps> = () => {
   const {setUserPersona, updateKeys} = useAppStore.getState();
   const username = useAppStore(state => state.username);
 
@@ -82,13 +82,13 @@ const CreatePersona: React.FC<CreatePersonaScreenProps> = ({navigation}) => {
                   }
                 />
 
-                <ReusableText
+                {/* <ReusableText
                   onPress={() => navigation.navigate('Login')}
                   textDecorationLine="underline"
                   fontWeight={FONTWEIGHT[300]}
                   color={COLORS.Black}>
                   Already have an account? Sign In
-                </ReusableText>
+                </ReusableText> */}
               </View>
               <ReusableButton text="Continue" onPress={handleContinue} />
             </View>

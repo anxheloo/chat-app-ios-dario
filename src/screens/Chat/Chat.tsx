@@ -14,22 +14,15 @@ import ChatFooter from './components/ChatFooter';
 
 import {stopAndClearRecorder} from '../../utils/voiceMessage';
 import {updateCurrentConversation} from '../../utils/message';
-import {getPrivateKey} from '../../utils/keys';
+// import {getPrivateKey} from '../../utils/keys';
 
 const Chat = () => {
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
-  const setUserPersona = useAppStore(state => state.setUserPersona);
 
   useEffect(() => {
     console.log('✅ ChatContainer Mounted');
 
     updateCurrentConversation();
-    getPrivateKey().then(key => {
-      if (key) {
-        setUserPersona({privateKey: key});
-      }
-    });
-
     return () => {
       console.log('❌ ChatContainer Unmounted');
       updateFuncChat({selectedChatMessages: [], selectedChatData: null});

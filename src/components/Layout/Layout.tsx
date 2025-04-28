@@ -1,11 +1,6 @@
 import React, {memo} from 'react';
 
-import {
-  // Keyboard,
-  StyleSheet,
-  // TouchableWithoutFeedback,
-  View,
-} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
@@ -21,13 +16,11 @@ const Layout: React.FC<Props> = memo(({children}) => {
   const insets = useSafeAreaInsets();
 
   return (
-    // <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
     <View style={[styles.safeAreaStyles, {paddingTop: insets.top}]}>
       <Header />
       {children}
       <FullScreenLoader version={'absolute'} />
     </View>
-    /* </TouchableWithoutFeedback> */
   );
 });
 

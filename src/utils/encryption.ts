@@ -4,9 +4,10 @@ import {randomBytes} from '@noble/hashes/utils';
 import CryptoJS from 'crypto-js';
 import {Buffer} from 'buffer';
 import {useAppStore} from '../store';
-import {getPrivateKey} from './keys';
+// import {getPrivateKey} from './keys';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import {HOST} from '../api/apis';
+import * as Keychain from 'react-native-keychain';
 
 export const encryptMessage = async (
   plaintext: string,
@@ -15,7 +16,8 @@ export const encryptMessage = async (
 
   try {
     // 1️⃣ Load sender private key from Keychain
-    const senderBase64Pk = privateKey ?? (await getPrivateKey());
+    // const senderBase64Pk = privateKey ?? (await getPrivateKey());
+    const senderBase64Pk = privateKey;
 
     if (!senderBase64Pk) {
       throw new Error('Private key not found');
@@ -67,7 +69,8 @@ export const decryptMessage = async (
 
   try {
     // 1️⃣ Get private key from Keychain
-    const privateKeyBase64 = privateKey ?? (await getPrivateKey());
+    // const privateKeyBase64 = privateKey ?? (await getPrivateKey());
+    const privateKeyBase64 = privateKey;
 
     if (!privateKeyBase64) {
       throw new Error('Private key not found');
@@ -113,19 +116,24 @@ export const encryptFile = async (
   const {privateKey, selectedChatData} = useAppStore.getState();
 
   try {
-    const senderBase64Pk = privateKey ?? (await getPrivateKey());
-
-    console.log('This is senderBase64Pk', senderBase64Pk);
+    // const senderBase64Pk = privateKey ?? (await getPrivateKey());
+    // 1.Load sender private key from memory
+    const senderBase64Pk = privateKey;
 
     const senderPrivateKey = Uint8Array.from(
       Buffer.from(senderBase64Pk!, 'base64'),
     );
 
-    const recipientPublicKey = Uint8Array.from(
+    console.log('This is senderBase64Pk', senderBase64Pk);
+    console.log('This is senderPrivateKey', senderPrivateKey);
+    console.log(
+      'This is  Buffer.from(selectedChatData?.publicKey!,),',
       Buffer.from(selectedChatData?.publicKey!, 'base64'),
     );
 
-    console.log('This is recipientPublicKey', recipientPublicKey);
+    const recipientPublicKey = Uint8Array.from(
+      Buffer.from(selectedChatData?.publicKey!, 'base64'),
+    );
 
     const sharedSecret = x25519.getSharedSecret(
       senderPrivateKey,
@@ -135,7 +143,7 @@ export const encryptFile = async (
       Buffer.from(sha256(sharedSecret)).toString('hex'),
     );
 
-    const wordArray = CryptoJS.lib.WordArray.create(buffer as any);
+    const wordArray = CryptoJS.lib.WordArray.create(buffer);
     const iv = CryptoJS.lib.WordArray.random(16);
 
     const encrypted = CryptoJS.AES.encrypt(wordArray, aesKey, {
@@ -185,7 +193,8 @@ export const decryptFile = async (
       'base64',
     );
 
-    const privateKeyBase64 = privateKey ?? (await getPrivateKey());
+    // const privateKeyBase64 = privateKey ?? (await getPrivateKey());
+    const privateKeyBase64 = privateKey;
     if (!privateKeyBase64) {
       throw new Error('Private key not found');
     }
@@ -241,3 +250,105 @@ export const generateKeys = async () => {
     console.error('🔑 generateKeys error:', err);
   }
 };
+
+export const encryptPrivateKey = (privateKey: string, pin: string): string => {
+  const salt = CryptoJS.lib.WordArray.random(16);
+  const key = deriveKeyFromPin(pin, salt);
+  const iv = CryptoJS.lib.WordArray.random(16);
+
+  const encrypted = CryptoJS.AES.encrypt(privateKey, key, {
+    iv,
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7,
+  });
+
+  return JSON.stringify({
+    salt: CryptoJS.enc.Base64.stringify(salt),
+    iv: CryptoJS.enc.Base64.stringify(iv),
+    ciphertext: encrypted.ciphertext.toString(CryptoJS.enc.Base64),
+  });
+};
+
+export const decryptPrivateKey = async (
+  pin: string,
+  userId: string,
+): Promise<string | null> => {
+  try {
+    // 1. Get the encrypted private key from Keychain using userId
+    const credentials = await Keychain.getGenericPassword({
+      service: `encrypted-private-key-${userId}`,
+    });
+
+    if (!credentials) {
+      return null;
+    }
+
+    const {iv, salt, ciphertext} = JSON.parse(credentials.password);
+
+    const key = deriveKeyFromPin(pin, CryptoJS.enc.Base64.parse(salt));
+
+    const decrypted = CryptoJS.AES.decrypt(
+      CryptoJS.lib.CipherParams.create({
+        ciphertext: CryptoJS.enc.Base64.parse(ciphertext),
+      }),
+      key,
+      {
+        iv: CryptoJS.enc.Base64.parse(iv),
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7,
+      },
+    );
+
+    return decrypted.toString(CryptoJS.enc.Utf8);
+  } catch (error) {
+    console.error('Decryption failed:', error);
+    return null;
+  }
+};
+
+export const deriveKeyFromPin = (
+  pin: string,
+  salt: CryptoJS.lib.WordArray,
+): CryptoJS.lib.WordArray => {
+  return CryptoJS.PBKDF2(pin, salt, {
+    keySize: 256 / 32,
+    iterations: 1000,
+  });
+};
+
+export const storeEncryptedPrivateKey = async (
+  encryptedPrivateKey: string,
+  userId: string,
+) => {
+  await Keychain.setGenericPassword(
+    'encrypted-private-key',
+    encryptedPrivateKey,
+    {
+      service: `encrypted-private-key-${userId}`,
+      accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+    },
+  );
+};
+
+// export const storeGeneratedPrivateKey = async (
+//   privateKey: string,
+//   userId: string,
+// ) => {
+//   await Keychain.setGenericPassword('private-key', privateKey, {
+//     accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+//     service: `private-key-${userId}`,
+//   });
+// };
+
+// export const getPrivateKey = async () => {
+//   const {id: userId} = useAppStore.getState();
+
+//   const credentials = await Keychain.getGenericPassword({
+//     service: `private-key-${userId}`,
+//   });
+//   if (credentials) {
+//     return credentials.password;
+//   } else {
+//     console.log('No credentials stored');
+//   }
+// };

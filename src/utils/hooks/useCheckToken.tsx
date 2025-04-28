@@ -1,17 +1,21 @@
 import {useCallback, useEffect} from 'react';
 
-import {getToken} from '../TokenStorage';
+import {clearKeychainIfNoToken, getToken} from '../TokenStorage';
 
-import {replace} from '../../navigation/navigationRef';
+import {useAppStore} from '../../store';
 
 const useCheckToken = () => {
+  const {updateKeys} = useAppStore.getState();
+
   const checkToken = useCallback(async () => {
     const token = await getToken();
 
     if (token) {
-      replace('BottomTabNavigation');
+      updateKeys({pinModal: true});
+    } else {
+      await clearKeychainIfNoToken();
     }
-  }, []);
+  }, [updateKeys]);
 
   useEffect(() => {
     checkToken();

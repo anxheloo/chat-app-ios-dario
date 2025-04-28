@@ -9,7 +9,7 @@ import {RootStackParamList} from '../utils/types';
 
 import CreatePersona from '../screens/Persona/CreatePersona';
 import CreatePin from '../screens/Persona/CreatePin';
-import Login from '../screens/Login/Login';
+// import Login from '../screens/Login/Login';
 import Chat from '../screens/Chat/Chat';
 import ScannerScreen from '../screens/Scanner/ScannerScreen';
 import ScannedUser from '../screens/Scanner/ScannedUser';
@@ -28,11 +28,11 @@ const MainNavigation = () => {
         screenOptions={{
           animation: 'slide_from_right',
         }}>
-        <Stack.Screen
+        {/* <Stack.Screen
           name="Login"
           component={Login}
           options={{headerShown: false}}
-        />
+        /> */}
         <Stack.Screen
           name="CreatePersona"
           component={CreatePersona}
