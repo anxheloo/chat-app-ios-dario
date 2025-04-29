@@ -7,7 +7,7 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 import Video from 'react-native-video';
 
-import {RootStackParamList} from '../../utils/types';
+import {RootStackParamList} from '../../types/types';
 
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
 

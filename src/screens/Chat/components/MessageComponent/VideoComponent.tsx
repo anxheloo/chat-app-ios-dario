@@ -12,7 +12,7 @@ import {useNavigation} from '@react-navigation/native';
 import Video from 'react-native-video';
 
 import {formatDuration} from '../../../../utils/helpers';
-import {Message, NavigationProps} from '../../../../utils/types';
+import {Message, NavigationProps} from '../../../../types/types';
 
 import {BORDERRADIUS} from '../../../../theme/theme';
 

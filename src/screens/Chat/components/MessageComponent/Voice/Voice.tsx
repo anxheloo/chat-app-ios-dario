@@ -9,7 +9,7 @@ import {
 import {useAppStore} from '../../../../../store';
 
 import {onPlayPause} from '../../../../../utils/voiceMessage';
-import {Message} from '../../../../../utils/types';
+import {Message} from '../../../../../types/types';
 
 import MessageHOC from '../MessageHOC';
 import AudioWave from './AudioWave';

@@ -11,7 +11,7 @@ import ReusableText from '../../components/ReusableText';
 import {BORDERRADIUS, COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import ReusableInput from '../../components/ReusableInput';
 import {useAppStore} from '../../store';
-import {NavigationProps} from '../../utils/types';
+import {NavigationProps} from '../../types/types';
 import ReusableButton from '../../components/ReusableButton';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {handleRegister} from '../../utils/DataFetching';

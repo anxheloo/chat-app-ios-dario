@@ -10,7 +10,7 @@ import {
   Conversation,
   Message,
   NavigationProps,
-} from '../utils/types';
+} from '../types/types';
 
 import {MediaStream} from 'react-native-webrtc';
 

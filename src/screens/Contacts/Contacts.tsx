@@ -1,7 +1,7 @@
 import React from 'react';
 import {Keyboard, TouchableWithoutFeedback} from 'react-native';
 
-import {NavigationProps} from '../../utils/types';
+import {NavigationProps} from '../../types/types';
 
 import ContactsList from './ContactsList';
 

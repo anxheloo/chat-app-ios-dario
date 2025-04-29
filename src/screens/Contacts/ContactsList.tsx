@@ -4,7 +4,7 @@ import {ActivityIndicator, StyleSheet, View} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 
 import {useAppStore} from '../../store';
-import {NavigationProps} from '../../utils/types';
+import {NavigationProps} from '../../types/types';
 import {loadMoreFriends, refetchFriends} from '../../utils/DataFetching';
 
 import EmptyContacts from './EmptyContacts';

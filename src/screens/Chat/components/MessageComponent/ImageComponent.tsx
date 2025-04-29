@@ -10,7 +10,7 @@ import {useNavigation} from '@react-navigation/native';
 
 import {BORDERRADIUS} from '../../../../theme/theme';
 
-import {Message, NavigationProps} from '../../../../utils/types';
+import {Message, NavigationProps} from '../../../../types/types';
 import MessageHOC from './MessageHOC';
 
 type ImageProps = {
@@ -51,9 +51,7 @@ const ImageComponent: React.FC<ImageProps> = ({message, isSender}) => {
           }}
           style={styles.image}
           resizeMode="cover"
-          onError={error =>
-            console.log('This is error inside ImageComponent:', error)
-          }
+          onError={error => console.log('This is error inside ImageComponent:')}
         />
       )}
     </TouchableOpacity>

@@ -9,7 +9,7 @@ import DeleteIcon from '../../assets/icons/Chat/DeleteIcon';
 import {DELETE_CONVERSATION} from '../../api/apis';
 import {useAppStore} from '../../store';
 import {apiClient} from '../../api/apiClient';
-import {Conversation} from '../../utils/types';
+import {Conversation} from '../../types/types';
 
 const DeleteComponent = () => {
   const updateFuncChat = useAppStore(state => state.updateFuncChat);

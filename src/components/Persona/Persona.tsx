@@ -13,7 +13,7 @@ import {useAppStore} from '../../store';
 import Avatar from './Avatar';
 
 import {COLORS, FONTSIZE} from '../../theme/theme';
-import {Contact} from '../../utils/types';
+import {Contact} from '../../types/types';
 
 import ReanimatedSwipable from 'react-native-gesture-handler/ReanimatedSwipeable';
 

@@ -14,7 +14,7 @@ import {useIsFocused} from '@react-navigation/native';
 
 import {SAFE_AREA_PADDING} from './Constants';
 import {useIsForeground} from '../../utils/useIsForeground';
-import {NavigationProps} from '../../utils/types';
+import {NavigationProps} from '../../types/types';
 
 import CloseIcon from '../../assets/icons/messages/CloseIcon';
 

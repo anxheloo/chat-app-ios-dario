@@ -26,14 +26,10 @@ import {apiClient} from '../api/apiClient';
 import {Buffer} from 'buffer';
 import {encryptFile} from './encryption';
 
-declare global {
-  interface FormData {
-    append(
-      name: string,
-      value: {uri: string; name: string; type: string},
-      filename?: string,
-    ): void;
-  }
+interface AudioFile extends Blob {
+  uri: string;
+  name: string;
+  type: string;
 }
 
 // ====================================================
@@ -165,10 +161,10 @@ export const uploadAudioMessage = async (fileUri: string) => {
   } = useAppStore.getState();
 
   const fileName = fileUri.split('/').pop();
-  console.log('This is fileName', fileName);
-  console.log('This is fileUri inside uploadAudioMessage', fileUri);
+
   const dirs = ReactNativeBlobUtil.fs.dirs;
   const localFolderPath = `${dirs.CacheDir}/encrypted`;
+
   const exists = await ReactNativeBlobUtil.fs.exists(localFolderPath);
   if (!exists) {
     await ReactNativeBlobUtil.fs.mkdir(localFolderPath);
@@ -196,16 +192,21 @@ export const uploadAudioMessage = async (fileUri: string) => {
   // Update UI with pending message
   updateSelectedChatMessages(current => [...current, tempMsg]);
 
+  let encryptedFilePath = `${localFolderPath}/${tempId}.enc`;
+
   try {
     // Prepare the FormData for upload
-    console.log('This is fileUri', fileUri);
-    const base64File = await ReactNativeBlobUtil.fs.readFile(
+
+    let base64File = await ReactNativeBlobUtil.fs.readFile(
       fileUri.replace('file://', ''),
       'base64',
     );
+
     const binary = Buffer.from(base64File, 'base64').buffer;
+    base64File = null;
+
     const {encrypted, iv} = await encryptFile(binary);
-    let encryptedFilePath = `${localFolderPath}/${tempId}.enc`;
+
     await ReactNativeBlobUtil.fs.writeFile(
       encryptedFilePath,
       encrypted,
@@ -213,17 +214,17 @@ export const uploadAudioMessage = async (fileUri: string) => {
     );
     formData.append('files', {
       uri: 'file://' + encryptedFilePath,
-      // uri: fileUri,
       name: fileName,
       type: 'audio/m4a',
-    });
+    } as AudioFile);
     // // // Upload the file to the server
     const response = await apiClient.post(`${HOST}/${UPLOAD_FILE}`, formData, {
       headers: {'Content-Type': 'multipart/form-data'},
     });
+
     if (response.status === 200) {
-      console.log('This is response success', response);
       const uploadedFilePath = response.data.filePaths[0];
+
       updateSelectedChatMessages(current =>
         current.map(msg =>
           msg._id === tempMsg._id
@@ -238,24 +239,16 @@ export const uploadAudioMessage = async (fileUri: string) => {
         fileUrl: uploadedFilePath,
         iv,
       };
-      socket?.emit('sendMessage', {messages: [uploadedVoice]});
-      await ReactNativeBlobUtil.fs
-        .unlink(encryptedFilePath)
-        .catch(error => console.log('Error deleting file:', error));
 
-      console.log(
-        'Check exists after unlink',
-        await ReactNativeBlobUtil.fs.exists(encryptedFilePath),
-      );
+      socket?.emit('sendMessage', {messages: [uploadedVoice]});
     }
   } catch (error: any) {
     console.error('Failed to upload audio message:', error);
-    console.log('Request:', error.request);
-    console.log('Message:', error.message);
     updateSelectedChatMessages(current =>
       current.filter(msg => msg._id !== tempMsg._id),
     );
   } finally {
+    cleanupResources(encryptedFilePath);
     updateMicSlice({
       recordSecs: 0,
       waveMetering: null,
@@ -383,4 +376,12 @@ export const stopAndClearRecorder = async () => {
     isPlaying: false,
     recordSecs: 0,
   });
+};
+
+export const cleanupResources = async (filePath: string): Promise<void> => {
+  try {
+    await ReactNativeBlobUtil.fs.unlink(filePath);
+  } catch (error) {
+    console.error('Cleanup failed:', error);
+  }
 };

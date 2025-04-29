@@ -9,7 +9,7 @@ import ClockIcon from '../../assets/icons/profile/ClockIcon';
 import RightIcon from '../../assets/icons/profile/RighArrow';
 
 import {useAppStore} from '../../store';
-import {SettingType} from '../../utils/types';
+import {SettingType} from '../../types/types';
 
 import DeleteOrWipe from './DeleteOrWipe';
 

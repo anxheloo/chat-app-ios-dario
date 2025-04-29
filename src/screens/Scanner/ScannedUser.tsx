@@ -3,7 +3,7 @@ import {ImageBackground, StyleSheet, TouchableOpacity} from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import {RootStackParamList} from '../../utils/types';
+import {RootStackParamList} from '../../types/types';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 import CloseIcon from '../../assets/icons/messages/CloseIcon';

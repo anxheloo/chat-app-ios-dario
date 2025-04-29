@@ -14,7 +14,7 @@ import {COLORS} from '../../theme/theme';
 
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 
-import {Call, NavigationProps} from '../../utils/types';
+import {Call, NavigationProps} from '../../types/types';
 import {loadMoreCalls, refetchCalls} from '../../utils/DataFetching';
 import useSearch from '../../utils/hooks/useSearch';
 import useAppState from '../../utils/hooks/useAppState';

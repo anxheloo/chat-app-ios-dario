@@ -3,7 +3,7 @@ import {StyleSheet, View} from 'react-native';
 import ReusableText from '../../components/ReusableText';
 import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 import ContactsIcon from '../../assets/icons/BottomTabIcons/ContactsIcon';
-import {NavigationProps} from '../../utils/types';
+import {NavigationProps} from '../../types/types';
 
 type EmptyChatProps = {
   navigation: NavigationProps;

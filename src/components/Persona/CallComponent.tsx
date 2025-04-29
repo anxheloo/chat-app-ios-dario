@@ -16,7 +16,7 @@ import {DELETE_CALL} from '../../api/apis';
 import {apiClient} from '../../api/apiClient';
 
 import {handleCall} from '../../utils/webrtc';
-import {Call, Contact, NavigationProps} from '../../utils/types';
+import {Call, Contact, NavigationProps} from '../../types/types';
 import {timeCalendarFormat} from '../../utils/helpers';
 import {COLORS, FONTSIZE} from '../../theme/theme';
 

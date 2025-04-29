@@ -8,7 +8,7 @@ import SettingElement from './SettingElement';
 import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 
 import {useAppStore} from '../../store';
-import {NavigationProps, SettingType} from '../../utils/types';
+import {NavigationProps, SettingType} from '../../types/types';
 import {deleteAccount} from '../../utils/helpers';
 
 type ProfileProps = {

@@ -3,8 +3,6 @@ import {KeyboardAvoidingView, StyleSheet} from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import {useAppStore} from '../../store';
-
 import FullScreenLoader from '../../components/Loading/FullScreenLoader';
 import DeleteMsg from '../../components/modals/DeleteMsg';
 
@@ -13,22 +11,21 @@ import ChatContainer from './components/ChatContainer';
 import ChatFooter from './components/ChatFooter';
 
 import {stopAndClearRecorder} from '../../utils/voiceMessage';
-import {updateCurrentConversation} from '../../utils/message';
-// import {getPrivateKey} from '../../utils/keys';
+import {
+  clearCacheAndChatData,
+  updateCurrentConversation,
+} from '../../utils/message';
 
 const Chat = () => {
-  const updateFuncChat = useAppStore(state => state.updateFuncChat);
-
   useEffect(() => {
     console.log('✅ ChatContainer Mounted');
 
     updateCurrentConversation();
     return () => {
       console.log('❌ ChatContainer Unmounted');
-      updateFuncChat({selectedChatMessages: [], selectedChatData: null});
+      clearCacheAndChatData();
       stopAndClearRecorder();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

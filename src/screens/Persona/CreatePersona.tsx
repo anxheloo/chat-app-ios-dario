@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {NavigationProps} from '../../utils/types';
+import {NavigationProps} from '../../types/types';
 
 import {useAppStore} from '../../store';
 

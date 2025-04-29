@@ -5,7 +5,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import BottomTabNavigation from './BottomTabNavigation';
 
-import {RootStackParamList} from '../utils/types';
+import {RootStackParamList} from '../types/types';
 
 import CreatePersona from '../screens/Persona/CreatePersona';
 import CreatePin from '../screens/Persona/CreatePin';

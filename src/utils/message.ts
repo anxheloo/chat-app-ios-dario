@@ -3,7 +3,7 @@ import {Alert, Platform} from 'react-native';
 
 import {useAppStore} from '../store';
 
-import {Contact, Conversation, Message} from './types';
+import {Contact, Conversation, Message} from '../types/types';
 
 import {DELETE_CONVERSATION, DELETE_MESSAGE, UPLOAD_FILE} from '../api/apis';
 import {apiClient} from '../api/apiClient';
@@ -40,8 +40,6 @@ export const handleReceiveMessage = async ({message}: any) => {
     socket,
     id,
   } = useAppStore.getState();
-
-  console.log('This is message:', message);
 
   const isRecipient = message.sender?._id !== id;
 
@@ -441,7 +439,6 @@ export const handleCameraUpload = async (
   }
 
   const formData = new FormData();
-  const ivList: string[] = [];
 
   try {
     // 1.Check the total size of the selected images or videos
@@ -450,8 +447,8 @@ export const handleCameraUpload = async (
       0,
     );
 
-    // 2.If total size is bigger than 500mb return
-    if (totalSize > 500 * 1024 * 1024) {
+    // 2.If total size is bigger than 250mb return
+    if (totalSize > 250 * 1024 * 1024) {
       setCameraOptions(false);
       updateKeys({loading: false});
       return Alert.alert(
@@ -496,20 +493,31 @@ export const handleCameraUpload = async (
           msg.messageType === 'video'
             ? await compressVideo(msg.fileUrl)
             : await compressImage(msg.fileUrl);
+
         const filePath = compressedUri.replace('file://', '');
-        const base64File = await ReactNativeBlobUtil.fs.readFile(
+
+        let base64File = await ReactNativeBlobUtil.fs.readFile(
           filePath,
           'base64',
         );
-        const binary = Buffer.from(base64File, 'base64').buffer;
+
+        let binary: ArrayBuffer | null = Buffer.from(
+          base64File,
+          'base64',
+        ).buffer;
+        base64File = null;
+
         const {encrypted, iv} = await encryptFile(binary);
         let encryptedFilePath = `${ReactNativeBlobUtil.fs.dirs.CacheDir}/encrypted/${msg._id}.enc`;
+
         await ReactNativeBlobUtil.fs.writeFile(
           encryptedFilePath,
           encrypted,
           'base64',
         );
-        ivList.push(iv);
+
+        binary = null;
+
         formData.append('files', {
           uri: 'file://' + encryptedFilePath,
           name: msg.fileName,
@@ -521,10 +529,8 @@ export const handleCameraUpload = async (
       }),
     );
 
-    console.log('This is tempMsgs:', tempMsgs);
-
     // 6. Send the compressed file
-    // await postMediaMessages(formData, tempMsgs, setCameraOptions);
+    await postMediaMessages(formData, tempMsgs, setCameraOptions);
   } catch (error) {
     console.error('THis is camera upload error:', error);
     throw error;
@@ -542,7 +548,6 @@ export const postMediaMessages = async (
   const {updateSelectedChatMessages, socket} = useAppStore.getState();
 
   try {
-    console.log('Ready to post');
     //1. Post the compressed file to store on the server
     const uploadResponse = await apiClient.post(UPLOAD_FILE, formData, {
       headers: {
@@ -576,20 +581,23 @@ export const postMediaMessages = async (
       const uploadedMessages = tempMsgs.map(
         (tempMsg: Message, index: number) => ({
           ...tempMsg,
-          // uploading: false,
-          // isLocalUri: false,
           fileUrl: uploadedFilePaths[index],
+          iv: tempMsg.iv,
         }),
       );
 
       await socket?.emit('sendMessage', {messages: uploadedMessages});
 
-      tempMsgs.forEach(async (tempMsg: Message) => {
-        // Remove the temporary file from the local storage
-        await ReactNativeBlobUtil.fs
-          .unlink(tempMsg?.encryptedFilePath!)
-          .catch(error => console.log('Error deleting file:', error));
-      });
+      // Remove the encrypted message from cache after successfully posting it. Temporary we are using its path from Image Picker stored in cache.
+      await Promise.all(
+        tempMsgs.map(async tempMsg => {
+          try {
+            await ReactNativeBlobUtil.fs.unlink(tempMsg.encryptedFilePath!);
+          } catch (error) {
+            console.log('Error deleting file:', error);
+          }
+        }),
+      );
     }
   } catch (error: any) {
     updateSelectedChatMessages(currentMessages =>
@@ -659,25 +667,25 @@ export const handleDelete = async () => {
       msgId: selectedMessageToDelete?._id,
     });
 
+    const msgType = ['image', 'video', 'audio', 'file'];
+
     if (res.status === 200) {
       if (
-        selectedMessageToDelete?.messageType === 'image' ||
-        selectedMessageToDelete?.messageType === 'video' ||
-        selectedMessageToDelete?.messageType === 'audio' ||
-        selectedMessageToDelete?.messageType === 'file'
+        selectedMessageToDelete?._id &&
+        msgType.includes(selectedMessageToDelete?.messageType!)
       ) {
         try {
           const path = selectedMessageToDelete?.fileUrl.startsWith('file://')
             ? selectedMessageToDelete.fileUrl.replace('file://', '')
             : selectedMessageToDelete?.fileUrl;
 
-          console.log('This is path:', path);
-
           const exists = await ReactNativeBlobUtil.fs.exists(path!);
           if (exists) {
             await ReactNativeBlobUtil.fs
               .unlink(path!)
-              .catch(error => console.log(error));
+              .catch(error =>
+                console.log('Error deleting file inside DeleteMsg:', error),
+              );
           }
         } catch (error) {
           console.log('Error deleting file:', error);
@@ -722,6 +730,37 @@ export const handleDelete = async () => {
   } finally {
     updateFuncChat({selectedMessageToDelete: null});
   }
+};
+
+// ====================================================
+// Clear Cache on Unmount
+// ====================================================
+
+export const clearCacheAndChatData = async () => {
+  const {updateFuncChat, selectedChatMessages} = useAppStore.getState();
+
+  const msgType = ['image', 'video', 'audio', 'file'];
+
+  await Promise.allSettled(
+    selectedChatMessages.map(async msg => {
+      // fileUrl is a local path that starts with 'file://'
+      // We need to remove 'file://' from the path before deleting otherwise it will not work
+      const isFileFromPicker = msg.fileUrl.startsWith('file://');
+
+      if (msgType.includes(msg.messageType) && msg.fileUrl) {
+        try {
+          const path = isFileFromPicker
+            ? msg.fileUrl.replace('file://', '')
+            : msg.fileUrl;
+          await ReactNativeBlobUtil.fs.unlink(path);
+        } catch (error) {
+          console.log('Error deleting file:', error);
+        }
+      }
+    }),
+  );
+
+  updateFuncChat({selectedChatMessages: [], selectedChatData: null});
 };
 
 export const closeModal = () => {

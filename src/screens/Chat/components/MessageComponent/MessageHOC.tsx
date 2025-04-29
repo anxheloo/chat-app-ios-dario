@@ -1,7 +1,7 @@
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
 
-import {Message} from '../../../../utils/types';
+import {Message} from '../../../../types/types';
 
 import {BORDERRADIUS, COLORS} from '../../../../theme/theme';
 

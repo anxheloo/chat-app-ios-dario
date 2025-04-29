@@ -3,7 +3,7 @@ import {Alert, Linking} from 'react-native';
 
 import {useAppStore} from '../store';
 
-import {Contact, Message} from './types';
+import {Contact, Message} from '../types/types';
 
 import {request, check, RESULTS} from 'react-native-permissions';
 

@@ -11,7 +11,7 @@ import {
 import Avatar from './Avatar';
 import {useAppStore} from '../../store';
 
-import {Conversation, NavigationProps} from '../../utils/types';
+import {Conversation, NavigationProps} from '../../types/types';
 import {COLORS, FONTSIZE} from '../../theme/theme';
 
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';

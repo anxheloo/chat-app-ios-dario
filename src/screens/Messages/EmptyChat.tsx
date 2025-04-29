@@ -5,7 +5,7 @@ import MessagingIcon from '../../assets/icons/messages/MessagingIcon';
 import ReusableText from '../../components/ReusableText';
 
 import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
-import {NavigationProps} from '../../utils/types';
+import {NavigationProps} from '../../types/types';
 import {useAppStore} from '../../store';
 
 type EmptyChatProps = {

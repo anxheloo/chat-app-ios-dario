@@ -3,7 +3,7 @@ import {ActivityIndicator, FlatList, StyleSheet, View} from 'react-native';
 
 import {useAppStore} from '../../store';
 
-import {NavigationProps} from '../../utils/types';
+import {NavigationProps} from '../../types/types';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 
 import useAppState from '../../utils/hooks/useAppState';

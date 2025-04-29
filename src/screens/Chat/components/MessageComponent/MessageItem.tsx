@@ -1,7 +1,7 @@
 import React, {useCallback} from 'react';
 import {StyleSheet, TouchableOpacity} from 'react-native';
 
-import {Message} from '../../../../utils/types';
+import {Message} from '../../../../types/types';
 
 import {useAppStore} from '../../../../store';
 

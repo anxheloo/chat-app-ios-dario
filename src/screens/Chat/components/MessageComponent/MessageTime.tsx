@@ -7,7 +7,7 @@ import {COLORS, FONTSIZE} from '../../../../theme/theme';
 import moment from 'moment';
 import {formatDuration} from '../../../../utils/helpers';
 import {useAppStore} from '../../../../store';
-import {Message} from '../../../../utils/types';
+import {Message} from '../../../../types/types';
 
 type Props = {
   isSender: boolean;

@@ -5,7 +5,7 @@ import {apiClient} from '../../api/apiClient';
 import {GET_SCANNED_USER} from '../../api/apis';
 
 import {useAppStore} from '../../store';
-import {Contact} from '../types';
+import {Contact} from '../../types/types';
 
 const useScannedUser = (scannedUserId: string) => {
   const updateKeys = useAppStore(state => state.updateKeys);

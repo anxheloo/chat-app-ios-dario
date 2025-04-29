@@ -14,7 +14,7 @@ import VideoIcon from '../../../assets/icons/Chat/VideoIcon';
 import {handleCall} from '../../../utils/webrtc';
 
 import {useNavigation} from '@react-navigation/native';
-import {NavigationProps} from '../../../utils/types';
+import {NavigationProps} from '../../../types/types';
 
 const ChatHeader = memo(() => {
   const {selectedChatData} = useAppStore.getState();
