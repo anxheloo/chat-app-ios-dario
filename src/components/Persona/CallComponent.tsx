@@ -33,7 +33,8 @@ type ConversationsProps = {
 
 const CallComponent: React.FC<ConversationsProps> = React.memo(
   ({call, backgroundColor}) => {
-    const {id: loggedInUserId} = useAppStore.getState();
+    const {id: loggedInUserId, updateConfirmationModal} =
+      useAppStore.getState();
     const [loading, setLoading] = useState(false);
 
     const receiver = useMemo(() => {
@@ -100,7 +101,14 @@ const CallComponent: React.FC<ConversationsProps> = React.memo(
     const renderRightActions = useCallback(() => {
       return (
         <TouchableOpacity
-          onPress={deleteCall}
+          onPress={() => {
+            updateConfirmationModal({
+              confirmationModalSlice: {
+                title: 'Delete Call?',
+                onConfirm: deleteCall,
+              },
+            });
+          }}
           style={[styles.renderRightActions]}>
           {loading ? (
             <ActivityIndicator size="small" color="white" />
@@ -109,7 +117,7 @@ const CallComponent: React.FC<ConversationsProps> = React.memo(
           )}
         </TouchableOpacity>
       );
-    }, [deleteCall, loading]);
+    }, [deleteCall, loading, updateConfirmationModal]);
 
     if (!receiver) {
       return null;

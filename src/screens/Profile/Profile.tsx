@@ -9,14 +9,14 @@ import {COLORS, FONTSIZE, FONTWEIGHT} from '../../theme/theme';
 
 import {useAppStore} from '../../store';
 import {NavigationProps, SettingType} from '../../types/types';
-import {deleteAccount} from '../../utils/helpers';
+import {deleteOrWipe} from '../../utils/DataFetching';
 
 type ProfileProps = {
   navigation: NavigationProps;
 };
 
 const Profile: React.FC<ProfileProps> = () => {
-  const {updateKeys} = useAppStore.getState();
+  const {updateKeys, updateConfirmationModal} = useAppStore.getState();
 
   const settings = useMemo(
     () =>
@@ -24,16 +24,30 @@ const Profile: React.FC<ProfileProps> = () => {
         <SettingElement
           key={type}
           type={type as SettingType}
-          onPress={() =>
+          onPress={
             type === 'delete'
-              ? deleteAccount()
+              ? () => {
+                  updateConfirmationModal({
+                    confirmationModalSlice: {
+                      title: 'Delete Account?',
+                      onConfirm: () => deleteOrWipe(type),
+                    },
+                  });
+                }
               : type === 'wipe'
-              ? deleteAccount()
-              : updateKeys({bottomSheetType: type})
+              ? () => {
+                  updateConfirmationModal({
+                    confirmationModalSlice: {
+                      title: 'Wipe out everything?',
+                      onConfirm: () => deleteOrWipe(type),
+                    },
+                  });
+                }
+              : () => updateKeys({bottomSheetType: type})
           }
         />
       )),
-    [updateKeys],
+    [updateConfirmationModal, updateKeys],
   );
 
   return (

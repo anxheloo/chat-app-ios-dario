@@ -18,6 +18,8 @@ import DeleteIcon from '../../../../assets/icons/Chat/DeleteIcon';
 import DayDate from './DayDate';
 import Animated, {FadeInRight, FadeOutDown} from 'react-native-reanimated';
 
+import {handleDelete} from '../../../../utils/message';
+
 type MessageItemProps = {
   message: Message;
 };
@@ -25,6 +27,9 @@ type MessageItemProps = {
 const MessageItem: React.FC<MessageItemProps> = React.memo(({message}) => {
   const loggedInUserId = useAppStore(state => state.id);
   const updateFuncChat = useAppStore(state => state.updateFuncChat);
+  const updateConfirmationModal = useAppStore(
+    state => state.updateConfirmationModal,
+  );
   const isSender = message?.sender === loggedInUserId;
 
   // Render messages based on message type
@@ -60,7 +65,14 @@ const MessageItem: React.FC<MessageItemProps> = React.memo(({message}) => {
   // Show modal on delete icon click
   const showDeleteModal = useCallback(() => {
     updateFuncChat({selectedMessageToDelete: message});
-  }, [message, updateFuncChat]);
+
+    updateConfirmationModal({
+      confirmationModalSlice: {
+        title: 'Delete Message?',
+        onConfirm: handleDelete,
+      },
+    });
+  }, [message, updateConfirmationModal, updateFuncChat]);
 
   // Render delete icon
   const renderRightActions = useCallback(() => {

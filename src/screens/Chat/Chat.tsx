@@ -4,7 +4,6 @@ import {KeyboardAvoidingView, StyleSheet} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import FullScreenLoader from '../../components/Loading/FullScreenLoader';
-import DeleteMsg from '../../components/modals/DeleteMsg';
 
 import ChatHeader from './components/ChatHeader';
 import ChatContainer from './components/ChatContainer';
@@ -36,7 +35,6 @@ const Chat = () => {
         <ChatFooter />
       </KeyboardAvoidingView>
       <FullScreenLoader version={'absolute'} />
-      <DeleteMsg />
     </SafeAreaView>
   );
 };

@@ -11,6 +11,7 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import MainNavigation from './src/navigation/MainNavigation';
 import InternetPopup from './src/components/Internet/InternetPopup';
 import PinModal from './src/components/modals/PinModal';
+import ConfirmationModal from './src/components/modals/ConfirmationModal';
 
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import CustomBottomSheetModal from './src/components/BottomSheet/CustomBottomSheetModal';
@@ -37,6 +38,7 @@ const App = () => {
         </SafeAreaProvider>
       </BottomSheetModalProvider>
       <PinModal />
+      <ConfirmationModal />
     </GestureHandlerRootView>
   );
 };

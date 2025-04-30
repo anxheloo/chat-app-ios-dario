@@ -15,7 +15,7 @@ import ReactNativeBlobUtil from 'react-native-blob-util';
 
 import {useAppStore} from '../store';
 
-import {checkPermissionStatus} from './helpers';
+import {checkPermissionStatus, cleanupResources} from './helpers';
 
 import {permission} from './permissions';
 
@@ -202,25 +202,34 @@ export const uploadAudioMessage = async (fileUri: string) => {
       'base64',
     );
 
-    const binary = Buffer.from(base64File, 'base64').buffer;
+    let binary: ArrayBuffer | null = Buffer.from(base64File, 'base64').buffer;
     base64File = null;
 
     const {encrypted, iv} = await encryptFile(binary);
+    binary = null;
 
     await ReactNativeBlobUtil.fs.writeFile(
       encryptedFilePath,
       encrypted,
       'base64',
     );
+
     formData.append('files', {
       uri: 'file://' + encryptedFilePath,
       name: fileName,
       type: 'audio/m4a',
     } as AudioFile);
-    // // // Upload the file to the server
-    const response = await apiClient.post(`${HOST}/${UPLOAD_FILE}`, formData, {
-      headers: {'Content-Type': 'multipart/form-data'},
-    });
+
+    // Upload the file to the server
+    const response = await apiClient
+      .post(`${HOST}/${UPLOAD_FILE}`, formData, {
+        headers: {'Content-Type': 'multipart/form-data'},
+        timeout: 30000,
+      })
+      .catch(error => {
+        console.error('Upload failed:', error);
+        throw new Error('Upload failed: ' + error.message);
+      });
 
     if (response.status === 200) {
       const uploadedFilePath = response.data.filePaths[0];
@@ -248,6 +257,7 @@ export const uploadAudioMessage = async (fileUri: string) => {
       current.filter(msg => msg._id !== tempMsg._id),
     );
   } finally {
+    // clean up the encrypted file in the local folder in cache
     cleanupResources(encryptedFilePath);
     updateMicSlice({
       recordSecs: 0,
@@ -320,7 +330,7 @@ export const getOrDownloadFile = async (fileUrl: string, messageId: string) => {
     const dirs = ReactNativeBlobUtil.fs.dirs;
     const localPath = `${dirs.CacheDir}/${fileName}`;
 
-    const exists = await ReactNativeBlobUtil.fs.exists(localPath);
+    const exists = await ensureFileExists(localPath);
 
     if (exists) {
       return 'file://' + localPath;
@@ -368,9 +378,8 @@ export const getOrDownloadFile = async (fileUrl: string, messageId: string) => {
 export const stopAndClearRecorder = async () => {
   const {updateMicSlice} = useAppStore.getState();
 
-  const audioPlayer = getAudioPlayer();
-  await audioPlayer.stopPlayer();
-  audioPlayer.removePlayBackListener();
+  await cleanupAudioResources();
+
   updateMicSlice({
     playingAudioId: null,
     isPlaying: false,
@@ -378,10 +387,47 @@ export const stopAndClearRecorder = async () => {
   });
 };
 
-export const cleanupResources = async (filePath: string): Promise<void> => {
+export const cleanupAudioResources = async () => {
+  const audioPlayer = getAudioPlayer();
   try {
-    await ReactNativeBlobUtil.fs.unlink(filePath);
+    await audioPlayer.stopPlayer();
+    await audioPlayer.stopRecorder();
+    audioPlayer.removePlayBackListener();
+    audioPlayer.removeRecordBackListener();
   } catch (error) {
-    console.error('Cleanup failed:', error);
+    console.error('Error cleaning up audio resources:', error);
   }
 };
+
+export const ensureFileExists = async (filePath: string): Promise<boolean> => {
+  try {
+    return await ReactNativeBlobUtil.fs.exists(filePath);
+  } catch {
+    return false;
+  }
+};
+
+// Add buffer management
+// const readFileInChunks = async (filePath: string): Promise<Buffer> => {
+//   const chunkSize = 1024 * 1024; // 1MB chunks
+//   const chunks: Buffer[] = [];
+
+//   const file = await ReactNativeBlobUtil.fs.readStream(
+//     filePath,
+//     'base64',
+//     chunkSize
+//   );
+
+//   return new Promise((resolve, reject) => {
+//     file.open();
+//     file.onData((chunk) => {
+//       chunks.push(Buffer.from(chunk, 'base64'));
+//     });
+//     file.onEnd(() => {
+//       resolve(Buffer.concat(chunks));
+//     });
+//     file.onError((error) => {
+//       reject(error);
+//     });
+//   });
+// };

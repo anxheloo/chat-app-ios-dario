@@ -68,6 +68,7 @@ export type Contact = {
   username: string;
   avatar: number;
   publicKey: string;
+  isActive: boolean;
 };
 
 export type Conversation = {
@@ -80,6 +81,7 @@ export type Conversation = {
   recipientUnread: number;
   senderUnread?: number;
   lastSender: string;
+  isActive: boolean;
 };
 
 export type Call = {

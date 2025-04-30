@@ -3,14 +3,14 @@ import {Alert, Linking} from 'react-native';
 
 import {useAppStore} from '../store';
 
-import {Contact, Message} from '../types/types';
+import {Message} from '../types/types';
 
 import {request, check, RESULTS} from 'react-native-permissions';
 
-import {goBack, navigate, replace} from '../navigation/navigationRef';
+import {navigate} from '../navigation/navigationRef';
 import {permission} from './permissions';
-import {apiClient} from '../api/apiClient';
-import {ADD_FRIEND} from '../api/apis';
+
+import ReactNativeBlobUtil from 'react-native-blob-util';
 
 // ====================================================================
 // Helper functions related to MESSAGES
@@ -128,75 +128,6 @@ export const checkPermissionStatus = async (permissionType: any) => {
   }
 };
 
-// ====================================================================
-// Helper function related to LOGOUT
-// ====================================================================
-
-export const deleteAccount = async () => {
-  const {
-    // updateFuncChat,
-    // setIsUserInfoFetched,
-    // setUserPersona,
-    // updateCalls,
-    // setCallsPagination,
-    // disconnectSocket,
-    updateKeys,
-  } = useAppStore.getState();
-
-  updateKeys({loading: true});
-
-  try {
-    // const response = await apiClient.post(LOGOUT_ROUTE);
-
-    // if (response.status === 200) {
-    //   console.log('Logout success');
-    //   // remove token , disconnect socket
-    //   await removeToken();
-    //   disconnectSocket();
-
-    //   // reset user persona for logout/login app state
-    //   setUserPersona({
-    //     username: '',
-    //     pin: '',
-    //     avatar: 0,
-    //     id: '',
-    //   });
-
-    //   // user info needes to be fetched again by the new user if app state stays active during logout/login
-    //   setIsUserInfoFetched(false);
-
-    //   // conversations, friends, paginations
-    //   updateFuncChat({
-    //     conversations: [],
-    //     friends: [],
-    //     conversationPagination: {page: 0, hasMore: true, isLoading: false},
-    //     friendsPagination: {page: 0, hasMore: true, isLoading: false},
-    //   });
-
-    //   // calls
-    //   updateCalls(() => []);
-    //   setCallsPagination({
-    //     page: 0,
-    //     hasMore: true,
-    //     isLoading: false,
-    //   });
-
-    //   reset('Login');
-    // }
-
-    console.log('Ready to delete');
-  } catch (error) {
-    console.error('Error logout:', error);
-    Alert.alert('Error', 'Failed to logout');
-  } finally {
-    updateKeys({loading: false});
-  }
-};
-
-// ====================================================================
-// Helper functions related to SCANNER SCREEN
-// ====================================================================
-
 // Navigate to Scanner Screen
 export const openScanner = async () => {
   const status = await checkPermissionStatus(permission.camera);
@@ -205,31 +136,11 @@ export const openScanner = async () => {
   }
 };
 
-// Add Friend
-export const addFriend = async (scannedUser: Contact | null) => {
-  const {socket, id, updateFriends} = useAppStore.getState();
-
+// Clean up resources
+export const cleanupResources = async (filePath: string): Promise<void> => {
   try {
-    const res = await apiClient.post(ADD_FRIEND, {
-      recipientId: scannedUser?._id,
-    });
-
-    if (res.status === 200 && scannedUser) {
-      updateFriends(current => [scannedUser, ...current]);
-
-      await socket?.emit('addFriend', {
-        recipientId: scannedUser?._id,
-        senderId: id,
-      });
-      replace('BottomTabNavigation', {
-        screen: 'Messages',
-      });
-      Alert.alert('Success', 'Friend successfully added!');
-    } else {
-      Alert.alert('Something went wrong, please try again!');
-      goBack();
-    }
-  } catch (error: any) {
-    Alert.alert('Error', error.response.data.message);
+    await ReactNativeBlobUtil.fs.unlink(filePath);
+  } catch (error) {
+    console.error('Cleanup failed:', error);
   }
 };

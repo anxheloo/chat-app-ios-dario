@@ -79,6 +79,7 @@ export const handleReceiveMessage = async ({message}: any) => {
       lastMessageTime: message.createdAt,
       recipientUnread: isRecipient ? 1 : 0,
       lastSender: message.sender._id,
+      isActive: true,
     });
   }
 
@@ -185,6 +186,66 @@ export const handleMessageDeleted = ({messageId}: {messageId: string}) => {
       }),
     });
   }
+};
+
+// WHen a user deletes their account, we need
+export const deletedUser = async ({user}: {user: Contact}) => {
+  console.log('This is the user', user);
+
+  const {
+    updateFriends,
+    updateWebRTCState,
+    updateFuncChat,
+    selectedChatData,
+    conversations,
+    calls,
+  } = useAppStore.getState();
+
+  // If I am inside chat, update selectedChatData with new deleted user datas
+  if (selectedChatData?._id === user._id) {
+    updateFuncChat({
+      selectedChatData: {
+        ...selectedChatData,
+        ...user,
+      },
+    });
+  }
+
+  // Update conversations to mark the user as inactive
+  const updatedConversations = conversations.map(conversation => {
+    const updatedParticipants = conversation.participants.map(participant =>
+      participant._id === user._id ? {...participant, ...user} : participant,
+    );
+    return {
+      ...conversation,
+      participants: updatedParticipants,
+    };
+  });
+
+  // Update conversations with deleted user so the isActive field is present
+  updateFuncChat({
+    conversations: updatedConversations,
+  });
+
+  // Update friends with deleted user so the isActive field is present
+  updateFriends(current => {
+    return current.map(item => (item._id === user._id ? user : item));
+  });
+
+  // Update calls with deleted user so the isActive field is present
+  const updatedCalls = calls.map(call => {
+    const updatedParticipants = call.participants.map(p =>
+      p._id === user._id ? {...p, ...user} : p,
+    );
+    return {
+      ...call,
+      participants: updatedParticipants,
+    };
+  });
+
+  updateWebRTCState({
+    calls: updatedCalls,
+  });
 };
 
 // ====================================================
@@ -316,7 +377,11 @@ export const onButtonPress = async (
   options: any,
   setCameraOptions: (data: boolean) => void,
 ) => {
-  const {updateKeys} = useAppStore.getState();
+  const {updateKeys, selectedChatData} = useAppStore.getState();
+
+  if (!selectedChatData?.isActive) {
+    return Alert.alert('User is not active');
+  }
 
   if (type === 'capture') {
     const status = await checkPermissionStatus(permission.camera);
@@ -397,6 +462,10 @@ export const sendMessage = async (
 ) => {
   const {socket, id, selectedChatData, disappearingMessages} =
     useAppStore.getState();
+
+  if (!selectedChatData?.isActive) {
+    return Alert.alert('User is not active');
+  }
 
   if (message.trim() === '') {
     return;
@@ -742,7 +811,7 @@ export const clearCacheAndChatData = async () => {
   const msgType = ['image', 'video', 'audio', 'file'];
 
   await Promise.allSettled(
-    selectedChatMessages.map(async msg => {
+    selectedChatMessages?.map(async msg => {
       // fileUrl is a local path that starts with 'file://'
       // We need to remove 'file://' from the path before deleting otherwise it will not work
       const isFileFromPicker = msg.fileUrl.startsWith('file://');

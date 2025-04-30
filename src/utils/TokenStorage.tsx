@@ -55,8 +55,8 @@ export const removeToken = async () => {
 
 export const clearKeychainIfNoToken = async () => {
   const keys = await Keychain.getAllGenericPasswordServices?.();
-  if (keys) {
-    await Promise.all(
+  if (keys && keys.length > 0) {
+    await Promise.allSettled(
       keys.map(service => Keychain.resetGenericPassword({service})),
     );
   }

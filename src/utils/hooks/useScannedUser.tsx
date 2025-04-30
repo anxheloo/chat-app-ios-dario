@@ -22,8 +22,8 @@ const useScannedUser = (scannedUserId: string) => {
       );
 
       if (response.status === 200) {
-        const {username, avatar, _id, publicKey} = response.data;
-        setScannedUser({username, avatar, _id, publicKey});
+        const {username, avatar, _id, publicKey, isActive} = response.data;
+        setScannedUser({username, avatar, _id, publicKey, isActive});
       }
     } catch (error) {
       Alert.alert('Error', 'Failed to get user details');

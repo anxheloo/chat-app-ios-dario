@@ -15,7 +15,7 @@ import useScannedUser from '../../utils/hooks/useScannedUser';
 
 import {COLORS} from '../../theme/theme';
 import {goBack} from '../../navigation/navigationRef';
-import {addFriend} from '../../utils/helpers';
+import {addFriend} from '../../utils/DataFetching';
 
 type ScannedUserProps = NativeStackScreenProps<
   RootStackParamList,

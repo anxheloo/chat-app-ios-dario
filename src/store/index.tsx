@@ -14,6 +14,20 @@ import {
 
 import {MediaStream} from 'react-native-webrtc';
 
+type ConfirmationModalSlice = {
+  confirmationModalSlice: {
+    title?: string;
+    onConfirm: () => void;
+    onCancel?: () => void;
+  } | null;
+  updateConfirmationModal: (data: Partial<ConfirmationModalSlice>) => void;
+};
+
+const confirmationModalSlice: StateCreator<ConfirmationModalSlice> = set => ({
+  confirmationModalSlice: null,
+  updateConfirmationModal: data => set(data),
+});
+
 type ScrollSlice = {
   scrollControl: boolean;
   updateScrollControl: (scrollControl: boolean) => void;
@@ -138,13 +152,15 @@ type CreateSlice = PersonaSlice &
   ChatSlice &
   MicSlice &
   SocketSlice &
-  WebRTCSlice;
+  WebRTCSlice &
+  ConfirmationModalSlice;
 
 type PersonaSlice = {
   username: string;
   avatar: number;
   pin: string;
   id: string;
+  isActive: boolean | null;
   disappearingMessages: {text: string; value: number | null};
   publicKey: string | null;
   privateKey: string | null;
@@ -158,6 +174,7 @@ const createPersonaSlice: StateCreator<PersonaSlice> = set => ({
   avatar: 0,
   pin: '',
   id: '',
+  isActive: null,
   publicKey: null,
   privateKey: null,
   disappearingMessages: {text: 'None', value: null},
@@ -374,6 +391,7 @@ const socketSlice: StateCreator<SocketSlice> = (set, get) => ({
 });
 
 export const useAppStore = create<CreateSlice>()((...args) => ({
+  ...confirmationModalSlice(...args),
   ...scrollSlice(...args),
   ...createPersonaSlice(...args),
   ...createStatusSlice(...args),

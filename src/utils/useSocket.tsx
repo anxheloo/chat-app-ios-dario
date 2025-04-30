@@ -11,6 +11,7 @@ import {
 } from './webrtc';
 
 import {
+  deletedUser,
   friendDeleted,
   handleConversationUpdated,
   handleMessageDeleted,
@@ -33,6 +34,7 @@ export const useSocket = () => {
     if (socket) {
       socket.on('receiveMessage', handleReceiveMessage);
       socket.on('messageDeleted', handleMessageDeleted);
+      socket.on('notifyDeletedUser', deletedUser);
       socket.on('conversationUpdated', handleConversationUpdated);
       socket.on('friendCreated', notifyReceiver);
       socket.on('friendDeleted', friendDeleted);
@@ -59,6 +61,7 @@ export const useSocket = () => {
           'ICEcandidate',
           'callRejected',
           'toggle-camera',
+          'notifyDeletedUser',
         ].forEach(event => {
           socket.off(event);
         });

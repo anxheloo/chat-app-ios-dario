@@ -9,9 +9,8 @@ import {useAppStore} from '../../store';
 import {decryptFile, decryptMessage} from '../encryption';
 
 const useMessages = (flatListRef: any) => {
-  const updateSelectedChatMessages = useAppStore(
-    state => state.updateSelectedChatMessages,
-  );
+  const {updateKeys, updateSelectedChatMessages} = useAppStore.getState();
+
   const selectedChatData = useAppStore(state => state.selectedChatData);
 
   const [pagination, setPagination] = useState({
@@ -28,6 +27,10 @@ const useMessages = (flatListRef: any) => {
     }
 
     setPagination(prev => ({...prev, isLoading: true}));
+
+    if (pagination.page === 0) {
+      updateKeys({loading: true});
+    }
 
     try {
       const response = await apiClient.post(GET_ALL_MESSAGES, {
@@ -97,6 +100,7 @@ const useMessages = (flatListRef: any) => {
         {text: 'Try again', onPress: refetch},
       ]);
     } finally {
+      updateKeys({loading: false});
       setPagination(prev => ({...prev, isLoading: false}));
     }
   };

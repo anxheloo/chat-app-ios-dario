@@ -36,7 +36,11 @@ type ConversationsProps = {
 
 const Conversations: React.FC<ConversationsProps> = React.memo(
   ({conversation, backgroundColor, cancel}) => {
-    const {updateFuncChat, id: loggedInUserId} = useAppStore.getState();
+    const {
+      updateFuncChat,
+      id: loggedInUserId,
+      updateConfirmationModal,
+    } = useAppStore.getState();
     const [loading, setLoading] = useState(false);
 
     const recipient = useMemo(() => {
@@ -113,7 +117,15 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
     const renderRightActions = useCallback(() => {
       return (
         <TouchableOpacity
-          onPress={() => deleteConversation(setLoading, conversation._id)}
+          onPress={() => {
+            updateConfirmationModal({
+              confirmationModalSlice: {
+                title: 'Delete Conversation?',
+                onConfirm: () =>
+                  deleteConversation(setLoading, conversation._id),
+              },
+            });
+          }}
           style={[styles.renderRightActions]}>
           {loading ? (
             <ActivityIndicator size="small" color="white" />
@@ -122,7 +134,7 @@ const Conversations: React.FC<ConversationsProps> = React.memo(
           )}
         </TouchableOpacity>
       );
-    }, [conversation._id, loading]);
+    }, [conversation._id, loading, updateConfirmationModal]);
 
     if (!recipient) {
       return null;

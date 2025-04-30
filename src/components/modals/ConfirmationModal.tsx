@@ -4,33 +4,41 @@ import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {BORDERRADIUS, COLORS, FONTSIZE} from '../../theme/theme';
 
 import {useAppStore} from '../../store';
-import {closeModal, handleDelete} from '../../utils/message';
 
-const DeleteMsg = React.memo(() => {
-  const selectedMsgToDelete = useAppStore(
-    state => state.selectedMessageToDelete,
+const ConfirmationModal = React.memo(() => {
+  const confirmationModal = useAppStore(state => state.confirmationModalSlice);
+  const updateConfirmationModal = useAppStore(
+    state => state.updateConfirmationModal,
   );
-  const isShown = selectedMsgToDelete !== null;
 
-  if (!isShown) {
+  if (!confirmationModal) {
     return null;
   }
+
+  const close = () => updateConfirmationModal({confirmationModalSlice: null});
 
   return (
     <View style={StyleSheet.absoluteFill}>
       <View style={styles.overlay}>
         <View style={styles.content}>
-          <Text style={styles.title}>Are you sure?</Text>
+          <Text style={styles.title}>
+            {confirmationModal.title || 'Are you sure?'}
+          </Text>
 
           <View style={styles.btnContainer}>
-            <TouchableOpacity style={[styles.btn]} onPress={closeModal}>
+            <TouchableOpacity
+              style={[styles.btn]}
+              onPress={confirmationModal.onCancel || close}>
               <Text style={styles.cancelBtn}>Cancel</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={handleDelete}
+              onPress={() => {
+                confirmationModal.onConfirm();
+                close();
+              }}
               style={[styles.btn, {backgroundColor: COLORS.White}]}>
-              <Text style={styles.deleteBtn}>Delete</Text>
+              <Text style={styles.deleteBtn}>Confirm</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -81,4 +89,4 @@ const styles = StyleSheet.create({
   cancelBtn: {fontWeight: '300', fontSize: FONTSIZE.md},
 });
 
-export default DeleteMsg;
+export default ConfirmationModal;

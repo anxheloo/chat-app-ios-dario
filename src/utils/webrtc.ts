@@ -30,73 +30,27 @@ export const servers: RTCConfiguration = {
     {urls: 'stun:stun.l.google.com:19302'},
     {urls: 'stun:stun1.l.google.com:19302'},
     {urls: 'stun:stun2.l.google.com:19302'},
-    // {
-    //   urls: 'turn:openrelay.metered.ca:80',
-    //   username: 'openrelayproject',
-    //   credential: 'openrelayproject',
-    // },
-    // {
-    //   urls: 'turn:openrelay.metered.ca:443',
-    //   username: 'openrelayproject',
-    //   credential: 'openrelayproject',
-    // },
-    // {
-    //   urls: 'turn:numb.viagenie.ca',
-    //   credential: 'muazkh',
-    //   username: 'webrtc@live.com',
-    // },
+    {
+      urls: 'turn:openrelay.metered.ca:80',
+      username: 'openrelayproject',
+      credential: 'openrelayproject',
+    },
+    {
+      urls: 'turn:openrelay.metered.ca:443',
+      username: 'openrelayproject',
+      credential: 'openrelayproject',
+    },
+    {
+      urls: 'turn:numb.viagenie.ca',
+      credential: 'muazkh',
+      username: 'webrtc@live.com',
+    },
   ],
   iceCandidatePoolSize: 10,
   bundlePolicy: 'max-bundle',
   rtcpMuxPolicy: 'require',
   iceTransportPolicy: 'all',
 };
-
-// export const servers = {
-//   iceServers: [
-//     {urls: 'stun:stun.l.google.com:19302'},
-//     {urls: 'stun:stun1.l.google.com:19302'},
-//     {urls: 'stun:stun2.l.google.com:19302'},
-//     {
-//       urls: 'turn:openrelay.metered.ca:80',
-//       username: 'openrelayproject',
-//       credential: 'openrelayproject',
-//     },
-//     {
-//       urls: 'turn:openrelay.metered.ca:443',
-//       username: 'openrelayproject',
-//       credential: 'openrelayproject',
-//     },
-//   ],
-//   iceCandidatePoolSize: 10,
-//   sdpSemantics: 'unified-plan', // Improves iOS-Android compatibility
-//   bundlePolicy: 'max-bundle', // Optimizes media bundling
-//   rtcpMuxPolicy: 'require', // Enforces RTCP multiplexing
-//   iceTransportPolicy: 'all', // Allows relay (TURN) if needed
-// };
-
-// export const servers = {
-//   iceServers: [
-//     {
-//       urls: [
-//         'stun:stun.l.google.com:19302',
-//         'stun:stun1.l.google.com:19302',
-//         'stun:stun2.l.google.com:19302',
-//       ],
-//     },
-//   ],
-//   iceCandidatePoolSize: 10,
-//   // Add these options to improve iOS-Android compatibility
-//   sdpSemantics: 'unified-plan',
-//   bundlePolicy: 'max-bundle' as const,
-//   rtcpMuxPolicy: 'require',
-//   // iOS-specific options
-//   ...(Platform.OS === 'ios'
-//     ? {
-//         iceTransportPolicy: 'all',
-//       }
-//     : {}),
-// };
 
 // ====================================================================
 // END CALL FUNCTIONS
@@ -254,13 +208,8 @@ export const toggleCamera = () => {
     localStream.getVideoTracks()[0].enabled = !isVideoEnabled;
   }
 
-  // localStream?.getVideoTracks().forEach(track => {
-  //   track.enabled = !isVideoEnabled;
-  // });
-
   updateWebRTCState({
     isVideoEnabled: !isVideoEnabled,
-    // localStream: localStream,
   });
 
   socket?.emit('toggle-camera', {
@@ -278,44 +227,6 @@ export const toggleCameraEvent = ({
 
   updateWebRTCState({isRemoteVideoEnabled: isVideoEnabled});
 };
-
-// export const setUpCallManager = async (
-//   callType: 'audio' | 'video' | null,
-//   isCaller: boolean,
-// ) => {
-//   try {
-//     // InCallManager.start({media: callType!, auto: true});
-
-//     if (callType === 'video') {
-//       InCallManager.setSpeakerphoneOn(true);
-//       InCallManager.setKeepScreenOn(true);
-//     } else {
-//       InCallManager.setSpeakerphoneOn(false);
-//     }
-
-//     // if (isCaller) {
-//     //   InCallManager.start({
-//     //     media: callType,
-//     //     ringback: '_BUNDLE_',
-//     //   });
-//     // }
-
-//     // if (isCaller) {
-//     //   // Start ringback tone for the caller
-//     //   InCallManager.startRingback('_DEFAULT_');
-//     // } else {
-//     //   // Start ringtone for the receiver
-//     //   InCallManager.startRingtone(
-//     //     '_BUNDLE_',
-//     //     [1000, 1000, 1000, 1000, 1000],
-//     //     '_BUNDLE_',
-//     //     15,
-//     //   );
-//     // }
-//   } catch (e) {
-//     console.log('Error in setUpCallManager:', e);
-//   }
-// };
 
 export const permissions = async (
   callType: 'audio' | 'video' | null = 'audio',
@@ -349,7 +260,11 @@ export const busyCall = async ({callState}: {callState: 'busy'}) => {
 // CALLER
 // ====================================================================
 export const handleCall = async (callType: 'audio' | 'video' = 'audio') => {
-  const {updateWebRTCState} = useAppStore.getState();
+  const {updateWebRTCState, selectedChatData} = useAppStore.getState();
+
+  if (!selectedChatData?.isActive) {
+    return Alert.alert('User is not active');
+  }
 
   const status = await permissions(callType);
 
@@ -393,7 +308,11 @@ export const startCall = async () => {
       isVideoEnabled: callType === 'video',
     });
 
-    InCallManager.start({media: callType!, ringback: '_BUNDLE_', auto: true});
+    InCallManager.start({
+      media: callType!,
+      auto: true,
+      ringback: '',
+    });
 
     const peerConnection = new RTCPeerConnection(servers);
     updateWebRTCState({peerConnection});

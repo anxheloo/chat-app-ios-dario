@@ -17,7 +17,7 @@ import {useNavigation} from '@react-navigation/native';
 import {NavigationProps} from '../../../types/types';
 
 const ChatHeader = memo(() => {
-  const {selectedChatData} = useAppStore.getState();
+  const selectedChatData = useAppStore(state => state.selectedChatData);
   const navigation = useNavigation<NavigationProps>();
 
   return (
@@ -41,12 +41,26 @@ const ChatHeader = memo(() => {
         </ReusableText>
       </View>
 
-      <TouchableOpacity style={styles.icon} onPress={() => handleCall('video')}>
-        <VideoIcon width={'100%'} height={'100%'} fill={'#212121'} />
+      <TouchableOpacity
+        style={styles.icon}
+        onPress={() => handleCall('video')}
+        disabled={!selectedChatData?.isActive}>
+        <VideoIcon
+          width={'100%'}
+          height={'100%'}
+          fill={!selectedChatData?.isActive ? COLORS.IsDeleted : '#212121'}
+        />
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.icon} onPress={() => handleCall('audio')}>
-        <CallIcon width={'100%'} height={'100%'} fill={'#212121'} />
+      <TouchableOpacity
+        style={styles.icon}
+        onPress={() => handleCall('audio')}
+        disabled={!selectedChatData?.isActive}>
+        <CallIcon
+          width={'100%'}
+          height={'100%'}
+          fill={!selectedChatData?.isActive ? COLORS.IsDeleted : '#212121'}
+        />
       </TouchableOpacity>
     </View>
   );

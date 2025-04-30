@@ -82,13 +82,21 @@ const Persona: React.FC<PersonaProps> = memo(
     }, [contact._id, socket]);
 
     const renderRightActions = useCallback(() => {
+      const {updateConfirmationModal} = useAppStore.getState();
       if (version && version === 'search') {
         return null;
       }
 
       return (
         <TouchableOpacity
-          onPress={deleteContact}
+          onPress={() => {
+            updateConfirmationModal({
+              confirmationModalSlice: {
+                title: 'Delete Contact?',
+                onConfirm: deleteContact,
+              },
+            });
+          }}
           style={[styles.renderRightActions]}>
           {loading ? (
             <ActivityIndicator size="small" color="white" />

@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   useWindowDimensions,
   View,
+  Text,
 } from 'react-native';
 
 import ReusableInput from '../../../components/ReusableInput';
@@ -16,7 +17,7 @@ import {sendMessage} from '../../../utils/message';
 import MicrophoneIcon from '../../../assets/icons/Chat/MicrophoneIcon';
 import CameraIcon from '../../../assets/icons/Chat/CameraIcon';
 
-import {COLORS} from '../../../theme/theme';
+import {COLORS, FONTSIZE} from '../../../theme/theme';
 
 import {useAppStore} from '../../../store';
 
@@ -52,6 +53,8 @@ const ChatFooter = () => {
     ],
   }));
 
+  const selectedChatData = useAppStore(state => state.selectedChatData);
+
   useEffect(() => {
     checkPermissionStatus(permission.microphone);
   }, []);
@@ -65,42 +68,54 @@ const ChatFooter = () => {
       {/* SHOW OPTIONS TO SELECT OR TAKE IMAGE/VIDEO */}
       {cameraOptions && <CameraOptions setCameraOptions={setCameraOptions} />}
 
-      <View
-        style={styles.inputContainerParent}
-        onLayout={e => setWidth(e.nativeEvent.layout.width)}>
-        <Animated.View
-          style={[styles.inputContainer, translateX, {width: width * 2}]}>
-          <View style={{width}}>
-            <ReusableInput
-              placeholder="Write"
-              value={message}
-              onChange={setMessage}
-            />
-          </View>
-          <View style={{width}}>{message === '' && <OnRecord />}</View>
-        </Animated.View>
-      </View>
-      {message === '' ? (
-        <View style={styles.iconContainer}>
-          {!isRecording && (
-            <TouchableOpacity onPress={() => setCameraOptions(prev => !prev)}>
-              <CameraIcon width={24} height={24} />
-            </TouchableOpacity>
-          )}
-
-          <TouchableOpacity onLongPress={onMicPress} onPressOut={onMicRelease}>
-            <MicrophoneIcon width={24} height={24} />
-          </TouchableOpacity>
+      {!selectedChatData?.isActive ? (
+        <View style={styles.notActiveUser}>
+          <Text style={styles.notActiveUserText}>Deleted Account</Text>
         </View>
       ) : (
-        <TouchableOpacity
-          onPress={() => sendMessage(message, setMessage)}
-          style={styles.sendIconContainer}>
-          <Image
-            source={require('../../../assets/icons/Chat/sendIcon.png')}
-            style={styles.image}
-          />
-        </TouchableOpacity>
+        <>
+          <View
+            style={styles.inputContainerParent}
+            onLayout={e => setWidth(e.nativeEvent.layout.width)}>
+            <Animated.View
+              style={[styles.inputContainer, translateX, {width: width * 2}]}>
+              <View style={{width}}>
+                <ReusableInput
+                  placeholder="Write"
+                  value={message}
+                  onChange={setMessage}
+                />
+              </View>
+              <View style={{width}}>{message === '' && <OnRecord />}</View>
+            </Animated.View>
+          </View>
+
+          {message === '' ? (
+            <View style={styles.iconContainer}>
+              {!isRecording && (
+                <TouchableOpacity
+                  onPress={() => setCameraOptions(prev => !prev)}>
+                  <CameraIcon width={24} height={24} />
+                </TouchableOpacity>
+              )}
+
+              <TouchableOpacity
+                onLongPress={onMicPress}
+                onPressOut={onMicRelease}>
+                <MicrophoneIcon width={24} height={24} />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity
+              onPress={() => sendMessage(message, setMessage)}
+              style={styles.sendIconContainer}>
+              <Image
+                source={require('../../../assets/icons/Chat/sendIcon.png')}
+                style={styles.image}
+              />
+            </TouchableOpacity>
+          )}
+        </>
       )}
     </View>
   );
@@ -115,6 +130,22 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#E5E5E5',
     height: 66,
+  },
+
+  notActiveUser: {
+    position: 'absolute',
+    top: 0,
+    bottom: -100,
+    left: 0,
+    right: 0,
+    backgroundColor: COLORS.IsDeleted,
+  },
+
+  notActiveUserText: {
+    marginTop: 20,
+    textAlign: 'center',
+    color: 'white',
+    fontSize: FONTSIZE.lg,
   },
 
   inputContainerParent: {

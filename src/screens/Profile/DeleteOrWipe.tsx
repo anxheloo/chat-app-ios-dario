@@ -1,27 +1,21 @@
 import React from 'react';
-import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
-import {useAppStore} from '../../store';
+import {StyleSheet, Text, View} from 'react-native';
 
 const DeleteOrWipe = ({text}: {text: string}) => {
-  const loading = useAppStore(state => state.loading);
-
   return (
-    <View style={loading ? styles.isLoading : styles.normal}>
-      {loading ? (
-        <ActivityIndicator color="black" size={'small'} />
-      ) : (
-        <Text style={styles.username}>{text}</Text>
-      )}
+    <View style={styles.container}>
+      <Text style={styles.username}>{text}</Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  isLoading: {
-    justifyContent: 'center',
+  container: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
-
-  normal: {},
 
   username: {
     fontWeight: '300',

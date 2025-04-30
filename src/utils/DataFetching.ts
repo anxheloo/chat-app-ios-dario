@@ -2,6 +2,8 @@ import {Alert} from 'react-native';
 
 import {apiClient} from '../api/apiClient';
 import {
+  ADD_FRIEND,
+  DELETE_DATA,
   GET_ALL_CALLS,
   GET_ALL_FRIENDS,
   GET_CONVERSATIONS,
@@ -10,8 +12,8 @@ import {
 } from '../api/apis';
 
 import {useAppStore} from '../store';
-import {saveToken} from './TokenStorage';
-import {reset} from '../navigation/navigationRef';
+import {removeToken, saveToken} from './TokenStorage';
+import {goBack, replace, reset} from '../navigation/navigationRef';
 
 import {
   decryptMessage,
@@ -19,6 +21,8 @@ import {
   generateKeys,
   storeEncryptedPrivateKey,
 } from './encryption';
+
+import {Contact} from '../types/types';
 
 export const getUserInfo = async () => {
   const {updateKeys, setIsUserInfoFetched, setUserPersona, isUserInfoFetched} =
@@ -80,8 +84,6 @@ export const getConversations = async () => {
     if (response.status === 200) {
       const {conversations, hasMore: updatedHasMore} = response.data;
 
-      console.log('This is conversations', conversations);
-
       if (conversations.length > 0) {
         const tempConversations = [...conversations];
         try {
@@ -109,21 +111,19 @@ export const getConversations = async () => {
           console.log('This is error inside getConversations', error);
         }
 
-        console.log('These are tempConversations', tempConversations);
-
         updateConversations(current => [
           ...current.filter(
             c => !tempConversations.some((m: any) => m._id === c._id),
           ),
           ...tempConversations,
         ]);
-
-        setPagination({
-          page: pagination.page + 1,
-          isLoading: false,
-          hasMore: updatedHasMore,
-        });
       }
+
+      setPagination({
+        page: conversations.length > 0 ? pagination.page + 1 : pagination.page,
+        isLoading: false,
+        hasMore: updatedHasMore,
+      });
     }
   } catch (error) {
     setPagination({isLoading: false});
@@ -190,13 +190,13 @@ export const getFriends = async () => {
           ...current.filter(c => !friends.some((m: any) => m._id === c._id)),
           ...friends,
         ]);
-
-        setPagination({
-          page: pagination.page + 1,
-          isLoading: false,
-          hasMore: updatedHasMore,
-        });
       }
+
+      setPagination({
+        page: friends.length > 0 ? pagination.page + 1 : pagination.page,
+        isLoading: false,
+        hasMore: updatedHasMore,
+      });
     }
   } catch (error) {
     setPagination({isLoading: false});
@@ -264,13 +264,13 @@ export const getCalls = async () => {
           ...current.filter(c => !calls.some((m: any) => m._id === c._id)),
           ...calls,
         ]);
-
-        setPagination({
-          page: pagination.page + 1,
-          isLoading: false,
-          hasMore: updatedHasMore,
-        });
       }
+
+      setPagination({
+        page: calls.length > 0 ? pagination.page + 1 : pagination.page,
+        isLoading: false,
+        hasMore: updatedHasMore,
+      });
     }
   } catch (error) {
     setPagination({isLoading: false});
@@ -347,5 +347,111 @@ export const handleRegister = async () => {
     Alert.alert('Register Error', error?.response.data.message);
   } finally {
     updateKeys({loading: false, message: 'Register Failed'});
+  }
+};
+
+// =====================================================================
+// Delete or Wipe account
+// =====================================================================
+export const deleteOrWipe = async (type: string) => {
+  const {
+    updateFuncChat,
+    setIsUserInfoFetched,
+    setUserPersona,
+    updateCalls,
+    setCallsPagination,
+    disconnectSocket,
+    updateKeys,
+  } = useAppStore.getState();
+
+  updateKeys({loading: true});
+
+  try {
+    console.log('THis is type: ', type);
+    const response = await apiClient.post(`${DELETE_DATA}?type=${type}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    if (response.status === 200) {
+      //  Remove token locally and in memory, remove users private key
+      if (type === 'delete') {
+        await removeToken();
+        disconnectSocket();
+        // Reset user persona for new User
+        setUserPersona({
+          username: '',
+          pin: '',
+          avatar: 0,
+          id: '',
+          isActive: null,
+          publicKey: null,
+        });
+        // User info needs to be fetched again by the new user if app state stays active during logout/login
+        setIsUserInfoFetched(false);
+
+        // Reset Calls and Calls Pagination
+        reset('CreatePersona');
+      }
+
+      // Reset Conversations, Friends Pagination
+      updateFuncChat({
+        conversations: [],
+        friends: [],
+        conversationPagination: {page: 0, hasMore: true, isLoading: false},
+        friendsPagination: {page: 0, hasMore: true, isLoading: false},
+      });
+
+      updateCalls(() => []);
+
+      setCallsPagination({
+        page: 0,
+        hasMore: true,
+        isLoading: false,
+      });
+
+      Alert.alert(
+        'Success',
+        type === 'delete'
+          ? 'Account successfully deleted'
+          : 'Account successfully wiped',
+      );
+    }
+  } catch (error) {
+    console.error('Error logout:', error);
+    Alert.alert('Error', 'Failed to logout');
+  } finally {
+    updateKeys({loading: false});
+  }
+};
+
+// =====================================================================
+// Add Friend
+// =====================================================================
+export const addFriend = async (scannedUser: Contact | null) => {
+  const {socket, id, updateFriends} = useAppStore.getState();
+
+  try {
+    const res = await apiClient.post(ADD_FRIEND, {
+      recipientId: scannedUser?._id,
+    });
+
+    if (res.status === 200 && scannedUser) {
+      updateFriends(current => [scannedUser, ...current]);
+
+      await socket?.emit('addFriend', {
+        recipientId: scannedUser?._id,
+        senderId: id,
+      });
+      replace('BottomTabNavigation', {
+        screen: 'Messages',
+      });
+      Alert.alert('Success', 'Friend successfully added!');
+    } else {
+      Alert.alert('Something went wrong, please try again!');
+      goBack();
+    }
+  } catch (error: any) {
+    Alert.alert('Error', error.response.data.message);
   }
 };
